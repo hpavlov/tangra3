@@ -30,12 +30,12 @@
             this.label5 = new System.Windows.Forms.Label();
             this.tbLimitMagnitude = new System.Windows.Forms.TrackBar();
             this.pnlSolve = new System.Windows.Forms.Panel();
-            this.label10 = new System.Windows.Forms.Label();
-            this.tbarTolerance = new System.Windows.Forms.TrackBar();
             this.btnSendProblemFit = new System.Windows.Forms.Button();
             this.rbIdentify3Stars = new System.Windows.Forms.RadioButton();
             this.rbDoManualFit = new System.Windows.Forms.RadioButton();
             this.cbxShowGrid = new System.Windows.Forms.CheckBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.tbarTolerance = new System.Windows.Forms.TrackBar();
             this.pnlDebugFits = new System.Windows.Forms.Panel();
             this.lblPixSize = new System.Windows.Forms.Label();
             this.rbPrelim = new System.Windows.Forms.RadioButton();
@@ -80,8 +80,8 @@
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.pnlToleranceControl = new System.Windows.Forms.Panel();
-            this.label12 = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.tbRotation)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbFocalLength)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbAspect)).BeginInit();
@@ -124,7 +124,7 @@
             this.tbRotation.Maximum = 180;
             this.tbRotation.Minimum = -180;
             this.tbRotation.Name = "tbRotation";
-            this.tbRotation.Size = new System.Drawing.Size(236, 42);
+            this.tbRotation.Size = new System.Drawing.Size(236, 45);
             this.tbRotation.TabIndex = 10;
             this.tbRotation.TickFrequency = 10;
             this.tbRotation.ValueChanged += new System.EventHandler(this.tbRotation_ValueChanged);
@@ -134,7 +134,7 @@
             this.tbFocalLength.Location = new System.Drawing.Point(-2, 18);
             this.tbFocalLength.Maximum = 20000;
             this.tbFocalLength.Name = "tbFocalLength";
-            this.tbFocalLength.Size = new System.Drawing.Size(236, 42);
+            this.tbFocalLength.Size = new System.Drawing.Size(236, 45);
             this.tbFocalLength.TabIndex = 9;
             this.tbFocalLength.TickFrequency = 10;
             this.tbFocalLength.Value = 10;
@@ -186,7 +186,7 @@
             this.tbAspect.Maximum = 200;
             this.tbAspect.Minimum = -200;
             this.tbAspect.Name = "tbAspect";
-            this.tbAspect.Size = new System.Drawing.Size(236, 42);
+            this.tbAspect.Size = new System.Drawing.Size(236, 45);
             this.tbAspect.TabIndex = 15;
             this.tbAspect.TickFrequency = 10;
             this.tbAspect.ValueChanged += new System.EventHandler(this.tbAspect_ValueChanged);
@@ -228,7 +228,7 @@
             this.tbLimitMagnitude.Maximum = 35;
             this.tbLimitMagnitude.Minimum = 8;
             this.tbLimitMagnitude.Name = "tbLimitMagnitude";
-            this.tbLimitMagnitude.Size = new System.Drawing.Size(236, 42);
+            this.tbLimitMagnitude.Size = new System.Drawing.Size(236, 45);
             this.tbLimitMagnitude.TabIndex = 19;
             this.tbLimitMagnitude.Value = 8;
             this.tbLimitMagnitude.ValueChanged += new System.EventHandler(this.tbLimitMagnitude_ValueChanged);
@@ -256,27 +256,6 @@
             this.pnlSolve.Name = "pnlSolve";
             this.pnlSolve.Size = new System.Drawing.Size(257, 354);
             this.pnlSolve.TabIndex = 23;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel, ((byte)(204)));
-            this.label10.Location = new System.Drawing.Point(3, -1);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(64, 13);
-            this.label10.TabIndex = 76;
-            this.label10.Text = "Tolerance";
-            // 
-            // tbarTolerance
-            // 
-            this.tbarTolerance.Location = new System.Drawing.Point(0, 9);
-            this.tbarTolerance.Maximum = 4;
-            this.tbarTolerance.Minimum = 1;
-            this.tbarTolerance.Name = "tbarTolerance";
-            this.tbarTolerance.Size = new System.Drawing.Size(219, 42);
-            this.tbarTolerance.TabIndex = 75;
-            this.tbarTolerance.Value = 2;
-            this.tbarTolerance.ValueChanged += new System.EventHandler(this.tbarTolerance_ValueChanged);
             // 
             // btnSendProblemFit
             // 
@@ -325,6 +304,27 @@
             this.cbxShowGrid.UseVisualStyleBackColor = true;
             this.cbxShowGrid.Visible = false;
             this.cbxShowGrid.CheckedChanged += new System.EventHandler(this.cbxShowGrid_CheckedChanged);
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel, ((byte)(204)));
+            this.label10.Location = new System.Drawing.Point(3, -1);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(64, 13);
+            this.label10.TabIndex = 76;
+            this.label10.Text = "Tolerance";
+            // 
+            // tbarTolerance
+            // 
+            this.tbarTolerance.Location = new System.Drawing.Point(0, 9);
+            this.tbarTolerance.Maximum = 4;
+            this.tbarTolerance.Minimum = 1;
+            this.tbarTolerance.Name = "tbarTolerance";
+            this.tbarTolerance.Size = new System.Drawing.Size(219, 45);
+            this.tbarTolerance.TabIndex = 75;
+            this.tbarTolerance.Value = 2;
+            this.tbarTolerance.ValueChanged += new System.EventHandler(this.tbarTolerance_ValueChanged);
             // 
             // pnlDebugFits
             // 
@@ -465,10 +465,12 @@
             // 
             this.rbAuto.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.rbAuto.AutoSize = true;
+            this.rbAuto.Checked = true;
             this.rbAuto.Location = new System.Drawing.Point(18, 118);
             this.rbAuto.Name = "rbAuto";
             this.rbAuto.Size = new System.Drawing.Size(46, 17);
             this.rbAuto.TabIndex = 85;
+            this.rbAuto.TabStop = true;
             this.rbAuto.Text = "auto";
             this.rbAuto.UseVisualStyleBackColor = true;
             // 
@@ -476,12 +478,10 @@
             // 
             this.rbManual.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.rbManual.AutoSize = true;
-            this.rbManual.Checked = true;
             this.rbManual.Location = new System.Drawing.Point(70, 118);
             this.rbManual.Name = "rbManual";
             this.rbManual.Size = new System.Drawing.Size(59, 17);
             this.rbManual.TabIndex = 84;
-            this.rbManual.TabStop = true;
             this.rbManual.Text = "manual";
             this.rbManual.UseVisualStyleBackColor = true;
             this.rbManual.CheckedChanged += new System.EventHandler(this.rbManual_CheckedChanged);
@@ -499,11 +499,10 @@
             // trbarDepth
             // 
             this.trbarDepth.Location = new System.Drawing.Point(11, 141);
-            this.trbarDepth.Minimum = 2;
             this.trbarDepth.Name = "trbarDepth";
-            this.trbarDepth.Size = new System.Drawing.Size(163, 42);
+            this.trbarDepth.Size = new System.Drawing.Size(163, 45);
             this.trbarDepth.TabIndex = 74;
-            this.trbarDepth.Value = 2;
+            this.trbarDepth.Value = 5;
             this.trbarDepth.ValueChanged += new System.EventHandler(this.trbarDepth_ValueChanged);
             // 
             // btnSolveConfiguration
@@ -769,7 +768,7 @@
             this.tbLimitMagnitude2.Maximum = 35;
             this.tbLimitMagnitude2.Minimum = 8;
             this.tbLimitMagnitude2.Name = "tbLimitMagnitude2";
-            this.tbLimitMagnitude2.Size = new System.Drawing.Size(236, 42);
+            this.tbLimitMagnitude2.Size = new System.Drawing.Size(236, 45);
             this.tbLimitMagnitude2.TabIndex = 30;
             this.tbLimitMagnitude2.Value = 8;
             this.tbLimitMagnitude2.ValueChanged += new System.EventHandler(this.tbLimitMagnitude2_ValueChanged);
@@ -796,15 +795,6 @@
             this.pnlToleranceControl.TabIndex = 43;
             this.pnlToleranceControl.Visible = false;
             // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(7, 41);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(32, 13);
-            this.label12.TabIndex = 77;
-            this.label12.Text = "lower";
-            // 
             // label14
             // 
             this.label14.AutoSize = true;
@@ -813,6 +803,15 @@
             this.label14.Size = new System.Drawing.Size(36, 13);
             this.label14.TabIndex = 78;
             this.label14.Text = "higher";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(7, 41);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(32, 13);
+            this.label12.TabIndex = 77;
+            this.label12.Text = "lower";
             // 
             // ucCalibrationPanel
             // 

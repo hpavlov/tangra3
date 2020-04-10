@@ -59,6 +59,8 @@ namespace Tangra.VideoOperations.Astrometry
 			m_CalibrationTool.ActivateOsdAreaSizing();
 
 		    rbInclusion.Checked = TangraConfig.Settings.PlateSolve.SelectedScopeRecorderConfig.IsInclusionArea;
+
+		    TriggerStarMapRecalc();
 		}
 
 		void m_CalibrationTool_AreaChanged()
@@ -588,16 +590,24 @@ namespace Tangra.VideoOperations.Astrometry
 			timer1.Enabled = false;
 
 			StarMapInternalConfig starMapConfig = StarMapInternalConfig.Default;
-			
+
+            starMapConfig.StarMapperTolerance = 2;
 			if (rbAuto.Checked)
 			{
 				starMapConfig.OptimumStarsInField = (int) TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch;
-				starMapConfig.StarMapperTolerance = 2;
 			}
 			else
 			{
-				starMapConfig.OptimumStarsInField = -1;
-				starMapConfig.StarMapperTolerance = trbarDepth.Value;
+			    var halfWell = (trbarDepth.Maximum - trbarDepth.Minimum) / 2;
+			    var val = (trbarDepth.Value - trbarDepth.Minimum);
+			    if (val <= halfWell)
+			    {
+                    starMapConfig.OptimumStarsInField = (int)((1 + (halfWell - val) * 1.0 / halfWell) * (TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch / 2.0));
+			    }
+			    else
+			    {
+			        starMapConfig.OptimumStarsInField = (int)(TangraConfig.Settings.Astrometry.PyramidOptimumStarsToMatch * (1 + (val - halfWell) / 2.0));
+			    }
 			}
 
 			var starMap = new StarMap();
