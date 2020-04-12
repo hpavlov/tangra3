@@ -172,6 +172,11 @@ namespace Tangra.Video.FITS
             get { return false; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return false; }
+        }
+
 		public string VideoFileType
 		{
 			get { return "FITS Image"; }

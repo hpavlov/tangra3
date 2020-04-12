@@ -408,7 +408,56 @@ namespace Tangra.Video
 
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)
         {
-            throw new NotImplementedException();
+            if (m_AdvFile.MainSteamInfo.FrameCount == 0)
+                return null;
+
+            uint[] pixels;
+            uint[] unprocessedPixels = new uint[m_Width * m_Height];
+            byte[] displayBitmapBytes = new byte[m_Width * m_Height];
+            byte[] rawBitmapBytes = new byte[Pixelmap.GetBitmapBIRGBPixelArraySize(24, m_Width, m_Height) + 40 + 14 + 1];
+
+            Adv.AdvFrameInfo advFrameInfo;
+            lock (m_SyncLock)
+            {
+                if (startFrameNo >= m_AdvFile.MainSteamInfo.FrameCount) startFrameNo = m_AdvFile.MainSteamInfo.FrameCount - 1;
+                pixels = m_AdvFile.GetStackedMainFramePixels((uint)startFrameNo, (uint)framesToIntegrate, isSlidingIntegration, out advFrameInfo);
+
+                if (unprocessedPixels.Length != pixels.Length)
+                    throw new ApplicationException("ADV Buffer Error");
+
+                Array.Copy(pixels, unprocessedPixels, pixels.Length);
+            }
+
+            TangraCore.PreProcessors.ApplyPreProcessingPixelsOnly(unprocessedPixels, pixels, m_Width, m_Height, m_BitPix, m_MaxPixelValue, 1);
+
+            TangraCore.GetBitmapPixels(Width, Height, pixels, rawBitmapBytes, displayBitmapBytes, true, (ushort)BitPix, m_MaxPixelValue);
+
+            Bitmap displayBitmap = null;
+
+            if (m_AAVVersion != null && m_IntegratedAAVFrames > 0 && TangraConfig.Settings.AAV.SplitFieldsOSD && m_OsdFirstLine * m_OsdLastLine != 0)
+            {
+                TangraCore.BitmapSplitFieldsOSD(rawBitmapBytes, m_OsdFirstLine, m_OsdLastLine);
+                using (MemoryStream memStr = new MemoryStream(rawBitmapBytes))
+                {
+                    try
+                    {
+                        displayBitmap = (Bitmap)Bitmap.FromStream(memStr);
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(Adv.Extensions.GetFullStackTrace(ex));
+                        displayBitmap = new Bitmap(m_Width, m_Height);
+                    }
+                }
+            }
+            else
+                displayBitmap = Pixelmap.ConstructBitmapFromBitmapPixels(displayBitmapBytes, Width, Height);
+
+            Pixelmap rv = new Pixelmap(Width, Height, BitPix, pixels, displayBitmap, displayBitmapBytes);
+            rv.SetMaxSignalValue(m_MaxPixelValue);
+            rv.FrameState = GetCurrentFrameState(advFrameInfo);
+            rv.UnprocessedPixels = unprocessedPixels;
+            return rv;
         }
 
         public string GetFrameFileName(int index)
@@ -442,6 +491,11 @@ namespace Tangra.Video
         }
 
         public bool SupportsSoftwareIntegration
+        {
+            get { return true; }
+        }
+
+        public bool SupportsIntegrationByMedian
         {
             get { return false; }
         }

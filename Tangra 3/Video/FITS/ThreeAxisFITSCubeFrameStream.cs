@@ -254,6 +254,11 @@ namespace Tangra.Video.FITS
             get { return false; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return false; }
+        }
+
         public bool SupportsFrameFileNames
         {
             get { return false; }

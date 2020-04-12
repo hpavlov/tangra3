@@ -47,6 +47,7 @@ namespace Tangra.Model.Video
 
 		uint GetAav16NormVal();
 	    bool SupportsSoftwareIntegration { get; }
+        bool SupportsIntegrationByMedian { get; }
         bool SupportsFrameFileNames { get; }
 	}
 

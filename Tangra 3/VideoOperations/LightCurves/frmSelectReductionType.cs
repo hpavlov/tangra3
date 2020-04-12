@@ -476,6 +476,8 @@ namespace Tangra.VideoOperations.LightCurves
             if (!m_VideoContoller.SupportsSoftwareIntegration)
                 tabsOptions.TabPages.Remove(tabIntegration);
 
+            gbxPixelIntegration.Visible = m_VideoContoller.SupportsIntegrationByMedian;
+
             TrackingModeChanged(this, EventArgs.Empty);
             cbxFullDisappearance.Checked = true;
         }

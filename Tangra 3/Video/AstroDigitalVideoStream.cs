@@ -394,6 +394,11 @@ namespace Tangra.Video
             get { return false; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return false; }
+        }
+
         public string GetFrameFileName(int index)
         {
             throw new NotSupportedException();

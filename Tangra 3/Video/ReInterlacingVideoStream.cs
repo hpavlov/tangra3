@@ -233,6 +233,11 @@ namespace Tangra.Video
             get { return Mode == ReInterlaceMode.None; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return true; }
+        }
+
         public bool SupportsFrameFileNames
         {
             get { return false; }

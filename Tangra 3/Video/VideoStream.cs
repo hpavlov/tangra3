@@ -203,6 +203,11 @@ namespace Tangra.Video
             get { return true; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return true; }
+        }
+
 		public string VideoFileType
 		{
 			get { return m_OpenedFileInfo.VideoFileType; }

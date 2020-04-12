@@ -145,6 +145,11 @@ namespace Tangra.Video
             get { return false; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return false; }
+        }
+
 		public string VideoFileType
 		{
 			get { return "BMP Image"; }

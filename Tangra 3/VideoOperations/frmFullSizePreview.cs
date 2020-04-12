@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Model.Image;
 
@@ -17,9 +18,17 @@ namespace Tangra.VideoOperations
 {
 	public partial class frmFullSizePreview : Form
 	{
-		public frmFullSizePreview()
+	    private VideoController m_VideoController;
+
+        public frmFullSizePreview()
+        {
+            InitializeComponent();
+        }
+
+        public frmFullSizePreview(VideoController videoController)
+            : this()
 		{
-			InitializeComponent();
+			m_VideoController = videoController;
 		}
 
 		/// <summary>
@@ -47,7 +56,7 @@ namespace Tangra.VideoOperations
 	    public static event Action<MouseEventArgs> OnMouseUped;
         public static event Action<KeyEventArgs> OnPreviewKeyDowned;
 
-		public static void EnsureFullPreviewVisible(Pixelmap currFrame, Form parentForm)
+		public static void EnsureFullPreviewVisible(Pixelmap currFrame, Form parentForm, VideoController videoController)
 		{
 			lock(s_SyncRoot)
 			{
@@ -64,28 +73,31 @@ namespace Tangra.VideoOperations
 						s_FullPreviewForm = null;
 					}
 				}
-				if (s_FullPreviewForm == null)
-				{
-					s_FullPreviewForm = new frmFullSizePreview();
-					s_FullPreviewForm.Width = currFrame.Width + (s_FullPreviewForm.Width - s_FullPreviewForm.pictureBox.Width);
-					s_FullPreviewForm.Height = currFrame.Height + (s_FullPreviewForm.Height - s_FullPreviewForm.pictureBox.Height);
-					s_FullPreviewForm.Top = parentForm.Top;
-					s_FullPreviewForm.Left = parentForm.Right;
-					s_FullPreviewForm.StartPosition = FormStartPosition.Manual;
-				}
 
-			    s_FullPreviewForm.pictureBox.Image = GetPreviewImage(currFrame);
+                if (s_FullPreviewForm == null)
+                {
+                    s_FullPreviewForm = new frmFullSizePreview();
+                    s_FullPreviewForm.Width = currFrame.Width + (s_FullPreviewForm.Width - s_FullPreviewForm.pictureBox.Width);
+                    s_FullPreviewForm.Height = currFrame.Height + (s_FullPreviewForm.Height - s_FullPreviewForm.pictureBox.Height);
+                    s_FullPreviewForm.Top = parentForm.Top;
+                    s_FullPreviewForm.Left = parentForm.Right;
+                    s_FullPreviewForm.StartPosition = FormStartPosition.Manual;
+                }
 
-				if (!s_FullPreviewForm.Visible) 
-					s_FullPreviewForm.Show(parentForm);
-				s_FullPreviewForm.Refresh();
+                s_FullPreviewForm.pictureBox.Image = GetPreviewImage(currFrame, videoController);
+
+                if (!s_FullPreviewForm.Visible)
+                    s_FullPreviewForm.Show(parentForm);
+                s_FullPreviewForm.Refresh();
 			}
 		}
 
-	    private static Bitmap GetPreviewImage(Pixelmap currFrame)
+        private static Bitmap GetPreviewImage(Pixelmap currFrame, VideoController videoController)
 	    {
 	        CurrFrame = new AstroImage(currFrame);
             Bitmap image = currFrame.CreateDisplayBitmapDoNotDispose();
+
+            videoController.ApplyDynamicRangeAdjustments(image, currFrame);
 
 	        if (OnDrawOverlays != null)
 	        {
@@ -112,7 +124,7 @@ namespace Tangra.VideoOperations
 			}
 		}
 
-		public static void Update(Pixelmap currFrame)
+        public static void Update(Pixelmap currFrame, VideoController videoController)
 		{
 			if (s_FullPreviewForm != null)
 			{
@@ -121,7 +133,7 @@ namespace Tangra.VideoOperations
 					if (s_FullPreviewForm != null)
 					{
 
-						s_FullPreviewForm.pictureBox.Image = GetPreviewImage(currFrame);
+                        s_FullPreviewForm.pictureBox.Image = GetPreviewImage(currFrame, videoController);
 						s_FullPreviewForm.Refresh();
 					}
 				}

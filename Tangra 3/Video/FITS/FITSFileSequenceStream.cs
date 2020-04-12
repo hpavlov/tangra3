@@ -150,6 +150,11 @@ namespace Tangra.Video.FITS
             get { return false; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return false; }
+        }
+
         public string VideoFileType { get; private set; }
 
         public Pixelmap GetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSlidingIntegration, bool isMedianAveraging)

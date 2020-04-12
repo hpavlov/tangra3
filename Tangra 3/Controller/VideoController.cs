@@ -1381,6 +1381,11 @@ namespace Tangra.Controller
             get { return m_FramePlayer.Video.SupportsSoftwareIntegration; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return m_FramePlayer.Video.SupportsIntegrationByMedian; }
+        }
+
 	    public bool HasTimestampOCR()
 	    {
             return m_TimestampOCR != null;
@@ -1837,6 +1842,11 @@ namespace Tangra.Controller
             }
         }
 
+	    public void ApplyDynamicRangeAdjustments(Bitmap displayBitmap, Pixelmap displayPixelmap)
+	    {
+	        if (m_DisplayIntensifyMode == DisplayIntensifyMode.Dynamic && m_DynamicToValue - m_DynamicFromValue > 0)
+                BitmapFilter.ApplyDynamicRange(displayBitmap, displayPixelmap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
+	    }
 
 		public void SetDisplayIntensifyMode(DisplayIntensifyMode newMode, int? dynamicFromValue, int?  dynamicToValue, bool refresh = true)
 		{

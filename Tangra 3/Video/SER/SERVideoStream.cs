@@ -355,6 +355,11 @@ namespace Tangra.Video.SER
             get { return true; }
         }
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return false; }
+        }
+
 		public string VideoFileType
 		{
 			get { return string.Format("SER.{0}", m_FileInfo.PixelDepthPerPlane); }

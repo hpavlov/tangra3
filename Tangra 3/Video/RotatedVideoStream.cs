@@ -106,6 +106,11 @@ namespace Tangra.Video
 			get { return m_Video.SupportsSoftwareIntegration; }
 		}
 
+        public bool SupportsIntegrationByMedian
+        {
+            get { return m_Video.SupportsIntegrationByMedian; }
+        }
+
 		public bool SupportsFrameFileNames
 		{
 			get { return m_Video.SupportsFrameFileNames; }
