@@ -800,15 +800,15 @@ namespace Tangra.Controller
 	                    }
 	                    else
 	                    {
-	                        uint[] rv = pixelMap.Pixels;
+	                        uint[] rv = pixelMap.UnprocessedPixels;
 	                        if (pixelMap.MaxSignalValue > 0)
 	                        {
 	                            for (int i = 0; i < rv.Length; i++)
 	                            {
 	                                rv[i] = (uint) Math.Round(rv[i]*255.0/pixelMap.MaxSignalValue);
-	                            }	                
+	                            }
 	                        }
-	                        return rv;  	                    
+	                        return rv;
 	                    }
 	                }
 
