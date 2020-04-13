@@ -38,6 +38,7 @@ namespace Tangra.Config.SettingPannels
 			nudUserSpecifiedFWHM.SetNUDValue((int)TangraConfig.Settings.Photometry.UserSpecifiedFWHM);
             rbSeeingUser.Checked = TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM;
 			nudSNFrameWindow.SetNUDValue(TangraConfig.Settings.Photometry.SNFrameWindow);
+            nudStackedViewFrames.SetNUDValue(TangraConfig.Settings.Photometry.StackedViewNumFrames);
 
 			rb3DFirstOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Order == 1;
 			rb3DSecondOrder.Checked = TangraConfig.Settings.Photometry.Background3DPoly.Order == 2;
@@ -58,6 +59,7 @@ namespace Tangra.Config.SettingPannels
 			TangraConfig.Settings.Photometry.UserSpecifiedFWHM = (float)nudUserSpecifiedFWHM.Value;
             TangraConfig.Settings.Photometry.UseUserSpecifiedFWHM = rbSeeingUser.Checked;
 			TangraConfig.Settings.Photometry.SNFrameWindow = (int)nudSNFrameWindow.Value;
+            TangraConfig.Settings.Photometry.StackedViewNumFrames = (int)nudStackedViewFrames.Value;
 
 			if (rb3DFirstOrder.Checked)
 				TangraConfig.Settings.Photometry.Background3DPoly.Order = 1;

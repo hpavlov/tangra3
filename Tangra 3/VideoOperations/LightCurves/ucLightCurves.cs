@@ -849,11 +849,13 @@ namespace Tangra.VideoOperations.LightCurves
                 if (stacked)
                 {
                     btnStackedSelection.Image = Tangra.Properties.Resources.Stack1;
+                    toolTip1.SetToolTip(btnStackedSelection, "Toggle Single Image View");
                     m_VideoController.RedrawCurrentFrame(false);
                 }
                 else
                 {
                     btnStackedSelection.Image = Tangra.Properties.Resources.Stack3;
+                    toolTip1.SetToolTip(btnStackedSelection, "Toggle Stacked Image View");
                     m_VideoController.RefreshCurrentFrame();
                 }
             }

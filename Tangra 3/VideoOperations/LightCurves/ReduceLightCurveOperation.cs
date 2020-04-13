@@ -427,7 +427,7 @@ namespace Tangra.VideoOperations.LightCurves
                     m_VideoController.SetCursor(Cursors.WaitCursor);
                     try
                     {
-                        m_StackedSelectionFrame = m_VideoController.StackFrames(100);
+                        m_StackedSelectionFrame = m_VideoController.StackFrames(TangraConfig.Settings.Photometry.StackedViewNumFrames);
                     }
                     finally
                     {

@@ -447,6 +447,8 @@ namespace Tangra.Model.Config
 
 			public int SNFrameWindow = 64;
 
+            public int StackedViewNumFrames = 32;
+
 			public double MaxResidualStellarMags = 0.3;
 
 		    public static float REJECTION_BACKGROUND_PIXELS_STD_DEV = 6.0f;
