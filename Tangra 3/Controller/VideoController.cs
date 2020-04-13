@@ -597,8 +597,7 @@ namespace Tangra.Controller
 
 	                var pixMap = m_FramePlayer.GetFrame(frameStream.FirstFrame, false);
 
-	                BitmapFilter.ApplyDynamicRange(pixMap.DisplayBitmap, pixMap, m_DynamicFromValue, m_DynamicToValue,
-	                    m_DisplayInvertedMode, m_DisplayHueIntensityMode);
+	                BitmapFilter.ApplyDynamicRange(pixMap.DisplayBitmap, pixMap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode, EffectiveMaxPixelValue);
 
 	                var dynPixMap = Pixelmap.ConstructFromBitmap(pixMap.DisplayBitmap, TangraConfig.ColourChannel.Red);
 	                int sq = Math.Min(64, pixMap.Height/3);
@@ -1834,7 +1833,7 @@ namespace Tangra.Controller
 					BitmapFilter.ProcessHueBackgroundMode(displayBitmap, m_HBMTarget1X, m_HBMTarget1Y, m_HBMTarget2X, m_HBMTarget2Y, m_HBMTarget3X, m_HBMTarget3Y, m_HBMTarget4X, m_HBMTarget4Y);
 				}
 				else if (m_DisplayIntensifyMode == DisplayIntensifyMode.Dynamic && m_DynamicToValue - m_DynamicFromValue > 0 && displayPixelmap != null)
-                    BitmapFilter.ApplyDynamicRange(displayBitmap, displayPixelmap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
+                    BitmapFilter.ApplyDynamicRange(displayBitmap, displayPixelmap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode, EffectiveMaxPixelValue);
 				else if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off)
 					BitmapFilter.ApplyGamma(displayBitmap, m_DisplayIntensifyMode == DisplayIntensifyMode.Hi, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
                 else if (m_DisplayInvertedMode || m_DisplayHueIntensityMode)
@@ -1845,7 +1844,7 @@ namespace Tangra.Controller
 	    public void ApplyDynamicRangeAdjustments(Bitmap displayBitmap, Pixelmap displayPixelmap)
 	    {
 	        if (m_DisplayIntensifyMode == DisplayIntensifyMode.Dynamic && m_DynamicToValue - m_DynamicFromValue > 0)
-                BitmapFilter.ApplyDynamicRange(displayBitmap, displayPixelmap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode);
+                BitmapFilter.ApplyDynamicRange(displayBitmap, displayPixelmap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode, EffectiveMaxPixelValue);
 	    }
 
 		public void SetDisplayIntensifyMode(DisplayIntensifyMode newMode, int? dynamicFromValue, int?  dynamicToValue, bool refresh = true)

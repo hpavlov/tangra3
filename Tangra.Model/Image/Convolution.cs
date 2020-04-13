@@ -788,7 +788,7 @@ namespace Tangra.Model.Image
             }
         }
 
-        public static void ApplyDynamicRange(Bitmap bitmap, Pixelmap pixelmap, int fromValue, int toValue, bool invert, bool hueIntensity)
+        public static void ApplyDynamicRange(Bitmap bitmap, Pixelmap pixelmap, int fromValue, int toValue, bool invert, bool hueIntensity, uint effectiveMaxPixelValue)
 		{
 			int width = bitmap.Width;
 			int height = bitmap.Height;
@@ -798,7 +798,6 @@ namespace Tangra.Model.Image
 			try
 			{
 				int stride = bmData.Stride;
-				uint maxPixelValue = Pixelmap.GetMaxValueForBitPix(pixelmap.BitPixCamera);
 
                 byte minVal = 255;
                 double sum = 0;
@@ -849,9 +848,9 @@ namespace Tangra.Model.Image
 							uint pixelVal = pixelmap[x, y];
 							uint dynamicVal = (uint)(255 * (Math.Max(pixelVal, fromValue) - fromValue) / range);
 							byte btModified = (byte) (Math.Max(0, Math.Min(255, dynamicVal)));
-							byte btExpected = (byte)(Math.Max(0, Math.Min(255, 255.0 * pixelVal / maxPixelValue)));
+                            byte btExpected = (byte)(Math.Max(0, Math.Min(255, 255.0 * pixelVal / effectiveMaxPixelValue)));
 
-							if (Math.Abs(p[0] - btExpected) <= 1)
+                            if (btExpected != btModified && Math.Abs(p[0] - btExpected) <= 1)
 							{
 								p[0] = btModified;
 								p[1] = btModified;
