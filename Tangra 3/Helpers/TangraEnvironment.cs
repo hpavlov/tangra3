@@ -49,7 +49,7 @@ namespace Tangra.Helpers
         {
             get
             {
-                return AdvLib.GetLibraryVersion();
+                return AdvLib.GetLibraryVersion() + AdvLib.GetLibraryBitness();
             }
         }
     }

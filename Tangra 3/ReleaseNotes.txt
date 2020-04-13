@@ -1,5 +1,13 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.7.0 (2020-04-13)
+- Added astrometry support for GaiaDR2.
+- Added a new default 'Stacked Image View' when configuring an occultation light curve measurement.
+- Added software integration support for ADV v2 files (updated AdvLib to version 2.1d).
+- Implemented a better display handling of large resolution images.
+- Improvements in the ADV to FITS conversion.
+- Other minor improvements and bugfixes.
+
 v3.6.23 (2020-02-14)
 - Fixed random broken AAV file loading.
 - Now displaying geographical location overlay on the first frame for ADV v2 files.
