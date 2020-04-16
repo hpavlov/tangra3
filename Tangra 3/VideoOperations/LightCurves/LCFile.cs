@@ -2090,7 +2090,7 @@ namespace Tangra.VideoOperations.LightCurves
     {
         public static LCMeasurementFooter Empty = new LCMeasurementFooter();
 
-        private static int SERIALIZATION_VERSION = 13;
+        private static int SERIALIZATION_VERSION = 14;
 
         internal byte[] AveragedFrameBytes;
     	internal int AveragedFrameWidth;
@@ -2120,6 +2120,7 @@ namespace Tangra.VideoOperations.LightCurves
         internal int FitsDynamicToValue;
 
         internal RotateFlipType RotateFlipType;
+        internal double? AcquisitionDelay;
 
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
@@ -2142,7 +2143,8 @@ namespace Tangra.VideoOperations.LightCurves
             int aavStackedFrameRate,
             int fitsDynamicFromValue,
             int fitsDynamicToValue,
-            RotateFlipType rotateFlipType)
+            RotateFlipType rotateFlipType,
+            double? acquisitionDelay)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -2173,6 +2175,7 @@ namespace Tangra.VideoOperations.LightCurves
             FitsDynamicToValue = fitsDynamicToValue;
 
             RotateFlipType = rotateFlipType;
+            AcquisitionDelay = acquisitionDelay;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -2224,6 +2227,7 @@ namespace Tangra.VideoOperations.LightCurves
             FitsDynamicFromValue = -1;
             FitsDynamicToValue = -1;
             RotateFlipType = RotateFlipType.RotateNoneFlipNone;
+            AcquisitionDelay = null;
 
 			if (version > 1)
 			{
@@ -2290,6 +2294,12 @@ namespace Tangra.VideoOperations.LightCurves
                                                         if (version > 12)
                                                         {
                                                             RotateFlipType = (RotateFlipType)reader.ReadInt32();
+
+                                                            if (version > 13)
+                                                            {
+                                                                var acqDel = reader.ReadDouble();
+                                                                AcquisitionDelay = double.IsNaN(acqDel) ? (double?)null : acqDel;
+                                                            }
                                                         }
                                                     }
 	                                            }
@@ -2376,6 +2386,8 @@ namespace Tangra.VideoOperations.LightCurves
             writer.Write(FitsDynamicToValue);
 
             writer.Write((int)RotateFlipType);
+
+            writer.Write(AcquisitionDelay ?? double.NaN);
         }
     }
 

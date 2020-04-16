@@ -1,4 +1,4 @@
-﻿namespace Tangra.Config
+﻿namespace Tangra.VideoOperations.LightCurves
 {
 	partial class frmInstDelayConfigChooser
 	{

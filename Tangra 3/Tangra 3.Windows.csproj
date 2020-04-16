@@ -148,10 +148,16 @@
     <Compile Include="Config\frmChooseFirstTimeOcrSettings.Designer.cs">
       <DependentUpon>frmChooseFirstTimeOcrSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Config\frmInstDelayConfigChooser.cs">
+    <Compile Include="VideoOperations\LightCurves\frmAcquisitionDelayChooser.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Config\frmInstDelayConfigChooser.Designer.cs">
+    <Compile Include="VideoOperations\LightCurves\frmAcquisitionDelayChooser.Designer.cs">
+      <DependentUpon>frmAcquisitionDelayChooser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmInstDelayConfigChooser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\frmInstDelayConfigChooser.Designer.cs">
       <DependentUpon>frmInstDelayConfigChooser.cs</DependentUpon>
     </Compile>
     <Compile Include="Config\frmMPCObserver.cs">
@@ -1103,7 +1109,10 @@
     <EmbeddedResource Include="Config\frmChooseFirstTimeOcrSettings.resx">
       <DependentUpon>frmChooseFirstTimeOcrSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Config\frmInstDelayConfigChooser.resx">
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmAcquisitionDelayChooser.resx">
+      <DependentUpon>frmAcquisitionDelayChooser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\frmInstDelayConfigChooser.resx">
       <DependentUpon>frmInstDelayConfigChooser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Config\frmMPCObserver.resx">

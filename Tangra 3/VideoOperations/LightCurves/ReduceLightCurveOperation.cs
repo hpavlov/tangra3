@@ -86,6 +86,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    private string m_InstumentalDelaySelectedCamera;
 	    private Dictionary<int, float> m_InstumentalDelaySelectedConfig;
+        private double? m_AcquisitionDelay;
 
         private string m_CameraName;
         private int m_AavFrameIntegration;
@@ -1471,6 +1472,15 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 			}
 
+            if (m_VideoController.RequiresAcquisitionDelayCorrection)
+            {
+                var frm = new frmAcquisitionDelayChooser(m_VideoController);
+                frm.StartPosition = FormStartPosition.CenterParent;
+
+                m_VideoController.ShowDialog(frm);
+                m_AcquisitionDelay = frm.AcquisitionDelay;
+            }
+
 			LCFile file = FlushLightCurveFile();
 
 			if (file.Header.ReductionType == LightCurveReductionType.Asteroidal)
@@ -2052,7 +2062,8 @@ namespace Tangra.VideoOperations.LightCurves
                 m_AavStackedFrameRate,
                 m_FitsDynamicFromValue,
                 m_FitsDynamicToValue,
-                preProcessingInfo.RotateFlipType);
+                preProcessingInfo.RotateFlipType,
+                m_AcquisitionDelay);
 
 			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer, m_VideoController);
 		}

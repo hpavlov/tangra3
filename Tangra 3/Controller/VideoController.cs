@@ -1375,6 +1375,21 @@ namespace Tangra.Controller
             get { return m_FramePlayer.Video.Engine == SingleFITSFileFrameStream.SINGLE_FITS_FILE_ENGINE; }
         }
 
+        public bool RequiresAcquisitionDelayCorrection
+        {
+            get
+            {
+                // Acquisition delay corrections are requried for ...
+                return 
+                    // ... any ser file
+                    IsSerVideo || 
+                    // ... any FITS sequence
+                    IsFitsSequence ||
+                    // .. any ADV version 2 file, which is not an AAV file
+                    (IsAstroDigitalVideo && !IsAstroAnalogueVideo && m_FramePlayer.Video.Engine == "ADV2");
+            }
+        }
+
         public bool SupportsSoftwareIntegration
         {
             get { return m_FramePlayer.Video.SupportsSoftwareIntegration; }

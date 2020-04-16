@@ -4,17 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Tangra.Helpers;
 using Tangra.Model.Helpers;
 
-namespace Tangra.Config
+namespace Tangra.VideoOperations.LightCurves
 {
 	public partial class frmInstDelayConfigChooser : Form
 	{
