@@ -464,15 +464,19 @@ namespace Tangra.VideoOperations.LightCurves
                 return Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
         }
 
-		internal DateTime GetTimeForFrame(double frameNo, out string correctedForInstrumentalDelayMessage)
+        internal DateTime GetTimeForFrame(double frameNo, out string correctedForInstrumentalOrAcquisitionDelayMessage)
 		{
-			correctedForInstrumentalDelayMessage = null;
+            correctedForInstrumentalOrAcquisitionDelayMessage = null;
 
 			if (FrameTiming != null && FrameTiming.Count > 0)
 			{
-				if (Footer.InstrumentalDelayConfig != null)
-				{
-					return GetTimeForFrameWithInstrumentalDelay(frameNo, out correctedForInstrumentalDelayMessage);
+			    if (Footer.AcquisitionDelayMs != null)
+			    {
+                    return GetTimeForFrameWithAcquisitionDelay(frameNo, out correctedForInstrumentalOrAcquisitionDelayMessage);
+			    }
+			    else if (Footer.InstrumentalDelayConfig != null)
+			    {
+                    return GetTimeForFrameWithInstrumentalDelay(frameNo, out correctedForInstrumentalOrAcquisitionDelayMessage);
 				}
 				else
 				{
@@ -482,9 +486,13 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 			else
 			{
-				if (Footer.InstrumentalDelayConfig != null)
+                if (Footer.AcquisitionDelayMs != null)
+                {
+                    return GetTimeForFrameFromManuallyEnteredTimesWithAcquisitionDelay(frameNo, out correctedForInstrumentalOrAcquisitionDelayMessage);
+                }
+                else if (Footer.InstrumentalDelayConfig != null)
 				{
-					return GetTimeForFrameFromManuallyEnteredTimesWithInstrumentalDelay(frameNo, out correctedForInstrumentalDelayMessage);
+                    return GetTimeForFrameFromManuallyEnteredTimesWithInstrumentalDelay(frameNo, out correctedForInstrumentalOrAcquisitionDelayMessage);
 				}
 				else
 				{
@@ -492,6 +500,20 @@ namespace Tangra.VideoOperations.LightCurves
 				}
 			}
 		}
+
+        private DateTime GetTimeForFrameFromManuallyEnteredTimesWithAcquisitionDelay(double frameNo, out string correctedForAcquisitionDelayMessage)
+        {
+            DateTime headerComputedTime = Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
+            DateTime rv = headerComputedTime;
+            correctedForAcquisitionDelayMessage = null;
+
+            if (Footer.AcquisitionDelayMs != null)
+            {
+                correctedForAcquisitionDelayMessage = String.Format("Acquisition delay of {0:0.0} ms has been applied to the times\r\n\r\nMid-frame timestamp: {1}", Footer.AcquisitionDelayMs.Value, rv.ToString("HH:mm:ss.fff")); ;
+                rv = rv.AddMilliseconds(-1 * Footer.AcquisitionDelayMs.Value);
+            }
+            return rv;
+        }
 
 		private DateTime GetTimeForFrameFromManuallyEnteredTimesWithInstrumentalDelay(double frameNo, out string correctedForInstrumentalDelayMessage)
 		{
@@ -643,6 +665,23 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             return false;
+        }
+
+        private DateTime GetTimeForFrameWithAcquisitionDelay(double frameNo, out string correctedForAcquisitionDelayMessage)
+        {
+            int frameTimingIndex = (int)((uint)frameNo - Header.MinFrame);
+
+            LCFrameTiming timingEntry = FrameTiming[frameTimingIndex];
+
+            DateTime rv = timingEntry.FrameMidTime;
+            correctedForAcquisitionDelayMessage = null;
+
+            if (Footer.AcquisitionDelayMs != null)
+            {
+                correctedForAcquisitionDelayMessage = String.Format("Acquisition delay of {0:0.0} ms has been applied to the times\r\n\r\nMid-frame timestamp: {1}", Footer.AcquisitionDelayMs.Value, rv.ToString("HH:mm:ss.fff")); ;
+                rv = rv.AddMilliseconds(-1 * Footer.AcquisitionDelayMs.Value);
+            }
+            return rv;
         }
 
 		private DateTime GetTimeForFrameWithInstrumentalDelay(double frameNo, out string correctedForInstrumentalDelayMessage)
@@ -2120,7 +2159,7 @@ namespace Tangra.VideoOperations.LightCurves
         internal int FitsDynamicToValue;
 
         internal RotateFlipType RotateFlipType;
-        internal double? AcquisitionDelay;
+        internal double? AcquisitionDelayMs;
 
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
@@ -2144,7 +2183,7 @@ namespace Tangra.VideoOperations.LightCurves
             int fitsDynamicFromValue,
             int fitsDynamicToValue,
             RotateFlipType rotateFlipType,
-            double? acquisitionDelay)
+            double? acquisitionDelayMs)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -2175,7 +2214,7 @@ namespace Tangra.VideoOperations.LightCurves
             FitsDynamicToValue = fitsDynamicToValue;
 
             RotateFlipType = rotateFlipType;
-            AcquisitionDelay = acquisitionDelay;
+            AcquisitionDelayMs = acquisitionDelayMs;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -2227,7 +2266,7 @@ namespace Tangra.VideoOperations.LightCurves
             FitsDynamicFromValue = -1;
             FitsDynamicToValue = -1;
             RotateFlipType = RotateFlipType.RotateNoneFlipNone;
-            AcquisitionDelay = null;
+            AcquisitionDelayMs = null;
 
 			if (version > 1)
 			{
@@ -2298,7 +2337,7 @@ namespace Tangra.VideoOperations.LightCurves
                                                             if (version > 13)
                                                             {
                                                                 var acqDel = reader.ReadDouble();
-                                                                AcquisitionDelay = double.IsNaN(acqDel) ? (double?)null : acqDel;
+                                                                AcquisitionDelayMs = double.IsNaN(acqDel) ? (double?)null : acqDel;
                                                             }
                                                         }
                                                     }
@@ -2387,7 +2426,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             writer.Write((int)RotateFlipType);
 
-            writer.Write(AcquisitionDelay ?? double.NaN);
+            writer.Write(AcquisitionDelayMs ?? double.NaN);
         }
     }
 

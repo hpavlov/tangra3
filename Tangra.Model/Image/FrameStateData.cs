@@ -25,6 +25,7 @@ namespace Tangra.Model.Image
 		public int? NumberIntegratedFrames;
         public int? NumberStackedFrames;
         public bool IsVtiOsdCalibrationFrame;
+	    public string SerTimeStampReference;
 
 		public Dictionary<string, object> AdditionalProperties;
 	    public object Tag;

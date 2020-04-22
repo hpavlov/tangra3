@@ -298,6 +298,7 @@ namespace Tangra.Video.SER
 			    {
 			        if (UseTimeStamp == SerUseTimeStamp.FireCaptureLog)
 			        {
+                        rv.FrameState.SerTimeStampReference = "FireCapture Log";
 			            DateTime dt;
 			            if (m_FireCaptureTimeStamps.TryGetValue(1 + index, out dt))
 			                rv.FrameState.CentralExposureTime = dt;
@@ -307,14 +308,17 @@ namespace Tangra.Video.SER
 			            switch (TimeStampReference)
 			            {
 			                case SerTimeStampReference.StartFrame:
+                                rv.FrameState.SerTimeStampReference = "Start Frame";
                                 rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc.AddMilliseconds(MillisecondsPerFrame * 0.5);
 			                    break;
 
                             case SerTimeStampReference.EndFrame:
+                                rv.FrameState.SerTimeStampReference = "End Frame";
                                 rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc.AddMilliseconds(MillisecondsPerFrame * -0.5);
 			                    break;
 
                             default:
+                                rv.FrameState.SerTimeStampReference = "Mid Frame";
                                 rv.FrameState.CentralExposureTime = m_CurrentFrameInfo.TimeStampUtc;
 			                    break;
 			            }

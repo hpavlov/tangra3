@@ -92,6 +92,7 @@ namespace Tangra.Controller
 		private int[] m_ReProcessFitAreas = new int[4];
 
 		public string InstrumentalDelayConfigName;
+	    public bool AcquisitionDelayApplied;
 		public MeasurementTimingType TimingType;
 		public string CameraName;
 		public int AAVFrameIntegration;

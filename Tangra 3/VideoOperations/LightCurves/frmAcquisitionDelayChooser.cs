@@ -32,7 +32,7 @@ namespace Tangra.VideoOperations.LightCurves
             // TODO: For ADV v2 videos, try to get a default value for the delay from the header
         }
 
-        internal double AcquisitionDelay { get; private set; }
+        internal double AcquisitionDelayMs { get; private set; }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
@@ -52,7 +52,7 @@ namespace Tangra.VideoOperations.LightCurves
             ShellHelper.OpenUrl("https://www.google.com/search?q=Pavlov%2C+H.%2C+Gault%2C+D.%2C+Using+the+Windows+Clock+with+Network+Time+Protocol+(NTP)+for+Occultation+Timing%2C+Journal+for+Occultation+Astronomy%2C+No.+2020-02%2C+Vol.+10+No.+1&oq=Pavlov%2C+H.%2C+Gault%2C+D.%2C+Using+the+Windows+Clock+with+Network+Time+Protocol+(NTP)+for+Occultation+Timing%2C+Journal+for+Occultation+Astronomy%2C+No.+2020-02%2C+Vol.+10+No.+1");
         }
 
-        Regex m_Validator = new Regex(@"^\d+((\.|,)\d+)?$");
+        Regex m_Validator = new Regex(@"^[\+\-]?\d+((\.|,)\d+)?$");
 
         private void btnOK_Click(object sender, EventArgs e)
         {
@@ -63,7 +63,15 @@ namespace Tangra.VideoOperations.LightCurves
                 return;
             }
 
-            AcquisitionDelay = double.Parse(tbxAcquisitionDelay.Text.Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture);
+            var userInput = double.Parse(tbxAcquisitionDelay.Text.Trim().Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture);
+            if (userInput < 0)
+            {
+                MessageBox.Show(this, "By definition the acquisition delay cannot be negative. Please enter a correct value.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                tbxAcquisitionDelay.Focus();
+                return;
+            }
+
+            AcquisitionDelayMs = userInput;
 
             DialogResult = DialogResult.OK;
             Close();

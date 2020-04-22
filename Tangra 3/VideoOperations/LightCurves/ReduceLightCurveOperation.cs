@@ -86,7 +86,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    private string m_InstumentalDelaySelectedCamera;
 	    private Dictionary<int, float> m_InstumentalDelaySelectedConfig;
-        private double? m_AcquisitionDelay;
+        private double? m_AcquisitionDelayMs;
 
         private string m_CameraName;
         private int m_AavFrameIntegration;
@@ -1494,7 +1494,7 @@ namespace Tangra.VideoOperations.LightCurves
                 frm.StartPosition = FormStartPosition.CenterParent;
 
                 m_VideoController.ShowDialog(frm);
-                m_AcquisitionDelay = frm.AcquisitionDelay;
+                m_AcquisitionDelayMs = frm.AcquisitionDelayMs;
             }
 
 			LCFile file = FlushLightCurveFile();
@@ -2079,7 +2079,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_FitsDynamicFromValue,
                 m_FitsDynamicToValue,
                 preProcessingInfo.RotateFlipType,
-                m_AcquisitionDelay);
+                m_AcquisitionDelayMs);
 
 			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer, m_VideoController);
 		}

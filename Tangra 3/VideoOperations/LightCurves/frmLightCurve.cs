@@ -312,6 +312,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.Filter = LightCurveContext.FilterType.LowPassDifference;
 
             m_LightCurveController.Context.InstrumentalDelayConfigName = m_Footer.InstrumentalDelayConfigName;
+            m_LightCurveController.Context.AcquisitionDelayApplied = m_Footer.AcquisitionDelayMs != null;
             m_LightCurveController.Context.CameraName = m_Footer.CameraName;
             m_LightCurveController.Context.AAVFrameIntegration = m_Footer.AAVFrameIntegration;
             m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired = m_Header.InstrumentalDelayCorrectionsNotRequired();
@@ -353,7 +354,9 @@ namespace Tangra.VideoOperations.LightCurves
 			bool hasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
 
             m_CameraCorrectionsHaveBeenAppliedFlag =
-                !string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) || m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired;
+                !string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) || 
+                m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired ||
+                m_LightCurveController.Context.AcquisitionDelayApplied;
 
             m_HasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
 

@@ -983,6 +983,10 @@ namespace Tangra.VideoOperations.LightCurves
             string instrumentalDelayStatus = "Not Applied";
             if (m_LightCurveController.Context.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame && m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired)
                 instrumentalDelayStatus = "Not Required";
+            else if (m_Footer.AcquisitionDelayMs != null)
+            {
+                instrumentalDelayStatus = "Acquisition Delay Applied";
+            }
             else
             {
                 var delaysApplied = m_Header.GetInstrumentalDelaysApplied(videoFileFormat.ToString());
@@ -1003,12 +1007,12 @@ namespace Tangra.VideoOperations.LightCurves
                 }
             }
 
-            output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame, Reversed Camera Response, Video File Format");
+            output.Append("Reversed Gamma, Colour, Measured Band, Integration, Digital Filter, Signal Method, Background Method, Instrumental Delay Corrections, Camera, AAV Integration, First Frame, Last Frame, Reversed Camera Response, Video File Format, Acquisition Delay (ms)");
             if (addPSFReductionDetails) output.Append(", PSF Fitting");
             if (addPSFAverageModelDetails) output.Append(", Modeled FWHM, Average FWHM");
             if (options.PhotometricFormat == PhotometricFormat.Magnitudes) output.Append(", Zero Magnitude");
             output.AppendLine();
-            output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}", 
+            output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14}", 
                 m_LightCurveController.Context.EncodingGamma.ToString("0.00"),
                 m_Footer.ReductionContext.IsColourVideo ? "yes" : "no", 
                 m_Footer.ReductionContext.ColourChannel,
@@ -1024,7 +1028,8 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.MinFrame,
                 m_LightCurveController.Context.MaxFrame,
 				m_LightCurveController.Context.ReverseCameraResponse == TangraConfig.KnownCameraResponse.Undefined ? "" : m_LightCurveController.Context.ReverseCameraResponse.ToString(),
-                videoFileFormat);
+                videoFileFormat,
+                string.Format("{0:0.0}", m_Footer.AcquisitionDelayMs));
 
             if (addPSFReductionDetails) output.AppendFormat(",{0}", m_LightCurveController.Context.PsfFittingMethod);
             if (addPSFAverageModelDetails) output.AppendFormat(",{0},{1}", float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? "auto" : "manual", !float.IsNaN(m_LightCurveController.Context.ManualAverageFWHM) ? m_LightCurveController.Context.ManualAverageFWHM.ToString("0.00") : m_Footer.RefinedAverageFWHM.ToString("0.00"));

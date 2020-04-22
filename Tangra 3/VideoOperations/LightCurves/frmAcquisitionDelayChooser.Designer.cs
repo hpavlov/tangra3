@@ -42,7 +42,6 @@
             // 
             // btnOK
             // 
-            this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOK.Location = new System.Drawing.Point(93, 142);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(141, 23);
@@ -89,9 +88,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(211, 81);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(47, 13);
+            this.label2.Size = new System.Drawing.Size(63, 13);
             this.label2.TabIndex = 1;
-            this.label2.Text = "seconds";
+            this.label2.Text = "milliseconds";
             // 
             // label1
             // 
@@ -101,6 +100,12 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "    The timing of this video is likely to have been affected by an aquisition del" +
     "ay of the recording system. Please enter the acquisition delay below.";
+            // 
+            // toolTip1
+            // 
+            this.toolTip1.AutoPopDelay = 15000;
+            this.toolTip1.InitialDelay = 500;
+            this.toolTip1.ReshowDelay = 100;
             // 
             // frmAcquisitionDelayChooser
             // 

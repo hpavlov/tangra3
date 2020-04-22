@@ -34,7 +34,7 @@
             // 
             // btnCopy
             // 
-            this.btnCopy.Location = new System.Drawing.Point(64, 53);
+            this.btnCopy.Location = new System.Drawing.Point(64, 62);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(75, 23);
             this.btnCopy.TabIndex = 20;
@@ -54,7 +54,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(211, 87);
+            this.ClientSize = new System.Drawing.Size(211, 97);
             this.Controls.Add(this.btnCopy);
             this.Controls.Add(this.lblStatusCombined);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
