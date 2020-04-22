@@ -1490,11 +1490,19 @@ namespace Tangra.VideoOperations.LightCurves
 
             if (m_VideoController.RequiresAcquisitionDelayCorrection)
             {
-                var frm = new frmAcquisitionDelayChooser(m_VideoController);
-                frm.StartPosition = FormStartPosition.CenterParent;
+                var knownAcqDelaysMs = m_VideoController.KnownAcquisitionDelayMs;
+                if (knownAcqDelaysMs != null)
+                {
+                    m_AcquisitionDelayMs = knownAcqDelaysMs.Value;
+                }
+                else
+                {
+                    var frm = new frmAcquisitionDelayChooser(m_VideoController);
+                    frm.StartPosition = FormStartPosition.CenterParent;
 
-                m_VideoController.ShowDialog(frm);
-                m_AcquisitionDelayMs = frm.AcquisitionDelayMs;
+                    m_VideoController.ShowDialog(frm);
+                    m_AcquisitionDelayMs = frm.AcquisitionDelayMs;
+                }
             }
 
 			LCFile file = FlushLightCurveFile();

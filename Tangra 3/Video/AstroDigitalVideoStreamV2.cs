@@ -70,6 +70,7 @@ namespace Tangra.Video
         private int m_OsdLastLine = 0;
         private int m_StackingRate = 0;
         private int? m_AAVVersion = null;
+        private double? m_KnownAcquisitionDelayMs = null;
 
         private AdvFile2 m_AdvFile;
 
@@ -153,6 +154,12 @@ namespace Tangra.Video
             }
 
             geoLocation = this.geoLocation;
+
+            double acqDelay;
+            if (double.TryParse(GetFileTag("ACQUISITION-DELAY"), NumberStyles.Float, CultureInfo.InvariantCulture, out acqDelay))
+            {
+                m_KnownAcquisitionDelayMs = acqDelay;
+            }
         }
 
         public string GetFileTag(string tagName)
@@ -215,6 +222,11 @@ namespace Tangra.Video
         public int AAVStackingRate
         {
             get { return m_StackingRate; }
+        }
+
+        public double? KnownAcquisitionDelayMs
+        {
+            get { return m_KnownAcquisitionDelayMs; }
         }
 
         public bool NtpDataAvailable

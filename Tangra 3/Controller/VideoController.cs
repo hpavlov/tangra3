@@ -1390,6 +1390,19 @@ namespace Tangra.Controller
             }
         }
 
+	    public double? KnownAcquisitionDelayMs
+	    {
+	        get
+	        {
+                if (m_FramePlayer.IsAstroAnalogueVideoV2 && m_FramePlayer.Video.Engine == "ADV2")
+	            {
+	                return ((AstroDigitalVideoStreamV2)m_FramePlayer.Video).KnownAcquisitionDelayMs;
+	            }
+
+	            return null;
+	        }
+	    }
+
         public bool SupportsSoftwareIntegration
         {
             get { return m_FramePlayer.Video.SupportsSoftwareIntegration; }
