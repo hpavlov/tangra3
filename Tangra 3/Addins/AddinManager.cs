@@ -102,23 +102,31 @@ namespace Tangra.Addins
 
 				foreach (string asm in names)
 				{
-					try
-					{
-						Assembly loadedAssembly = Assembly.LoadFile(asm);
+				    try
+				    {
+				        Assembly loadedAssembly = Assembly.LoadFile(asm);
 
-						List<string> addinTypesFound = loadedAssembly
-							.GetTypes()
-							.Where(t => t.IsClass && t.GetInterface(typeof(ITangraAddin).FullName) != null)
-							.Select(t => string.Concat(t.FullName, ",", loadedAssembly.FullName))
-							.ToList();
+				        List<string> addinTypesFound = loadedAssembly
+				            .GetTypes()
+				            .Where(t => t.IsClass && t.GetInterface(typeof (ITangraAddin).FullName) != null)
+				            .Select(t => string.Concat(t.FullName, ",", loadedAssembly.FullName))
+				            .ToList();
 
-						addins.AddRange(addinTypesFound);
-					}
+				        addins.AddRange(addinTypesFound);
+				    }
+				    catch (ReflectionTypeLoadException rtlex)
+				    {
+                        Trace.WriteLine(string.Format("'{0}' is not identified as an add-in: {1}\r\n{2}\r\n{3}", 
+                            asm, 
+                            rtlex.GetType(), 
+                            rtlex,
+                            rtlex.LoaderExceptions != null ? string.Join("\r\n", rtlex.LoaderExceptions.Select(x => x.ToString())) : null));
+				    }
 					catch (Exception ex)
 					{
-                        Trace.WriteLine(string.Format("'{0}' is not identified as an add-in: {1}", Path.GetFileName(asm), ex.GetType()));
+                        Trace.WriteLine(string.Format("'{0}' is not identified as an add-in: {1}", asm, ex.GetType()));
 					}
-				}				
+				}
 			}
 
 			return addins;
