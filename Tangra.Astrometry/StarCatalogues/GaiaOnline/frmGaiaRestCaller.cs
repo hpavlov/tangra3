@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -163,7 +164,7 @@ namespace Tangra.StarCatalogues.GaiaOnline
             var QUERY = @"SELECT solution_id, designation, source_id, ref_epoch, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error, phot_g_mean_mag, bp_rp, phot_variable_flag
             FROM gdr2.gaia_source
             WHERE pos @ scircle(spoint(RADIANS({0}), RADIANS({1})), RADIANS({2})) AND(phot_g_mean_mag <= {3}) ORDER BY phot_g_mean_mag LIMIT {4}";
-            outgoingQueryString.Add("QUERY", string.Format(QUERY, raDeg, deDeg, radiusDeg, limitMag, limitStars));
+            outgoingQueryString.Add("QUERY", string.Format(QUERY, raDeg, deDeg, radiusDeg, limitMag, limitStars, CultureInfo.InvariantCulture));
             outgoingQueryString.Add("LANG", "postgresql-9.6");
             outgoingQueryString.Add("QUEUE", "5m");
             outgoingQueryString.Add("PHASE", "RUN");
