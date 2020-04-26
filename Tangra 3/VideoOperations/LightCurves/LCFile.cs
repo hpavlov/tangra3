@@ -453,6 +453,19 @@ namespace Tangra.VideoOperations.LightCurves
             Save(fileName, backwardsFile.Header, updatedMeas, updatedTimings, backwardsFile.Footer);
 	    }
 
+
+        private bool? m_InstrumentalDelayCorrectionsNotRequired;
+
+        internal bool InstrumentalDelayCorrectionsNotRequired()
+        {
+            if (!m_InstrumentalDelayCorrectionsNotRequired.HasValue)
+            {
+                m_InstrumentalDelayCorrectionsNotRequired = !Footer.TimingCorrectionsRequired;
+            }
+
+            return m_InstrumentalDelayCorrectionsNotRequired.Value;
+        }
+
         internal DateTime GetTimeForFrame(double frameNo)
         {
             if (FrameTiming != null && FrameTiming.Count > 0)
@@ -470,7 +483,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			if (FrameTiming != null && FrameTiming.Count > 0)
 			{
-			    if (Footer.AcquisitionDelayMs != null)
+                if (Footer.TimingCorrectionsRequired)
 			    {
                     return GetTimeForFrameWithAcquisitionDelay(frameNo, out correctedForInstrumentalOrAcquisitionDelayMessage);
 			    }
@@ -486,7 +499,7 @@ namespace Tangra.VideoOperations.LightCurves
 			}
 			else
 			{
-                if (Footer.AcquisitionDelayMs != null)
+                if (Footer.TimingCorrectionsRequired)
                 {
                     return GetTimeForFrameFromManuallyEnteredTimesWithAcquisitionDelay(frameNo, out correctedForInstrumentalOrAcquisitionDelayMessage);
                 }
@@ -504,14 +517,43 @@ namespace Tangra.VideoOperations.LightCurves
         private DateTime GetTimeForFrameFromManuallyEnteredTimesWithAcquisitionDelay(double frameNo, out string correctedForAcquisitionDelayMessage)
         {
             DateTime headerComputedTime = Header.GetTimeForFrameFromManuallyEnteredTimes(frameNo);
-            DateTime rv = headerComputedTime;
+
+            return CorrectForAcquisitionDelayAndReferenceTimeToUtcOffset(headerComputedTime, out correctedForAcquisitionDelayMessage);
+        }
+
+        private DateTime CorrectForAcquisitionDelayAndReferenceTimeToUtcOffset(DateTime timestamp, out string correctedForAcquisitionDelayMessage)
+        {
+            DateTime rv = timestamp;
             correctedForAcquisitionDelayMessage = null;
 
-            if (Footer.AcquisitionDelayMs != null)
+            if (Footer.AcquisitionDelayMs != null && Footer.ReferenceTimeToUtcOffsetMs != null)
             {
-                correctedForAcquisitionDelayMessage = String.Format("Acquisition delay of {0:0.0} ms has been applied to the times\r\n\r\nMid-frame timestamp: {1}", Footer.AcquisitionDelayMs.Value, rv.ToString("HH:mm:ss.fff")); ;
-                rv = rv.AddMilliseconds(-1 * Footer.AcquisitionDelayMs.Value);
+                correctedForAcquisitionDelayMessage =
+                    String.Format(
+                        "Acquisition delay of {0:0.0} ms and Reference Clock to UTC offset of {1:0.0} ms have been applied to the times\r\n\r\nMid-frame timestamp: {2}",
+                        Footer.AcquisitionDelayMs.Value, Footer.ReferenceTimeToUtcOffsetMs.Value,
+                        timestamp.ToString("HH:mm:ss.fff"));
+
+                rv = rv.AddMilliseconds(-1 * Footer.AcquisitionDelayMs.Value + Footer.ReferenceTimeToUtcOffsetMs.Value);
             }
+            else if (Footer.AcquisitionDelayMs != null)
+            {
+                correctedForAcquisitionDelayMessage =
+                    String.Format(
+                        "Acquisition delay of {0:0.0} ms has been applied to the times\r\n\r\nMid-frame timestamp: {1}",
+                        Footer.AcquisitionDelayMs.Value, timestamp.ToString("HH:mm:ss.fff"));
+                rv = rv.AddMilliseconds(-1*Footer.AcquisitionDelayMs.Value);
+            }
+            else if (Footer.ReferenceTimeToUtcOffsetMs != null)
+            {
+                correctedForAcquisitionDelayMessage =
+                    String.Format(
+                        "Reference Clock to UTC offset of {0:0.0} ms has been applied to the times\r\n\r\nMid-frame timestamp: {1}",
+                        Footer.ReferenceTimeToUtcOffsetMs.Value, timestamp.ToString("HH:mm:ss.fff"));
+
+                rv = rv.AddMilliseconds(Footer.ReferenceTimeToUtcOffsetMs.Value);
+            }
+
             return rv;
         }
 
@@ -673,15 +715,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             LCFrameTiming timingEntry = FrameTiming[frameTimingIndex];
 
-            DateTime rv = timingEntry.FrameMidTime;
-            correctedForAcquisitionDelayMessage = null;
-
-            if (Footer.AcquisitionDelayMs != null)
-            {
-                correctedForAcquisitionDelayMessage = String.Format("Acquisition delay of {0:0.0} ms has been applied to the times\r\n\r\nMid-frame timestamp: {1}", Footer.AcquisitionDelayMs.Value, rv.ToString("HH:mm:ss.fff")); ;
-                rv = rv.AddMilliseconds(-1 * Footer.AcquisitionDelayMs.Value);
-            }
-            return rv;
+            return CorrectForAcquisitionDelayAndReferenceTimeToUtcOffset(timingEntry.FrameMidTime, out correctedForAcquisitionDelayMessage);
         }
 
 		private DateTime GetTimeForFrameWithInstrumentalDelay(double frameNo, out string correctedForInstrumentalDelayMessage)
@@ -1418,19 +1452,6 @@ namespace Tangra.VideoOperations.LightCurves
             return double.NaN;
         }
 
-        private bool? m_InstrumentalDelayCorrectionsNotRequired;
-
-        internal bool InstrumentalDelayCorrectionsNotRequired()
-        {
-            if (!m_InstrumentalDelayCorrectionsNotRequired.HasValue)
-            {
-                VideoFileFormat format = GetVideoFileFormat();
-                m_InstrumentalDelayCorrectionsNotRequired = format == VideoFileFormat.ADV || format == VideoFileFormat.FITS;
-            }
-
-            return m_InstrumentalDelayCorrectionsNotRequired.Value;
-        }
-
 	    private static Regex s_RegexSourceToFileFormat = new Regex("^.+\\((?<format>(ADV|AAV|AVI|SER|FITS))2?\\..+\\).*$");
 
 		/// <summary>
@@ -1491,7 +1512,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         public InstrumentalDelayStatus GetInstrumentalDelaysApplied(string videoFileFormat)
 		{
-			if (videoFileFormat == "ADV")
+            if (videoFileFormat == "ADV" || videoFileFormat == "ADV2")
 				return InstrumentalDelayStatus.NotRequired;
 			else if (videoFileFormat == "AAV" || videoFileFormat == "AAV2")
 			{
@@ -1902,7 +1923,6 @@ namespace Tangra.VideoOperations.LightCurves
         {
             m_FramesPerSecond = 25;
             m_FrameExposureInMS = 40;
-            m_InstrumentalDelayCorrectionsNotRequired = null;
 
             ProcessingType = ProcessingType.SignalMinusBackground;
             MinAdjustedReading = 0;
@@ -1964,7 +1984,6 @@ namespace Tangra.VideoOperations.LightCurves
         internal LCMeasurementHeader(BinaryReader reader)
         {
             m_FrameExposureInMS = 40;
-            m_InstrumentalDelayCorrectionsNotRequired = null;
             ProcessingType = ProcessingType.SignalMinusBackground;
             MinAdjustedReading = 0;
             MaxAdjustedReading = 0;
@@ -2159,7 +2178,9 @@ namespace Tangra.VideoOperations.LightCurves
         internal int FitsDynamicToValue;
 
         internal RotateFlipType RotateFlipType;
+        internal bool TimingCorrectionsRequired;
         internal double? AcquisitionDelayMs;
+        internal double? ReferenceTimeToUtcOffsetMs;
 
         internal LCMeasurementFooter(
 			Pixelmap averagedFrame, 
@@ -2183,7 +2204,9 @@ namespace Tangra.VideoOperations.LightCurves
             int fitsDynamicFromValue,
             int fitsDynamicToValue,
             RotateFlipType rotateFlipType,
-            double? acquisitionDelayMs)
+            bool timingCorrectionsRequired,
+            double? acquisitionDelayMs,
+            double? referenceTimeToUtcOffsetMs)
         {
 			AveragedFrameBytes = averagedFrame.DisplayBitmapPixels;
         	AveragedFrameWidth = averagedFrame.Width;
@@ -2214,7 +2237,9 @@ namespace Tangra.VideoOperations.LightCurves
             FitsDynamicToValue = fitsDynamicToValue;
 
             RotateFlipType = rotateFlipType;
+            TimingCorrectionsRequired = timingCorrectionsRequired;
             AcquisitionDelayMs = acquisitionDelayMs;
+            ReferenceTimeToUtcOffsetMs = referenceTimeToUtcOffsetMs;
         }
 
         internal LCMeasurementFooter(BinaryReader reader)
@@ -2266,7 +2291,9 @@ namespace Tangra.VideoOperations.LightCurves
             FitsDynamicFromValue = -1;
             FitsDynamicToValue = -1;
             RotateFlipType = RotateFlipType.RotateNoneFlipNone;
+            TimingCorrectionsRequired = true;
             AcquisitionDelayMs = null;
+            ReferenceTimeToUtcOffsetMs = null;
 
 			if (version > 1)
 			{
@@ -2336,8 +2363,13 @@ namespace Tangra.VideoOperations.LightCurves
 
                                                             if (version > 13)
                                                             {
+                                                                TimingCorrectionsRequired = reader.ReadBoolean();
+
                                                                 var acqDel = reader.ReadDouble();
                                                                 AcquisitionDelayMs = double.IsNaN(acqDel) ? (double?)null : acqDel;
+
+                                                                var refTimeToUtcOffs = reader.ReadDouble();
+                                                                ReferenceTimeToUtcOffsetMs = double.IsNaN(refTimeToUtcOffs) ? (double?)null : refTimeToUtcOffs;
                                                             }
                                                         }
                                                     }
@@ -2426,7 +2458,9 @@ namespace Tangra.VideoOperations.LightCurves
 
             writer.Write((int)RotateFlipType);
 
+            writer.Write(TimingCorrectionsRequired);
             writer.Write(AcquisitionDelayMs ?? double.NaN);
+            writer.Write(ReferenceTimeToUtcOffsetMs ?? double.NaN);
         }
     }
 

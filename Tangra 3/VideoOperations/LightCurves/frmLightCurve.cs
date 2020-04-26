@@ -315,7 +315,7 @@ namespace Tangra.VideoOperations.LightCurves
             m_LightCurveController.Context.AcquisitionDelayApplied = m_Footer.AcquisitionDelayMs != null;
             m_LightCurveController.Context.CameraName = m_Footer.CameraName;
             m_LightCurveController.Context.AAVFrameIntegration = m_Footer.AAVFrameIntegration;
-            m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired = m_Header.InstrumentalDelayCorrectionsNotRequired();
+            m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired = m_LCFile.InstrumentalDelayCorrectionsNotRequired();
             m_LightCurveController.Context.TimingType = m_Header.TimingType;
             m_LightCurveController.Context.MinFrame = m_Header.MinFrame;
             m_LightCurveController.Context.MaxFrame = m_Header.MaxFrame;

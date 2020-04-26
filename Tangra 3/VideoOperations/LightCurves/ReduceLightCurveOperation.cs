@@ -86,7 +86,9 @@ namespace Tangra.VideoOperations.LightCurves
 
 	    private string m_InstumentalDelaySelectedCamera;
 	    private Dictionary<int, float> m_InstumentalDelaySelectedConfig;
+        private bool m_TimingCorrectionsRequired;
         private double? m_AcquisitionDelayMs;
+        private double? m_ReferenceTimeToUtcOffsetMs;
 
         private string m_CameraName;
         private int m_AavFrameIntegration;
@@ -1492,18 +1494,32 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_VideoController.RequiresAcquisitionDelayCorrection)
             {
                 var knownAcqDelaysMs = m_VideoController.KnownAcquisitionDelayMs;
-                if (knownAcqDelaysMs != null)
+                if (knownAcqDelaysMs != null && Math.Abs(knownAcqDelaysMs.Value) >= Double.Epsilon)
                 {
                     m_AcquisitionDelayMs = knownAcqDelaysMs.Value;
+                    m_TimingCorrectionsRequired = false;
                 }
                 else
                 {
                     var frm = new frmAcquisitionDelayChooser(m_VideoController);
                     frm.StartPosition = FormStartPosition.CenterParent;
 
-                    m_VideoController.ShowDialog(frm);
-                    m_AcquisitionDelayMs = frm.AcquisitionDelayMs;
+                    if (m_VideoController.ShowDialog(frm) == DialogResult.OK)
+                    {
+                        m_AcquisitionDelayMs = frm.AcquisitionDelayMs;
+                        m_ReferenceTimeToUtcOffsetMs = frm.ReferenceTimeToUtcOffsetMs;
+                        m_TimingCorrectionsRequired = frm.TimingCorrectionsRequired;
+                        m_CameraName = frm.CameraModel;
+                    }
+                    else
+                    {
+                        m_TimingCorrectionsRequired = true;
+                    }
                 }
+            }
+            else
+            {
+                m_TimingCorrectionsRequired = false;
             }
 
 			LCFile file = FlushLightCurveFile();
@@ -2088,7 +2104,9 @@ namespace Tangra.VideoOperations.LightCurves
                 m_FitsDynamicFromValue,
                 m_FitsDynamicToValue,
                 preProcessingInfo.RotateFlipType,
-                m_AcquisitionDelayMs);
+                m_TimingCorrectionsRequired,
+                m_AcquisitionDelayMs,
+                m_ReferenceTimeToUtcOffsetMs);
 
 			return LCFile.FlushOnTheFlyOutputFile(finalHeader, footer, m_VideoController);
 		}

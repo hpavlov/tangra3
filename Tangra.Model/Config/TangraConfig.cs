@@ -392,6 +392,27 @@ namespace Tangra.Model.Config
 			Analytical
 		}
 
+	    public enum CameraSystem
+	    {
+            Other = 0,
+
+            [Description("ADVS")]
+	        Advs = 1,
+
+            [Description("QHY174-GPS")]
+            Qhy174Gps = 2,
+
+            [Description("DVTI-CAM")]
+            Dvti = 3
+	    }
+
+	    public enum TimestampingSystem
+	    {
+            Other = 0,
+            GpsInsideCamera = 1,
+            WindowsTimestampByRecorder = 2
+	    }
+
 		public enum KnownCameraResponse
 		{
 			Undefined = 0,
@@ -709,6 +730,12 @@ namespace Tangra.Model.Config
             public double? RovingLongitude;
             public double? RovingLatitude;
             public double? RovingAltitude;
+
+            public CameraSystem? TimingCorrectionsCameraSystem = null;
+            public TimestampingSystem? TimingCorrectionsTimestampingSystem = null;
+            public string TimingCorrectionsCameraName;
+            public double? TimingCorrectionsAquisitionDelay;
+            public bool TimingCorrectionsEnteringRefertenceTimeOffset = true;
         }
 
         [Serializable]
