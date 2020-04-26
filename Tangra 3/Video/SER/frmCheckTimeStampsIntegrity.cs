@@ -17,6 +17,8 @@ namespace Tangra.Video.SER
 
         public double MedianExposure { get; private set; }
 
+        public double OneSigmaExposure { get; private set; }
+
         public frmCheckTimeStampsIntegrity()
         {
             InitializeComponent();
@@ -93,6 +95,15 @@ namespace Tangra.Video.SER
             Application.DoEvents();
 
             MedianExposure = exposures.Median();
+
+            if (exposures.Count > 2)
+            {
+                OneSigmaExposure = Math.Sqrt(exposures.Select(x => (x - MedianExposure) * (x - MedianExposure)).Sum() / (exposures.Count - 1));
+            }
+            else
+            {
+                OneSigmaExposure = 0;
+            }
 
             Close();
         }

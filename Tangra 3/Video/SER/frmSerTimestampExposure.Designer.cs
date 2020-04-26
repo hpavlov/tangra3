@@ -35,8 +35,14 @@
             this.nudExposureMs = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.pnlExposure = new System.Windows.Forms.Panel();
+            this.pnlExposureJitter = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblJitter = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudExposureMs)).BeginInit();
             this.pnlExposure.SuspendLayout();
+            this.pnlExposureJitter.SuspendLayout();
             this.SuspendLayout();
             // 
             // cbxTimeReference
@@ -64,7 +70,7 @@
             // 
             // btnOK
             // 
-            this.btnOK.Location = new System.Drawing.Point(94, 113);
+            this.btnOK.Location = new System.Drawing.Point(94, 116);
             this.btnOK.Name = "btnOK";
             this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 16;
@@ -110,14 +116,64 @@
             this.pnlExposure.Controls.Add(this.label3);
             this.pnlExposure.Location = new System.Drawing.Point(12, 56);
             this.pnlExposure.Name = "pnlExposure";
-            this.pnlExposure.Size = new System.Drawing.Size(237, 26);
+            this.pnlExposure.Size = new System.Drawing.Size(250, 25);
             this.pnlExposure.TabIndex = 24;
+            // 
+            // pnlExposureJitter
+            // 
+            this.pnlExposureJitter.Controls.Add(this.label6);
+            this.pnlExposureJitter.Controls.Add(this.lblJitter);
+            this.pnlExposureJitter.Controls.Add(this.label1);
+            this.pnlExposureJitter.Controls.Add(this.label4);
+            this.pnlExposureJitter.Location = new System.Drawing.Point(12, 80);
+            this.pnlExposureJitter.Name = "pnlExposureJitter";
+            this.pnlExposureJitter.Size = new System.Drawing.Size(252, 25);
+            this.pnlExposureJitter.TabIndex = 25;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(29, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(68, 13);
+            this.label1.TabIndex = 22;
+            this.label1.Text = "Jitter            :";
+            // 
+            // lblJitter
+            // 
+            this.lblJitter.AutoSize = true;
+            this.lblJitter.ForeColor = System.Drawing.Color.Maroon;
+            this.lblJitter.Location = new System.Drawing.Point(106, 7);
+            this.lblJitter.Name = "lblJitter";
+            this.lblJitter.Size = new System.Drawing.Size(20, 13);
+            this.lblJitter.TabIndex = 26;
+            this.lblJitter.Text = "ms";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(183, 7);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(20, 13);
+            this.label4.TabIndex = 23;
+            this.label4.Text = "ms";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
+            this.label6.Location = new System.Drawing.Point(55, 7);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(33, 13);
+            this.label6.TabIndex = 27;
+            this.label6.Text = "(3-s)";
             // 
             // frmSerTimestampExposure
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(276, 158);
+            this.ClientSize = new System.Drawing.Size(286, 158);
+            this.Controls.Add(this.pnlExposureJitter);
             this.Controls.Add(this.pnlExposure);
             this.Controls.Add(this.cbxTimeReference);
             this.Controls.Add(this.label5);
@@ -129,6 +185,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudExposureMs)).EndInit();
             this.pnlExposure.ResumeLayout(false);
             this.pnlExposure.PerformLayout();
+            this.pnlExposureJitter.ResumeLayout(false);
+            this.pnlExposureJitter.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -143,5 +201,10 @@
         private System.Windows.Forms.NumericUpDown nudExposureMs;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel pnlExposure;
+        private System.Windows.Forms.Panel pnlExposureJitter;
+        private System.Windows.Forms.Label lblJitter;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label4;
     }
 }

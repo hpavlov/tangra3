@@ -12,11 +12,16 @@ namespace Tangra.Video.SER
 {
     public partial class frmSerTimestampExposure : Form
     {
-        public frmSerTimestampExposure(double medianExposure)
+        public frmSerTimestampExposure(double medianExposure, double? oneSigma)
             : this()
         {
             nudExposureMs.Value = (decimal)medianExposure;
             cbxTimeReference.SelectedIndex = 0;
+            pnlExposureJitter.Visible = oneSigma.HasValue;
+            if (oneSigma.HasValue)
+            {
+                lblJitter.Text = string.Format("{0}", Math.Round(oneSigma.Value, 2));
+            }
         }
 
         public frmSerTimestampExposure()
