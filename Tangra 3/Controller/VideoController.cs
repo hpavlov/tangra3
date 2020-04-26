@@ -1639,9 +1639,36 @@ namespace Tangra.Controller
 			TangraContext.Current.CanScrollFrames = savedCanScrollFramesStateOnVideoStarted;
             TangraContext.Current.OperationInProgress = false;
 		}
+        
+	    private bool CanApplyDisplayModeAdjustmentsNow()
+	    {
+            if (m_CurrentOperation != null &&
+                m_CurrentOperation is ReduceLightCurveOperation &&
+	            ((ReduceLightCurveOperation) m_CurrentOperation).HasStackedSelectionFrame)
+	        {
+                // When using a stacked frame selection the DisplayModeAdjustments are applied when building the statacked selection frame
+                // not when the frame already exists
+	            return false;
+	        }
+
+	        return true;
+	    }
+
+	    private void NotifyOperationOfFrameDetailsChange()
+	    {
+	        if (m_CurrentOperation != null &&
+	            m_CurrentOperation is ReduceLightCurveOperation &&
+	            ((ReduceLightCurveOperation) m_CurrentOperation).IsStackedSelectionEnabled)
+	        {
+                // Something has changed, make sure we re-render the stacked frame as well
+                m_CurrentOperation.DisplayIntensifyModeChanged();
+	        }
+	    }
 
 		public void RefreshCurrentFrame()
 		{
+		    NotifyOperationOfFrameDetailsChange();
+
 			m_FramePlayer.RefreshCurrentFrame();
 		}
 
@@ -1751,6 +1778,17 @@ namespace Tangra.Controller
 
                 var intPixMap = FramePlayer.GetIntegratedFrame(frameNo, stackedFrames, false, false);
                 ApplyDisplayModeAdjustments(intPixMap.DisplayBitmap, true, intPixMap);
+
+                if (!TangraConfig.Settings.HelpFlags.DontShowStackedSelectionHelpFormAgain)
+                {
+                    TangraConfig.Settings.HelpFlags.DontShowStackedSelectionHelpFormAgain = true;
+                    TangraConfig.Settings.Save();
+
+                    var frm = new frmStackedSelectionHelpNote();
+                    frm.StartPosition = FormStartPosition.CenterParent;
+                    ShowForm(frm);
+                }
+
                 return intPixMap.DisplayBitmap;
 	        }
 	        catch (Exception ex)
@@ -1852,6 +1890,11 @@ namespace Tangra.Controller
 
 		public void ApplyDisplayModeAdjustments(Bitmap displayBitmap, bool enableBackgroundGlow = false, Pixelmap displayPixelmap = null)
         {
+		    if (!CanApplyDisplayModeAdjustmentsNow())
+		    {
+		        return;
+		    }
+
 			if (m_DisplayIntensifyMode != DisplayIntensifyMode.Off || m_DisplayInvertedMode || m_DisplayHueIntensityMode || m_DisplayHueBackgroundMode)
             {
                 // For display purposes only we apply display gamma and/or invert when requested by the user
@@ -1907,10 +1950,7 @@ namespace Tangra.Controller
                 !m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
 			{
-			    if (m_CurrentOperation != null)
-			        m_CurrentOperation.DisplayIntensifyModeChanged();
-
-				m_FramePlayer.RefreshCurrentFrame();
+                RefreshCurrentFrame();
 			}
 		}
 
@@ -1932,7 +1972,7 @@ namespace Tangra.Controller
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
 			{
-				m_FramePlayer.RefreshCurrentFrame();
+                RefreshCurrentFrame();
 			}
 		}
 
@@ -1955,7 +1995,7 @@ namespace Tangra.Controller
             if (!m_FramePlayer.IsRunning &&
                 m_FramePlayer.Video != null)
             {
-                m_FramePlayer.RefreshCurrentFrame();
+                RefreshCurrentFrame();
             }
         }
 
@@ -1985,8 +2025,8 @@ namespace Tangra.Controller
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
 			{
-				m_FramePlayer.RefreshCurrentFrame();
-			}			
+                RefreshCurrentFrame();
+			}
 		}
 
 		internal void SetDisplayHueBackgroundModeTargets(List<TrackedObjectConfig> trackedObjects)
@@ -2015,7 +2055,7 @@ namespace Tangra.Controller
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
 			{
-				m_FramePlayer.RefreshCurrentFrame();
+                RefreshCurrentFrame();
 			}
 	    }
 	    
@@ -2046,7 +2086,7 @@ namespace Tangra.Controller
 			if (!m_FramePlayer.IsRunning &&
 				m_FramePlayer.Video != null)
 			{
-				m_FramePlayer.RefreshCurrentFrame();
+                RefreshCurrentFrame();
 			}
 		}
 
@@ -2833,6 +2873,8 @@ namespace Tangra.Controller
         public void ShowForm(Form frm)
         {
             frm.Show(m_MainFormView);
+            frm.Top = m_MainFormView.Top + (m_MainFormView.Height - frm.Height) / 2;
+            frm.Left = m_MainFormView.Left + (m_MainFormView.Width - frm.Width) / 2;
         }
 
 		public DialogResult ShowSaveFileDialog(string title, string filter, ref string fileName, IWin32Window ownerWindow = null)

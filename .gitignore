@@ -124,3 +124,8 @@ _ReSharper.*
 Tangra 3.Linux.userprefs
 /Tangra.Video/Linux/lib/libTangraCore.so
 /Issues/Linux
+/Tangra.Core/Release64
+/Tangra.Core/.build-release64
+/Tangra.psess
+/*.etl
+/AdvLib/distribution

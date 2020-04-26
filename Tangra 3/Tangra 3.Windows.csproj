@@ -410,6 +410,24 @@
       <DependentUpon>frmAdditionalHeaders.cs</DependentUpon>
     </Compile>
     <Compile Include="VideoOperations\ConvertVideoToAav\HeaderValuePair.cs" />
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmAcquisitionDelayHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmAcquisitionDelayHelp.Designer.cs">
+      <DependentUpon>frmAcquisitionDelayHelp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmReferenceTimeOffsetHelp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmReferenceTimeOffsetHelp.Designer.cs">
+      <DependentUpon>frmReferenceTimeOffsetHelp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmStackedSelectionHelpNote.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\Helpers\frmStackedSelectionHelpNote.Designer.cs">
+      <DependentUpon>frmStackedSelectionHelpNote.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoTools\frmCorrectInterlacedDefects.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1265,6 +1283,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\ConvertVideoToAav\frmAdditionalHeaders.resx">
       <DependentUpon>frmAdditionalHeaders.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\Helpers\frmAcquisitionDelayHelp.resx">
+      <DependentUpon>frmAcquisitionDelayHelp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\Helpers\frmReferenceTimeOffsetHelp.resx">
+      <DependentUpon>frmReferenceTimeOffsetHelp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\Helpers\frmStackedSelectionHelpNote.resx">
+      <DependentUpon>frmStackedSelectionHelpNote.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmCorrectInterlacedDefects.resx">
       <DependentUpon>frmCorrectInterlacedDefects.cs</DependentUpon>

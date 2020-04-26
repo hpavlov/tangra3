@@ -2321,6 +2321,7 @@ namespace Tangra.Model.Config
 		public class HelpSystemFlags
 		{
 			public bool DontShowCalibrationHelpFormAgain = false;
+            public bool DontShowStackedSelectionHelpFormAgain = false;
 		}
 
 		public enum SpectroscopyInstrument

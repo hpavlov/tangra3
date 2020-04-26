@@ -431,34 +431,11 @@ namespace Tangra.VideoOperations.LightCurves
                     try
                     {
                         m_StackedSelectionFrame = m_VideoController.StackFrames(TangraConfig.Settings.Photometry.StackedViewNumFrames);
+                        g.DrawImage(m_StackedSelectionFrame, new Point(0, 0));
                     }
                     finally
                     {
                         m_VideoController.SetCursor(Cursors.Default);
-                    }
-                }
-
-                if (m_StackedSelectionFrame != null)
-                {
-                    g.DrawImage(m_StackedSelectionFrame, new Point(0, 0));
-                    for (int i = 0; i < 3; i++)
-                    {
-                        var pen = i == 0 ? Pens.DodgerBlue : Pens.Lime;
-                        g.DrawRectangle(pen, i, i, g.VisibleClipBounds.Width - 1 - 2 * i, g.VisibleClipBounds.Height - 1 - 2 * i);
-                    }
-                    g.DrawRectangle(Pens.DodgerBlue, 0,0, g.VisibleClipBounds.Width - 1, g.VisibleClipBounds.Height - 1);
-                    for (int i = 3; i < 18; i++)
-                    {
-                        using (var pen = new Pen(Color.FromArgb(Math.Min(255, 128 - (i - 4) * 128 / 15), Color.Lime.R, Color.Lime.G, Color.Lime.B)))
-                        {
-                            g.DrawRectangle(pen, i, i, g.VisibleClipBounds.Width - 1 - 2 * i, g.VisibleClipBounds.Height - 1 - 2 * i);
-                        }
-                    }
-                    string message = "FRAMES STACKED FOR EASIER OBJECT SELECTION";
-                    var sizeF = g.MeasureString(message, s_MessageFont);
-                    if (sizeF.Width - 40 < 0.75*g.VisibleClipBounds.Width)
-                    {
-                        g.DrawString(message, s_MessageFont, Brushes.Lime, g.VisibleClipBounds.Width - 20 - sizeF.Width, 20 + sizeF.Height / 2);
                     }
                 }
             }
@@ -483,6 +460,29 @@ namespace Tangra.VideoOperations.LightCurves
 
         public void PostDraw(Graphics g)
         {
+            if (CanShowStackedSelection() && m_StackedSelectionFrame != null)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    var pen = i == 0 ? Pens.DodgerBlue : Pens.Lime;
+                    g.DrawRectangle(pen, i, i, g.VisibleClipBounds.Width - 1 - 2 * i, g.VisibleClipBounds.Height - 1 - 2 * i);
+                }
+                g.DrawRectangle(Pens.DodgerBlue, 0, 0, g.VisibleClipBounds.Width - 1, g.VisibleClipBounds.Height - 1);
+                for (int i = 3; i < 18; i++)
+                {
+                    using (var pen = new Pen(Color.FromArgb(Math.Min(255, 128 - (i - 4) * 128 / 15), Color.Lime.R, Color.Lime.G, Color.Lime.B)))
+                    {
+                        g.DrawRectangle(pen, i, i, g.VisibleClipBounds.Width - 1 - 2 * i, g.VisibleClipBounds.Height - 1 - 2 * i);
+                    }
+                }
+                string message = "FRAMES STACKED FOR EASIER OBJECT SELECTION";
+                var sizeF = g.MeasureString(message, s_MessageFont);
+                if (sizeF.Width - 40 < 0.75 * g.VisibleClipBounds.Width)
+                {
+                    g.DrawString(message, s_MessageFont, Brushes.Lime, g.VisibleClipBounds.Width - 20 - sizeF.Width, 20 + sizeF.Height / 2);
+                }
+            }
+
             try
             {
 				if (m_ViewingLightCurve && m_LightCurveController.LcFile != null)
@@ -1294,6 +1294,7 @@ namespace Tangra.VideoOperations.LightCurves
 			m_ViewingLightCurve = false;
 			m_Configuring = false;
 			m_Correcting = false;
+            m_StackedSelectionFrame = null;
 
 			if (m_StackedAstroImage == null)
             {
@@ -2289,6 +2290,11 @@ namespace Tangra.VideoOperations.LightCurves
         public bool IsStackedSelectionEnabled
         {
             get { return m_StackedSelection; }
+        }
+
+        public bool HasStackedSelectionFrame
+        {
+            get { return m_StackedSelection && m_StackedSelectionFrame != null; }
         }
 
         public bool CanShowStackedSelection()
