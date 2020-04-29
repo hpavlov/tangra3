@@ -2398,6 +2398,8 @@ namespace Tangra.Model.Config
             public bool IsTimeStampAndExposure;
             public string FileHash;
             public string CardNamesHash;
+            public bool FlipHorizontally;
+            public bool FlipVertically;
         }
 
 	    public class RecentFITSFieldConfigSettings
@@ -2465,7 +2467,9 @@ namespace Tangra.Model.Config
 
                     ) &&
                     item1.TimeStampType == item2.TimeStampType &&
-                    item1.ExposureUnit == item2.ExposureUnit;
+                    item1.ExposureUnit == item2.ExposureUnit &&
+                    item1.FlipHorizontally == item2.FlipHorizontally &&
+                    item1.FlipVertically == item2.FlipVertically;
             }
 	    }
 	}

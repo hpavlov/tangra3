@@ -39,15 +39,15 @@
             // 
             this.label1.Location = new System.Drawing.Point(21, 23);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(416, 178);
+            this.label1.Size = new System.Drawing.Size(451, 178);
             this.label1.TabIndex = 1;
             this.label1.Text = resources.GetString("label1.Text");
             // 
             // linkLabel1
             // 
-            this.linkLabel1.Location = new System.Drawing.Point(26, 192);
+            this.linkLabel1.Location = new System.Drawing.Point(26, 181);
             this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(416, 38);
+            this.linkLabel1.Size = new System.Drawing.Size(446, 43);
             this.linkLabel1.TabIndex = 7;
             this.linkLabel1.TabStop = true;
             this.linkLabel1.Text = "Pavlov, H., Gault, D., Using the Windows Clock with Network Time Protocol (NTP) f" +
@@ -58,7 +58,7 @@
             // button1
             // 
             this.button1.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.button1.Location = new System.Drawing.Point(190, 288);
+            this.button1.Location = new System.Drawing.Point(200, 278);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 8;
@@ -68,9 +68,9 @@
             // 
             // linkLabel2
             // 
-            this.linkLabel2.Location = new System.Drawing.Point(26, 235);
+            this.linkLabel2.Location = new System.Drawing.Point(26, 224);
             this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(416, 38);
+            this.linkLabel2.Size = new System.Drawing.Size(446, 38);
             this.linkLabel2.TabIndex = 9;
             this.linkLabel2.TabStop = true;
             this.linkLabel2.Text = "Gault, D., Herald, D., All-Of-System Time Testing Using Lunar Occultations, Journ" +
@@ -81,7 +81,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(463, 329);
+            this.ClientSize = new System.Drawing.Size(484, 323);
             this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.linkLabel1);

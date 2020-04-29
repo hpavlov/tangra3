@@ -159,6 +159,9 @@ namespace Tangra.Video.FITS
             ucTimestampControl.UseRecentFitsConfig(config);
             ucTimestampControl2.UseRecentFitsConfig2(config);
 
+            cbxFlipHorizontally.Checked = config.FlipHorizontally;
+            cbxFlipVertically.Checked = config.FlipVertically;
+
             if (config.ExposureHeader != null)
             {
                 for (int i = 0; i < cbxExposure.Items.Count; i++)
@@ -230,7 +233,9 @@ namespace Tangra.Video.FITS
                     TimeStampHeader2 = singleTimeStampConfig.TimeStampHeader2,
                     TimeStampFormat2 = singleTimeStampConfig.TimeStampFormat2,
                     TimeStampType = singleTimeStampConfig.TimeStampType,
-                    IsTimeStampAndExposure = true
+                    IsTimeStampAndExposure = true,
+                    FlipHorizontally = cbxFlipHorizontally.Checked,
+                    FlipVertically = cbxFlipVertically.Checked
                 };
 
                 TimeStampReader = new FITSTimeStampReader(config);
@@ -269,7 +274,9 @@ namespace Tangra.Video.FITS
                     TimeStamp2Format = endTimeStampConfig.TimeStampFormat,
                     TimeStamp2Header2 = endTimeStampConfig.TimeStampHeader2,
                     TimeStamp2Format2 = endTimeStampConfig.TimeStampFormat2,
-                    IsTimeStampAndExposure = false
+                    IsTimeStampAndExposure = false,
+                    FlipHorizontally = cbxFlipHorizontally.Checked,
+                    FlipVertically = cbxFlipVertically.Checked
                 };
 
                 TimeStampReader = new FITSTimeStampReader(config);
