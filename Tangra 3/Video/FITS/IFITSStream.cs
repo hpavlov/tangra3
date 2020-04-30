@@ -5,10 +5,8 @@ using System.Text;
 
 namespace Tangra.Video.FITS
 {
-    public interface IFITSStream
+    public interface IFITSStream : IDynamicRangeStream
     {
-        uint MinPixelValue { get; }
-        uint MaxPixelValue { get; }
         bool HasUTCTimeStamps { get; }
     }
 }

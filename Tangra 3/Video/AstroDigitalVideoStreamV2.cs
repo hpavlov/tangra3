@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 using Adv;
 using Tangra.Helpers;
 using Tangra.Model.Config;
@@ -23,7 +24,7 @@ using Extensions = Tangra.Model.Helpers.Extensions;
 
 namespace Tangra.Video
 {
-    public class AstroDigitalVideoStreamV2 : IFrameStream, IFileHeaderProvider, IDisposable
+    public class AstroDigitalVideoStreamV2 : IFrameStream, IFileHeaderProvider, IDynamicRangeStream, IDisposable
     {
         public static IFrameStream OpenFile(string fileName, out AdvFileMetadataInfo fileMetadataInfo, out GeoLocationInfo geoLocation)
         {
@@ -72,6 +73,10 @@ namespace Tangra.Video
         private int? m_AAVVersion = null;
         private double? m_KnownAcquisitionDelayMs = null;
 
+        private uint? m_MinPixelValueFirstImage;
+        private uint? m_MaxPixelValueFirstImage;
+        private bool m_CanDetermineAutoDynamicRange;
+
         private AdvFile2 m_AdvFile;
 
         private object m_SyncLock = new object();
@@ -98,6 +103,9 @@ namespace Tangra.Video
             m_Width = m_AdvFile.Width;
             m_Height = m_AdvFile.Height;
             m_MaxPixelValue = (uint)m_AdvFile.MaxPixelValue;
+
+            // For the time being don't allow auto dynamic range for ROI type videos
+            m_CanDetermineAutoDynamicRange = !m_AdvFile.ImageLayouts.Any(x => x.ImageLayoutTags.ContainsKey("ROI-COUNT") && x.ImageLayoutTags["ROI-COUNT"] != "0");
 
             m_FrameRate = 0;
             m_AAVVersion = 0;
@@ -539,6 +547,66 @@ namespace Tangra.Video
             }
 
             return rv;
+        }
+
+        private void GetFirstFramePixelStats()
+        {
+            if (m_AdvFile.MainSteamInfo.FrameCount == 0) 
+                return;
+
+            uint[] pixels;
+            Adv.AdvFrameInfo advFrameInfo;
+
+            lock (m_SyncLock)
+            {
+                pixels = m_AdvFile.GetMainFramePixels((uint) 0, out advFrameInfo);
+            }
+
+            var pixMin = pixels.Min();
+            var pixMax = pixels.Max();
+
+            if (!m_CanDetermineAutoDynamicRange)
+            {
+                m_MinPixelValueFirstImage = pixMin;
+                m_MaxPixelValueFirstImage = pixMax;
+                return;
+            }
+
+            DynamicRangeHelper.SuggestUpperLowerAutoDynamicRangeLimit(pixels, pixMin, pixMax, out m_MinPixelValueFirstImage, out m_MaxPixelValueFirstImage);
+        }
+
+        public uint MinPixelValue
+        {
+            get
+            {
+                if (m_MinPixelValueFirstImage == null)
+                {
+                    GetFirstFramePixelStats();
+                }
+
+                return m_MinPixelValueFirstImage ?? 0;
+            }
+        }
+
+        public uint MaxPixelValue
+        {
+            get
+            {
+                if (m_MaxPixelValueFirstImage == null)
+                {
+                    GetFirstFramePixelStats();
+                }
+
+                return m_MaxPixelValueFirstImage ?? 0;
+            }
+        }
+
+        public bool CanDetermineAutoDynamicRange
+        {
+            get
+            {
+                return m_CanDetermineAutoDynamicRange;
+            }
         }
     }
 }

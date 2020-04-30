@@ -44,8 +44,12 @@ namespace Tangra.Video.SER
         EndFrame
     }
 
-	public class SERVideoStream : IFrameStream
+    public class SERVideoStream : IFrameStream, IDynamicRangeStream
 	{
+        private uint? m_MinPixelValueFirstImage;
+        
+        private uint? m_MaxPixelValueFirstImage;
+
         public static SERVideoStream OpenFile(string fileName, IWin32Window parentForm, TangraOpenFileArgs args, out SerEquipmentInfo equipmentInfo)
 		{
 			var fileInfo = new SerFileInfo();
@@ -147,6 +151,7 @@ namespace Tangra.Video.SER
                     rv = new SERVideoStream(fileName, derivedFrameRate, bitPix, grayScaleRGB, serTiming, fireCaptureTimeStamps, frmTsExp.ConfirmedTimeReference);
                 }
             }
+
             return rv;
 		}
 
@@ -437,6 +442,23 @@ namespace Tangra.Video.SER
 			}
 		}
 
+        private void GetFirstFramePixelStats()
+        {
+            uint[] pixels = new uint[Width * Height];
+            uint[] unprocessedPixels = new uint[Width * Height];
+            byte[] displayBitmapBytes = new byte[Width * Height];
+            byte[] rawBitmapBytes = new byte[Pixelmap.GetBitmapBIRGBPixelArraySize(24, Width, Height) + 40 + 14 + 1];
+
+            var frameInfo = new SerNativeFrameInfo();
+
+            TangraCore.SERGetFrame(FirstFrame, pixels, unprocessedPixels, rawBitmapBytes, displayBitmapBytes, (ushort)BitPix, ref frameInfo);
+
+            var pixMin = unprocessedPixels.Min();
+            var pixMax = unprocessedPixels.Max();
+
+            DynamicRangeHelper.SuggestUpperLowerAutoDynamicRangeLimit(pixels, pixMin, pixMax, out m_MinPixelValueFirstImage, out m_MaxPixelValueFirstImage);
+        }
+
 		public string Engine
 		{
 			get { return "SER"; }
@@ -460,6 +482,37 @@ namespace Tangra.Video.SER
         public bool SupportsFrameFileNames
         {
             get { return false; }
+        }
+
+        public uint MinPixelValue
+        {
+            get
+            {
+                if (m_MinPixelValueFirstImage == null)
+                {
+                    GetFirstFramePixelStats();
+                }
+
+                return m_MinPixelValueFirstImage ?? 0;
+            }
+        }
+
+        public uint MaxPixelValue
+        {
+            get
+            {
+                if (m_MaxPixelValueFirstImage == null)
+                {
+                    GetFirstFramePixelStats();
+                }
+
+                return m_MaxPixelValueFirstImage ?? 0;
+            }
+        }
+
+        public bool CanDetermineAutoDynamicRange
+        {
+            get { return true; }
         }
 	}
 }

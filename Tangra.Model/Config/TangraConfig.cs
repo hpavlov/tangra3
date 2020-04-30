@@ -700,6 +700,12 @@ namespace Tangra.Model.Config
 
             public bool TangraEndOfLifeWarningShown = false;
             public bool ShowZeroADULevel = false;
+
+            public int MinAutoDynamicRanage = 30;
+            public int MaxAutoDynamicRanage = 70;
+            public bool AutoDynamicRanageEnabledForSER = true;
+            public bool AutoDynamicRanageEnabledForADV = true;
+            public bool AutoDynamicRanageEnabledForFITS = true;
 		}
 
         [Serializable]

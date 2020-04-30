@@ -1014,6 +1014,7 @@
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\BMPFileSequenceStream.cs" />
+    <Compile Include="Video\IDynamicRangeStream.cs" />
     <Compile Include="Video\FITS\FITSFileSequenceStream.cs" />
     <Compile Include="Video\FITS\FitsTimestampHelper.cs" />
     <Compile Include="Video\FITS\frmDefinePixelMapping.cs">

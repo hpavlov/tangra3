@@ -190,5 +190,10 @@ namespace Tangra.Video.FITS
         {
             get { return m_MaxPixelValueFirstImage; }
         }
+
+        public bool CanDetermineAutoDynamicRange
+        {
+            get { return true; }
+        }
     }
 }

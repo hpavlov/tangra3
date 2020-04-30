@@ -494,7 +494,7 @@ namespace Tangra
 				{
 					if (m_VideoController.OpenVideoFile(fileName))
 					{
-                        if ((m_VideoController.IsFitsCube || m_VideoController.IsFitsFile) && tsmiDynamic.Checked)
+                        if (m_VideoController.IsDynamicRangeStream && tsmiDynamic.Checked)
                         {
                             var frmDynRange = new frmDefineDynamicRange(m_VideoController);
                             frmDynRange.StartPosition = FormStartPosition.Manual;

@@ -34,6 +34,12 @@ namespace Tangra.Config.SettingPannels
 			cbxCameraResponseFullFrame.Checked = TangraConfig.Settings.Generic.ReverseCameraResponse;
             DeserializeCameraResponseParameters(TangraConfig.Settings.Photometry.KnownCameraResponseParams);
 
+            nudMinAutoDynamicRange.SetNUDValue(TangraConfig.Settings.Generic.MinAutoDynamicRanage);
+            nudMaxAutoDynamicRange.SetNUDValue(TangraConfig.Settings.Generic.MaxAutoDynamicRanage);
+            cbxSER.Checked = TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForSER;
+            cbxADV.Checked = TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForADV;
+            cbxFITS.Checked = TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForFITS;
+
 			m_GammaWillChange = false;
 			m_CameraResponseReverseWillChange = false;
 
@@ -53,6 +59,20 @@ namespace Tangra.Config.SettingPannels
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return false;
+	        }
+
+	        if (nudMinAutoDynamicRange.Value > nudMaxAutoDynamicRange.Value)
+	        {
+                nudMaxAutoDynamicRange.Focus();
+
+                MessageBox.Show(
+                    this,
+                    "Upper limit should be bigger than the Lower limit",
+                    "Tangra",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+	            return false;
 	        }
 
             return true;
@@ -91,6 +111,12 @@ namespace Tangra.Config.SettingPannels
 				TangraConfig.Settings.Generic.ReverseCameraResponse = false;
                 TangraConfig.Settings.Photometry.KnownCameraResponse = TangraConfig.KnownCameraResponse.Undefined;
 			}
+
+            TangraConfig.Settings.Generic.MinAutoDynamicRanage = (int)nudMinAutoDynamicRange.Value;
+            TangraConfig.Settings.Generic.MaxAutoDynamicRanage = (int)nudMaxAutoDynamicRange.Value;
+            TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForSER = cbxSER.Checked;
+	        TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForADV = cbxADV.Checked;
+            TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForFITS = cbxFITS.Checked;
 		}
 
 		public override void OnPostSaveSettings()

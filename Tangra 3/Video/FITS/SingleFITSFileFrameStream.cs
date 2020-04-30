@@ -217,6 +217,11 @@ namespace Tangra.Video.FITS
             get { return m_MaxPixelValue; }
         }
 
+        public bool CanDetermineAutoDynamicRange
+        {
+            get { return true; }
+        }
+
         public bool HasUTCTimeStamps { get; private set; }
     }
 }
