@@ -26,4 +26,17 @@ namespace Tangra.Model.Config
 
         public string DisplayName { get; private set; }
     }
+
+    public class EnumValDetailsAttribute : Attribute
+    {
+        public EnumValDetailsAttribute(string description, string url)
+        {
+            Description = description;
+            Url = url;
+        }
+
+        public string Description { get; private set; }
+
+        public string Url { get; private set; }
+    }
 }

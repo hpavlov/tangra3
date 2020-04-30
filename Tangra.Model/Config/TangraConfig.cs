@@ -396,37 +396,39 @@ namespace Tangra.Model.Config
 	    {
             [GenericCameraSystem]
             [EnumValDisplayName("Other")]
+            [EnumValDetails("Other camera not listed above with or without integrated GPS receiver.", null)]
             Other = 0,
-
-            [Description("ADVS")]
-            [EnumValDisplayName("ADVS")]
-            [ProvidesUtcTime]
-	        Advs = 1,
 
             [Description("QHY174-GPS")]
             [EnumValDisplayName("QHY174-GPS")]
+            [EnumValDetails("The QHY174M-GPS and QHY174C-GPS cameras will record the global shutter exposure starting and ending time with microsecond precision.", "https://www.qhyccd.com")]
             [ProvidesUtcTime]
-            Qhy174Gps = 2,
+            Qhy174Gps = 1,
 
             [Description("DVTI-CAM")]
             [EnumValDisplayName("DVTI")]
+            [EnumValDetails("A digital video camera with precise GPS timestamp from integrated GPS receiver module.", "https://groups.io/g/d-vti-cam")]
             [ProvidesUtcTime]
-            Dvti = 3
+            Dvti = 2
 	    }
 
 	    public enum TimestampingSystem
 	    {
             [RequiresTimingCorrections]
             [EnumValDisplayName("Other")]
+            [EnumValDetails("This should be a very rare and unsual choise but it is here is case none of the other options above applies to you.", null)]
             Other = 0,
 
             [EnumValDisplayName("UTC Timestamp by the Camera")]
+            [EnumValDetails("The camera has access to UTC, typically via a GPS receiver. It associates accurate time with the exposures and sends this with each frame as metadata or via the driver.", null)]
             UtcTimestampInsideCamera = 1,
 
             [EnumValDisplayName("UTC Triggered Exposure")]
+            [EnumValDetails("The camera allows exposures to be triggered by an external device and such a device with access to UTC, typically via a GPS receiver, is triggering the exposures and recording the timestamps.", null)]
             UtcTriggeredExposure = 2,
 
             [EnumValDisplayName("Windows Timestamp by Recording Software")]
+            [EnumValDetails("The Windows Clock may be synchronised to UTC by external source or device such as GPS or an NTP Server. The recording software is using the Windows Clock to timestamp the recorded frames as they are received.", null)]
             [RequiresTimingCorrections]
             WindowsTimestampByRecorder = 3
 	    }

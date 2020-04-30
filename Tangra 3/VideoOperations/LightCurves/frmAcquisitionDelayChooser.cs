@@ -40,7 +40,7 @@ namespace Tangra.VideoOperations.LightCurves
             cbxCameraSystem.Items.Add(cameraSystems[0].GetEnumValDisplayName());
 
             var timestampingSystems = Enum.GetValues(typeof(TangraConfig.TimestampingSystem)).Cast<TangraConfig.TimestampingSystem>().ToList();
-            for (int i = 1; i < cameraSystems.Count; i++)
+            for (int i = 1; i < timestampingSystems.Count; i++)
             {
                 cbxTimestamping.Items.Add(timestampingSystems[i].GetEnumValDisplayName());
             }
@@ -213,12 +213,37 @@ namespace Tangra.VideoOperations.LightCurves
         }
 
         private void UpdateControlState()
-        {
-            tbxCameraModel.Visible = cbxCameraSystem.SelectedIndex > -1 && SelectedCameraSystem().IsGenericCameraSystem();
+        { 
+            TangraConfig.CameraSystem? selectedCameraSystem = cbxCameraSystem.SelectedIndex > -1 ? SelectedCameraSystem() : (TangraConfig.CameraSystem?)null;
+            tbxCameraModel.Visible = selectedCameraSystem != null && selectedCameraSystem.Value.IsGenericCameraSystem();
             pnlTimestamping.Visible = cbxCameraSystem.SelectedIndex > -1;
 
-            pnlTimingCorrections.Visible = cbxTimestamping.SelectedIndex > -1 && SelectedTimestampingSystem().RequiresTimingCorrections();
+            TangraConfig.TimestampingSystem? selectedTimestampingSystem = cbxTimestamping.SelectedIndex > -1 ? SelectedTimestampingSystem() : (TangraConfig.TimestampingSystem?)null;
+
+            pnlTimingCorrections.Visible = selectedTimestampingSystem != null && selectedTimestampingSystem.Value.RequiresTimingCorrections();
             pnlReferenceTimeOffset.Enabled = cbxEnterRefertenceTimeOffset.Checked;
+
+            if (selectedCameraSystem == null)
+            {
+                lblCameraSystem.Text = null;
+                llCameraSystemLink.Text = null;
+            }
+            else
+            {
+                var att = selectedCameraSystem.Value.GetEnumValDetails();
+                lblCameraSystem.Text = att != null ? att.Description : null;
+                llCameraSystemLink.Text = att != null ? att.Url : null;
+            }
+
+            if (selectedTimestampingSystem == null)
+            {
+                lblTimestamping.Text = null;
+            }
+            else
+            {
+                var att = selectedTimestampingSystem.Value.GetEnumValDetails();
+                lblTimestamping.Text = att != null ? att.Description : null;
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -254,6 +279,11 @@ namespace Tangra.VideoOperations.LightCurves
                 return (TangraConfig.CameraSystem)(cbxCameraSystem.SelectedIndex + 1);
             }
             return TangraConfig.CameraSystem.Other;
+        }
+
+        private void llCameraSystemLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            ShellHelper.OpenUrl(llCameraSystemLink.Text);
         }
     }
 }

@@ -200,5 +200,21 @@ namespace Tangra.Helpers
             else
                 return value.ToString();
         }
+
+        public static EnumValDetailsAttribute GetEnumValDetails(this Enum value)
+        {
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            EnumValDetailsAttribute[] attributes =
+                (EnumValDetailsAttribute[])fi.GetCustomAttributes(
+                typeof(EnumValDetailsAttribute),
+                false);
+
+            if (attributes.Length > 0)
+                return attributes[0];
+            else
+                return null;
+        }
+        
 	}
 }
