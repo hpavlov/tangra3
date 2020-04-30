@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tangra.Controller;
+using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.LightCurves.Helpers;
@@ -30,6 +31,20 @@ namespace Tangra.VideoOperations.LightCurves
             : this()
         {
             m_VideoController = videoController;
+
+            var cameraSystems = Enum.GetValues(typeof(TangraConfig.CameraSystem)).Cast<TangraConfig.CameraSystem>().ToList();
+            for (int i = 1; i < cameraSystems.Count; i++)
+            {
+                cbxCameraSystem.Items.Add(cameraSystems[i].GetEnumValDisplayName());
+            }
+            cbxCameraSystem.Items.Add(cameraSystems[0].GetEnumValDisplayName());
+
+            var timestampingSystems = Enum.GetValues(typeof(TangraConfig.TimestampingSystem)).Cast<TangraConfig.TimestampingSystem>().ToList();
+            for (int i = 1; i < cameraSystems.Count; i++)
+            {
+                cbxTimestamping.Items.Add(timestampingSystems[i].GetEnumValDisplayName());
+            }
+            cbxTimestamping.Items.Add(timestampingSystems[0].GetEnumValDisplayName());
 
             if (TangraConfig.Settings.LastUsed.TimingCorrectionsCameraSystem != null)
             {
@@ -91,10 +106,9 @@ namespace Tangra.VideoOperations.LightCurves
                 return;
             }
 
-            TangraConfig.CameraSystem cameraSystem = TangraConfig.CameraSystem.Other;
-            if (cbxCameraSystem.SelectedIndex != cbxCameraSystem.Items.Count - 1)
+            TangraConfig.CameraSystem cameraSystem = SelectedCameraSystem();
+            if (cameraSystem != TangraConfig.CameraSystem.Other)
             {
-                cameraSystem = (TangraConfig.CameraSystem) (cbxCameraSystem.SelectedIndex + 1);
                 CameraModel = cameraSystem.GetEnumDescription();
             }
             else 
@@ -116,14 +130,8 @@ namespace Tangra.VideoOperations.LightCurves
                 return;
             }
 
-            TangraConfig.TimestampingSystem timestampingSystem = TangraConfig.TimestampingSystem.Other;
-            if (cbxTimestamping.SelectedIndex != cbxTimestamping.Items.Count - 1)
-            {
-                timestampingSystem = (TangraConfig.TimestampingSystem)(cbxTimestamping.SelectedIndex + 1);
-            }
-
             TangraConfig.Settings.LastUsed.TimingCorrectionsCameraSystem = cameraSystem;
-            TangraConfig.Settings.LastUsed.TimingCorrectionsTimestampingSystem = timestampingSystem;
+            TangraConfig.Settings.LastUsed.TimingCorrectionsTimestampingSystem = SelectedTimestampingSystem();
             TangraConfig.Settings.LastUsed.TimingCorrectionsCameraName = tbxCameraModel.Text;
 
 
@@ -185,7 +193,7 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void cbxCameraSystem_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbxCameraSystem.SelectedIndex >= 0 && cbxCameraSystem.SelectedIndex <= 2)
+            if (cbxCameraSystem.SelectedIndex > -1 && SelectedCameraSystem().ProvidesUtcTime())
             {
                 cbxTimestamping.SelectedIndex = 0;
                 cbxTimestamping.Enabled = false;
@@ -206,10 +214,10 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void UpdateControlState()
         {
-            tbxCameraModel.Visible = cbxCameraSystem.SelectedIndex == 3;
+            tbxCameraModel.Visible = cbxCameraSystem.SelectedIndex > -1 && SelectedCameraSystem().IsGenericCameraSystem();
             pnlTimestamping.Visible = cbxCameraSystem.SelectedIndex > -1;
 
-            pnlTimingCorrections.Visible = cbxTimestamping.SelectedIndex > 0;
+            pnlTimingCorrections.Visible = cbxTimestamping.SelectedIndex > -1 && SelectedTimestampingSystem().RequiresTimingCorrections();
             pnlReferenceTimeOffset.Enabled = cbxEnterRefertenceTimeOffset.Checked;
         }
 
@@ -228,6 +236,24 @@ namespace Tangra.VideoOperations.LightCurves
         private void cbxEnterRefertenceTimeOffset_CheckedChanged(object sender, EventArgs e)
         {
             UpdateControlState();
+        }
+
+        private TangraConfig.TimestampingSystem SelectedTimestampingSystem()
+        {
+            if (cbxTimestamping.SelectedIndex != cbxTimestamping.Items.Count - 1)
+            {
+                return (TangraConfig.TimestampingSystem)(cbxTimestamping.SelectedIndex + 1);
+            }
+            return TangraConfig.TimestampingSystem.Other;
+        }
+
+        private TangraConfig.CameraSystem SelectedCameraSystem()
+        {
+            if (cbxCameraSystem.SelectedIndex != cbxCameraSystem.Items.Count - 1)
+            {
+                return (TangraConfig.CameraSystem)(cbxCameraSystem.SelectedIndex + 1);
+            }
+            return TangraConfig.CameraSystem.Other;
         }
     }
 }

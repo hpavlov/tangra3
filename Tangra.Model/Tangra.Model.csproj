@@ -145,6 +145,7 @@
     <Compile Include="Config\SerSettings.cs" />
     <Compile Include="Config\StarMapInternalConfig.cs" />
     <Compile Include="Config\TangraConfig.cs" />
+    <Compile Include="Config\TangraConfigAttributes.cs" />
     <Compile Include="Config\VideoCamera.cs" />
     <Compile Include="Context\ApplicationContext.cs" />
     <Compile Include="Context\RenderFrameContext.cs" />

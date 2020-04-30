@@ -394,23 +394,41 @@ namespace Tangra.Model.Config
 
 	    public enum CameraSystem
 	    {
+            [GenericCameraSystem]
+            [EnumValDisplayName("Other")]
             Other = 0,
 
             [Description("ADVS")]
+            [EnumValDisplayName("ADVS")]
+            [ProvidesUtcTime]
 	        Advs = 1,
 
             [Description("QHY174-GPS")]
+            [EnumValDisplayName("QHY174-GPS")]
+            [ProvidesUtcTime]
             Qhy174Gps = 2,
 
             [Description("DVTI-CAM")]
+            [EnumValDisplayName("DVTI")]
+            [ProvidesUtcTime]
             Dvti = 3
 	    }
 
 	    public enum TimestampingSystem
 	    {
+            [RequiresTimingCorrections]
+            [EnumValDisplayName("Other")]
             Other = 0,
-            GpsInsideCamera = 1,
-            WindowsTimestampByRecorder = 2
+
+            [EnumValDisplayName("UTC Timestamp by the Camera")]
+            UtcTimestampInsideCamera = 1,
+
+            [EnumValDisplayName("UTC Triggered Exposure")]
+            UtcTriggeredExposure = 2,
+
+            [EnumValDisplayName("Windows Timestamp by Recording Software")]
+            [RequiresTimingCorrections]
+            WindowsTimestampByRecorder = 3
 	    }
 
 		public enum KnownCameraResponse

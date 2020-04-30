@@ -4,13 +4,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
+using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.LightCurves;
 
@@ -145,6 +148,57 @@ namespace Tangra.Helpers
                 xmlSerializer.Serialize(memStr, instance);
                 return memStr.ToString();
             }
+        }
+
+        public static bool RequiresTimingCorrections(this TangraConfig.TimestampingSystem value)
+	    {
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            RequiresTimingCorrectionsAttribute[] attributes =
+                (RequiresTimingCorrectionsAttribute[])fi.GetCustomAttributes(
+                typeof(RequiresTimingCorrectionsAttribute),
+                false);
+
+            return attributes.Length > 0;
+	    }
+
+        public static bool IsGenericCameraSystem(this TangraConfig.CameraSystem value)
+        {
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            GenericCameraSystemAttribute[] attributes =
+                (GenericCameraSystemAttribute[])fi.GetCustomAttributes(
+                typeof(GenericCameraSystemAttribute),
+                false);
+
+            return attributes.Length > 0;
+        }
+
+        public static bool ProvidesUtcTime(this TangraConfig.CameraSystem value)
+        {
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            ProvidesUtcTimeAttribute[] attributes =
+                (ProvidesUtcTimeAttribute[])fi.GetCustomAttributes(
+                typeof(ProvidesUtcTimeAttribute),
+                false);
+
+            return attributes.Length > 0;
+        }
+
+        public static string GetEnumValDisplayName(this Enum value)
+        {
+            FieldInfo fi = value.GetType().GetField(value.ToString());
+
+            EnumValDisplayNameAttribute[] attributes =
+                (EnumValDisplayNameAttribute[])fi.GetCustomAttributes(
+                typeof(EnumValDisplayNameAttribute),
+                false);
+
+            if (attributes.Length > 0)
+                return attributes[0].DisplayName;
+            else
+                return value.ToString();
         }
 	}
 }

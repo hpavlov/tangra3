@@ -45,15 +45,15 @@
             this.button2 = new System.Windows.Forms.Button();
             this.pnlTimingCorrections = new System.Windows.Forms.Panel();
             this.cbxEnterRefertenceTimeOffset = new System.Windows.Forms.CheckBox();
+            this.pnlReferenceTimeOffset = new System.Windows.Forms.Panel();
+            this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.pnlTimestamping = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label7 = new System.Windows.Forms.Label();
-            this.pnlReferenceTimeOffset = new System.Windows.Forms.Panel();
             this.pnlTimingCorrections.SuspendLayout();
-            this.pnlTimestamping.SuspendLayout();
             this.pnlReferenceTimeOffset.SuspendLayout();
+            this.pnlTimestamping.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnOK
@@ -92,11 +92,6 @@
             // 
             this.cbxCameraSystem.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxCameraSystem.FormattingEnabled = true;
-            this.cbxCameraSystem.Items.AddRange(new object[] {
-            "ADVS",
-            "QHY174-GPS",
-            "DVTI",
-            "Other"});
             this.cbxCameraSystem.Location = new System.Drawing.Point(112, 43);
             this.cbxCameraSystem.Name = "cbxCameraSystem";
             this.cbxCameraSystem.Size = new System.Drawing.Size(121, 21);
@@ -133,10 +128,6 @@
             // 
             this.cbxTimestamping.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxTimestamping.FormattingEnabled = true;
-            this.cbxTimestamping.Items.AddRange(new object[] {
-            "GPS Timestamps by the Camera",
-            "Windows Timestamp by Recording Software",
-            "Other"});
             this.cbxTimestamping.Location = new System.Drawing.Point(100, 3);
             this.cbxTimestamping.Name = "cbxTimestamping";
             this.cbxTimestamping.Size = new System.Drawing.Size(248, 21);
@@ -205,6 +196,26 @@
             this.cbxEnterRefertenceTimeOffset.UseVisualStyleBackColor = true;
             this.cbxEnterRefertenceTimeOffset.CheckedChanged += new System.EventHandler(this.cbxEnterRefertenceTimeOffset_CheckedChanged);
             // 
+            // pnlReferenceTimeOffset
+            // 
+            this.pnlReferenceTimeOffset.Controls.Add(this.label7);
+            this.pnlReferenceTimeOffset.Controls.Add(this.label5);
+            this.pnlReferenceTimeOffset.Controls.Add(this.tbxReferenceTimeOffset);
+            this.pnlReferenceTimeOffset.Controls.Add(this.button2);
+            this.pnlReferenceTimeOffset.Location = new System.Drawing.Point(28, 33);
+            this.pnlReferenceTimeOffset.Name = "pnlReferenceTimeOffset";
+            this.pnlReferenceTimeOffset.Size = new System.Drawing.Size(428, 29);
+            this.pnlReferenceTimeOffset.TabIndex = 25;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(1, 8);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(148, 13);
+            this.label7.TabIndex = 24;
+            this.label7.Text = "(ReferenceTime - UTC) Offset";
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -240,26 +251,6 @@
             this.panel1.Size = new System.Drawing.Size(456, 1);
             this.panel1.TabIndex = 23;
             // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(1, 8);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(148, 13);
-            this.label7.TabIndex = 24;
-            this.label7.Text = "(ReferenceTime - UTC) Offset";
-            // 
-            // pnlReferenceTimeOffset
-            // 
-            this.pnlReferenceTimeOffset.Controls.Add(this.label7);
-            this.pnlReferenceTimeOffset.Controls.Add(this.label5);
-            this.pnlReferenceTimeOffset.Controls.Add(this.tbxReferenceTimeOffset);
-            this.pnlReferenceTimeOffset.Controls.Add(this.button2);
-            this.pnlReferenceTimeOffset.Location = new System.Drawing.Point(28, 33);
-            this.pnlReferenceTimeOffset.Name = "pnlReferenceTimeOffset";
-            this.pnlReferenceTimeOffset.Size = new System.Drawing.Size(428, 29);
-            this.pnlReferenceTimeOffset.TabIndex = 25;
-            // 
             // frmAcquisitionDelayChooser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -281,10 +272,10 @@
             this.Text = "Camera and Timing Corrections";
             this.pnlTimingCorrections.ResumeLayout(false);
             this.pnlTimingCorrections.PerformLayout();
-            this.pnlTimestamping.ResumeLayout(false);
-            this.pnlTimestamping.PerformLayout();
             this.pnlReferenceTimeOffset.ResumeLayout(false);
             this.pnlReferenceTimeOffset.PerformLayout();
+            this.pnlTimestamping.ResumeLayout(false);
+            this.pnlTimestamping.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
