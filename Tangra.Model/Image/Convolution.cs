@@ -1303,5 +1303,39 @@ namespace Tangra.Model.Image
 
 			return mode;
 		}
+
+        public static byte[] GetBitmapPixels(Bitmap bitmap)
+        {
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+
+            var rv = new byte[width * height];
+
+            BitmapData bmData = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+            int stride = bmData.Stride;
+
+            unsafe
+            {
+                byte* p = (byte*)(void*)bmData.Scan0;
+
+                int nOffset = stride - bmData.Width * 3;
+
+                for (int y = 0; y < bmData.Height; ++y)
+                {
+                    for (int x = 0; x < bmData.Width; ++x)
+                    {
+                        rv[y * width + x] = p[0];
+
+                        p += 3;
+                    }
+                    p += nOffset;
+                }
+            }
+
+            bitmap.UnlockBits(bmData);
+
+            return rv;
+        }
 	}
 }

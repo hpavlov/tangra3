@@ -117,6 +117,19 @@ namespace Tangra.Model.Astro
                 return m_Pixelmap.Pixels;
         }
 
+	    public AstroImage Clone()
+	    {
+	        if (Pixelmap.DisplayBitmap != null)
+	        {
+                var bitmapPixels = BitmapFilter.GetBitmapPixels(Pixelmap.DisplayBitmap);
+                var bitmap = Pixelmap.ConstructBitmapFromBitmapPixels(bitmapPixels, Width, Height);
+                var pixMap = new Pixelmap(Width, Height, BitPix, Pixelmap.Pixels, bitmap, bitmapPixels);
+                return new AstroImage(pixMap);
+	        }
+            else
+                return new AstroImage(new Pixelmap(Pixelmap));
+	    }
+
         private uint m_MedianNoise = UInt32.MaxValue;
         public uint MedianNoise
         {
@@ -219,6 +232,34 @@ namespace Tangra.Model.Astro
                     if (x >= 0 && x < width && y >= 0 & y < height)
                     {
                         byteVal = m_Pixelmap.DisplayBitmapPixels[x + y * m_Width];
+                    }
+
+                    pixels[x - x0 + halfWidth, y - y0 + halfWidth] = byteVal;
+                }
+
+            return pixels;
+        }
+
+        public byte[,] GetMeasurableAreaDisplayBitmapPixels(byte[] bitmapPixels, int xCenter, int yCenter, int matrixSize)
+        {
+            byte[,] pixels = new byte[matrixSize, matrixSize];
+
+            int height = m_Height;
+            int width = m_Width;
+
+            int x0 = xCenter;
+            int y0 = yCenter;
+
+            int halfWidth = matrixSize / 2;
+
+            for (int x = x0 - halfWidth; x <= x0 + halfWidth; x++)
+                for (int y = y0 - halfWidth; y <= y0 + halfWidth; y++)
+                {
+                    byte byteVal = 0;
+
+                    if (x >= 0 && x < width && y >= 0 & y < height)
+                    {
+                        byteVal = bitmapPixels[x + y * m_Width];
                     }
 
                     pixels[x - x0 + halfWidth, y - y0 + halfWidth] = byteVal;

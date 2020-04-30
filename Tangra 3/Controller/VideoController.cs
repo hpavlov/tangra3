@@ -1717,7 +1717,7 @@ namespace Tangra.Controller
 
         public void UpdateZoomedImage(Bitmap zoomedBitmap, ImagePixel center, Pixelmap displayPixelmap = null)
         {
-			ApplyDisplayModeAdjustments(zoomedBitmap, false, displayPixelmap);
+			ApplyDisplayModeAdjustments(zoomedBitmap, false, displayPixelmap, true);
 
             m_ZoomedImageView.UpdateImage(zoomedBitmap);
 
@@ -1769,7 +1769,7 @@ namespace Tangra.Controller
 			}
         }
 
-	    public Bitmap StackFrames(int stackedFrames)
+	    public Pixelmap StackFrames(int stackedFrames)
 	    {
 	        try
 	        {
@@ -1789,7 +1789,7 @@ namespace Tangra.Controller
                     ShowForm(frm);
                 }
 
-                return intPixMap.DisplayBitmap;
+                return intPixMap;
 	        }
 	        catch (Exception ex)
 	        {
@@ -1888,9 +1888,9 @@ namespace Tangra.Controller
 			{ }
 		}
 
-		public void ApplyDisplayModeAdjustments(Bitmap displayBitmap, bool enableBackgroundGlow = false, Pixelmap displayPixelmap = null)
+		public void ApplyDisplayModeAdjustments(Bitmap displayBitmap, bool enableBackgroundGlow = false, Pixelmap displayPixelmap = null, bool isZoomedImage = false)
         {
-		    if (!CanApplyDisplayModeAdjustmentsNow())
+            if (!CanApplyDisplayModeAdjustmentsNow() && !isZoomedImage)
 		    {
 		        return;
 		    }

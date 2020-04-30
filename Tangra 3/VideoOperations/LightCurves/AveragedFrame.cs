@@ -18,7 +18,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 		public AveragedFrame(AstroImage image)
 		{
-			m_Image = image;
+            m_Image = image.Clone();
 		}
 
 		public Pixelmap Pixelmap

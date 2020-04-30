@@ -50,7 +50,7 @@ namespace Tangra.VideoOperations.LightCurves
         internal AstroImage m_AstroImage;
 
         private ucLightCurves m_ControlPanel = null;
-        internal AstroImage m_StackedAstroImage;
+        private AstroImage m_StackedAstroImage;
 
         private object m_SyncRoot = new object();
 
@@ -101,7 +101,7 @@ namespace Tangra.VideoOperations.LightCurves
         private int m_FitsDynamicToValue;
 
         private bool m_StackedSelection;
-        private Bitmap m_StackedSelectionFrame;
+        private AstroImage m_StackedSelectionFrame;
 
         private LCState m_BackedUpSelectMeasuringStarsState = null;
 
@@ -273,6 +273,7 @@ namespace Tangra.VideoOperations.LightCurves
             {
                 if (m_CurrFrameNo != frameNo) m_StackedAstroImage = null;
                 if (frameNo != m_StateMachine.SelectedObjectFrameNo) m_StateMachine.SelectedObject = null;
+                ResetStackedSelectionFrame();
             }
 
             if (m_Refining || m_Measuring)
@@ -432,8 +433,8 @@ namespace Tangra.VideoOperations.LightCurves
                     m_VideoController.SetCursor(Cursors.WaitCursor);
                     try
                     {
-                        m_StackedSelectionFrame = m_VideoController.StackFrames(TangraConfig.Settings.Photometry.StackedViewNumFrames);
-                        g.DrawImage(m_StackedSelectionFrame, new Point(0, 0));
+                        m_StackedSelectionFrame = new AstroImage(m_VideoController.StackFrames(TangraConfig.Settings.Photometry.StackedViewNumFrames));
+                        g.DrawImage(m_StackedSelectionFrame.Pixelmap.DisplayBitmap, new Point(0, 0));
                     }
                     finally
                     {
@@ -441,6 +442,22 @@ namespace Tangra.VideoOperations.LightCurves
                     }
                 }
             }
+        }
+
+        private void ResetStackedSelectionFrame()
+        {
+            if (m_StackedSelectionFrame != null && m_StackedSelectionFrame.Pixelmap != null)
+                m_StackedSelectionFrame.Pixelmap.Dispose();
+
+            m_StackedSelectionFrame = null;
+        }
+
+        internal AstroImage GetStackedAstroImage()
+        {
+            if (m_StackedSelectionFrame != null)
+                return m_StackedSelectionFrame.Clone();
+            else
+                return m_StackedAstroImage;
         }
 
         private int[] m_ManualTrackingDeltaX = new int[4];
@@ -632,79 +649,89 @@ namespace Tangra.VideoOperations.LightCurves
                         g.DrawLine(Pens.WhiteSmoke, (float)selection.XDouble, (float)selection.YDouble + 12, (float)selection.XDouble, (float)selection.YDouble + 6);
                     }
 
-                    #region Draw the zoomed image of the selected star
-                    bool isMeasuringStar = m_StateMachine.SelectedMeasuringStar != -1;
-                    if (isMeasuringStar || m_StateMachine.SelectedObject != null)
-                    {
-
-                        ImagePixel star =
-                            isMeasuringStar
-                                ? new ImagePixel(m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar].ApertureStartingX, m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar].ApertureStartingY)
-                                : m_StateMachine.SelectedObject;
-
-                        float dx = 0;
-                        float dy = 0;
-
-                        if (isMeasuringStar)
-                        {
-                            dx = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar].ApertureDX;
-                            dy = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar].ApertureDX;
-                        }
-
-
-                        float aperture =
-                            isMeasuringStar
-                                ? m_StateMachine.MeasuringApertures[m_StateMachine.SelectedMeasuringStar]
-                                : 5;
-
-                        Pen pen =
-                            isMeasuringStar
-							? m_DisplaySettings.TargetPens[m_StateMachine.SelectedMeasuringStar]
-                            : Pens.WhiteSmoke;
-
-                        Pixelmap zoomPixelmap;
-                        Bitmap zoomedBmp = m_AstroImage.GetZoomImagePixels(star.X, star.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation, out zoomPixelmap);
-                        using (Graphics gz = Graphics.FromImage(zoomedBmp))
-                        {
-                            float x = 8.0f * (float)(star.XDouble - star.X - 0.5f) + 16 * 8;
-                            float y = 8.0f * (float)(star.YDouble - star.Y - 0.5f) + 16 * 8;
-                            float ap = aperture * 8;
-                            gz.DrawEllipse(pen, x - ap, y - ap, 2 * ap, 2 * ap);
-
-                            if (isMeasuringStar)
-                            {
-								Pen bgPen =
-									isMeasuringStar
-									? m_DisplaySettings.TargetBackgroundPens[m_StateMachine.SelectedMeasuringStar]
-									: Pens.WhiteSmoke;
-
-                                // Draw background annulus
-                                float innerRadius = aperture * TangraConfig.Settings.Photometry.AnnulusInnerRadius;
-                                float outerRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
-
-                                innerRadius *= 8.0f;
-                                outerRadius *= 8.0f;
-
-                                gz.DrawEllipse(bgPen, x - innerRadius, y - innerRadius, 2 * innerRadius, 2 * innerRadius);
-                                gz.DrawEllipse(bgPen, x - outerRadius, y - outerRadius, 2 * outerRadius, 2 * outerRadius);
-                            }
-
-                            gz.Save();
-                        }
-
-                        m_VideoController.UpdateZoomedImage(zoomedBmp, star, zoomPixelmap);
-                    }
-                    else
-                    {
-                        m_VideoController.ClearZoomedImage();
-                    }
-                    #endregion
+                    DrawSelectedStarZoomedImage();
                 }
 
             }
             catch (Exception ex)
             {
                 Trace.WriteLine(ex);
+            }
+        }
+
+        private void DrawSelectedStarZoomedImage()
+        {
+            bool isMeasuringStar = m_StateMachine.SelectedMeasuringStar != -1;
+            if (isMeasuringStar || m_StateMachine.SelectedObject != null)
+            {
+
+                ImagePixel star =
+                    isMeasuringStar
+                        ? new ImagePixel(m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar].ApertureStartingX, m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar].ApertureStartingY)
+                        : m_StateMachine.SelectedObject;
+
+                float dx = 0;
+                float dy = 0;
+
+                if (isMeasuringStar)
+                {
+                    dx = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar].ApertureDX;
+                    dy = m_StateMachine.MeasuringStars[m_StateMachine.SelectedMeasuringStar].ApertureDX;
+                }
+
+
+                float aperture =
+                    isMeasuringStar
+                        ? m_StateMachine.MeasuringApertures[m_StateMachine.SelectedMeasuringStar]
+                        : 5;
+
+                Pen pen =
+                    isMeasuringStar
+                    ? m_DisplaySettings.TargetPens[m_StateMachine.SelectedMeasuringStar]
+                    : Pens.WhiteSmoke;
+
+                AstroImage astroImage;
+                if (CanShowStackedSelection() && IsStackedSelectionEnabled && m_StackedSelectionFrame != null)
+                    astroImage = m_StackedSelectionFrame;
+                else
+                    astroImage = m_AstroImage;
+
+                Pixelmap zoomPixelmap = null;
+                Bitmap zoomedBmp = astroImage.GetZoomImagePixels(star.X, star.Y, TangraConfig.Settings.Color.Saturation, TangraConfig.Settings.Photometry.Saturation, out zoomPixelmap);
+
+                using (Graphics gz = Graphics.FromImage(zoomedBmp))
+                {
+                    float x = 8.0f * (float)(star.XDouble - star.X - 0.5f) + 16 * 8;
+                    float y = 8.0f * (float)(star.YDouble - star.Y - 0.5f) + 16 * 8;
+                    float ap = aperture * 8;
+                    gz.DrawEllipse(pen, x - ap, y - ap, 2 * ap, 2 * ap);
+
+                    if (isMeasuringStar)
+                    {
+                        Pen bgPen =
+                            isMeasuringStar
+                            ? m_DisplaySettings.TargetBackgroundPens[m_StateMachine.SelectedMeasuringStar]
+                            : Pens.WhiteSmoke;
+
+                        // Draw background annulus
+                        float innerRadius = aperture * TangraConfig.Settings.Photometry.AnnulusInnerRadius;
+                        float outerRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + innerRadius * innerRadius);
+
+                        innerRadius *= 8.0f;
+                        outerRadius *= 8.0f;
+
+                        gz.DrawEllipse(bgPen, x - innerRadius, y - innerRadius, 2 * innerRadius, 2 * innerRadius);
+                        gz.DrawEllipse(bgPen, x - outerRadius, y - outerRadius, 2 * outerRadius, 2 * outerRadius);
+                    }
+
+                    gz.Save();
+                }
+
+                m_VideoController.UpdateZoomedImage(zoomedBmp, star, zoomPixelmap);
+            }
+            else
+            {
+                m_VideoController.ClearZoomedImage();
             }
         }
 
@@ -1223,6 +1250,8 @@ namespace Tangra.VideoOperations.LightCurves
             m_StateMachine.SelectedMeasuringStar = -1;
             m_StateMachine.SelectedObject = null;
 
+            ResetStackedSelectionFrame();
+
             m_ControlPanel.BeginConfiguration(m_StateMachine, m_VideoController);
 
             m_VideoController.StatusChanged("Configuring");
@@ -1296,13 +1325,14 @@ namespace Tangra.VideoOperations.LightCurves
 			m_ViewingLightCurve = false;
 			m_Configuring = false;
 			m_Correcting = false;
-            m_StackedSelectionFrame = null;
 
-			if (m_StackedAstroImage == null)
+            if (m_AveragedFrame == null)
             {
-                EnsureStackedAstroImage();
-                m_AveragedFrame = new AveragedFrame(m_StackedAstroImage);
+                if (m_StackedAstroImage == null) EnsureStackedAstroImage();
+                m_AveragedFrame = new AveragedFrame(GetStackedAstroImage());
             }
+
+            m_StackedSelectionFrame = null;
 
 	        string usedTrackerType;
 			m_Tracker = TrackerFactory.CreateTracker(
@@ -2076,7 +2106,7 @@ namespace Tangra.VideoOperations.LightCurves
 			if (m_AveragedFrame == null)
 			{
 				if (m_StackedAstroImage == null) EnsureStackedAstroImage();
-				m_AveragedFrame = new AveragedFrame(m_StackedAstroImage);
+				m_AveragedFrame = new AveragedFrame(GetStackedAstroImage());
 			}
 
             PreProcessingInfo preProcessingInfo;
@@ -2301,7 +2331,7 @@ namespace Tangra.VideoOperations.LightCurves
             TangraConfig.Settings.Photometry.UseStackedSelection = m_StackedSelection;
             TangraConfig.Settings.Save();
 
-            m_StackedSelectionFrame = null;
+            ResetStackedSelectionFrame();
             return m_StackedSelection;
         }
 
@@ -2328,7 +2358,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             base.DisplayIntensifyModeChanged();
 
-            m_StackedSelectionFrame = null;
+            ResetStackedSelectionFrame();
         }
     }
 

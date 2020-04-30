@@ -56,6 +56,7 @@ namespace Tangra.VideoOperations.LightCurves
         {
             m_StateMachine = stateMachine;
             m_VideoController = videoController;
+            lastStackedSelection = null;
 
             UpdateState();
         }
@@ -841,22 +842,28 @@ namespace Tangra.VideoOperations.LightCurves
             UpdateState(); 
         }
 
+        private bool? lastStackedSelection;
+
         private void UpdateStackedSelection()
         {
             if (m_StateMachine.VideoOperation.CanShowStackedSelection())
             {
                 bool stacked = m_StateMachine.VideoOperation.IsStackedSelectionEnabled;
-                if (stacked)
+                if (lastStackedSelection != stacked)
                 {
-                    btnStackedSelection.Image = Tangra.Properties.Resources.Stack1;
-                    toolTip1.SetToolTip(btnStackedSelection, "Toggle Single Image View");
-                    m_VideoController.RedrawCurrentFrame(false);
-                }
-                else
-                {
-                    btnStackedSelection.Image = Tangra.Properties.Resources.Stack3;
-                    toolTip1.SetToolTip(btnStackedSelection, "Toggle Stacked Image View");
-                    m_VideoController.RefreshCurrentFrame();
+                    lastStackedSelection = stacked;
+                    if (stacked)
+                    {
+                        btnStackedSelection.Image = Tangra.Properties.Resources.Stack1;
+                        toolTip1.SetToolTip(btnStackedSelection, "Toggle Single Image View");
+                        m_VideoController.RedrawCurrentFrame(false);
+                    }
+                    else
+                    {
+                        btnStackedSelection.Image = Tangra.Properties.Resources.Stack3;
+                        toolTip1.SetToolTip(btnStackedSelection, "Toggle Stacked Image View");
+                        m_VideoController.RefreshCurrentFrame();
+                    }
                 }
             }
             else

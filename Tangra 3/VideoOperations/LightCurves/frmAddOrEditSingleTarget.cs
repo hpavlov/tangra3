@@ -71,7 +71,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_ObjectId = objectId;
             m_State = state;
-            m_AstroImage = m_State.VideoOperation.m_StackedAstroImage;
+            m_AstroImage = m_State.VideoOperation.GetStackedAstroImage();
 
             ObjectToAdd = selectedObject;
 
@@ -138,7 +138,7 @@ namespace Tangra.VideoOperations.LightCurves
 
 			m_ObjectId = objectId;
 			m_State = state;
-            m_AstroImage = m_State.VideoOperation.m_StackedAstroImage;
+            m_AstroImage = m_State.VideoOperation.GetStackedAstroImage();
 
             ObjectToAdd = new TrackedObjectConfig();
 
