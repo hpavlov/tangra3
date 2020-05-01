@@ -2683,7 +2683,6 @@ namespace Tangra.Controller
 
 		internal void EnsureLightCurveForm()
 		{
-			EnsureAllPopUpFormsClosed();
 			m_LightCurveController.EnsureLightCurveForm();
 		}
 

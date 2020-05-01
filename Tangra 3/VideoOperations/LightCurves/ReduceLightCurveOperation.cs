@@ -759,10 +759,8 @@ namespace Tangra.VideoOperations.LightCurves
                 else
                     m_StateMachine.SelectedMeasuringStar = -1;
 
+                // This will also call RefreshCurrentFrame()
                 SelectedTargetChanged(m_StateMachine.SelectedMeasuringStar);
-
-                // This is how we tell the VideoOperation that something changed.
-                m_VideoController.RefreshCurrentFrame();
             }
         }
 
@@ -1268,6 +1266,7 @@ namespace Tangra.VideoOperations.LightCurves
                     MessageBoxIcon.Information);
             }
             m_VideoController.InitializePlayingDirection(isLunarR);
+            m_VideoController.RefreshCurrentFrame();
         }
 
         public void StartOver()
