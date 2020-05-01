@@ -594,30 +594,46 @@ namespace Tangra.Controller
 	            if (dyanmicRangeStream.CanDetermineAutoDynamicRange)
 	            {
                     int dynamicValueFrom = (int)dyanmicRangeStream.MinPixelValue;
+                    int dynamicValueTo = (int)dyanmicRangeStream.MaxPixelValue;
 
-                    Pixelmap pixMap;
+                    Pixelmap pixMap; 
+                    
+                    if (m_FramePlayer.Video.SupportsSoftwareIntegration && frameStream.CountFrames > 5)
+                        pixMap = m_FramePlayer.GetIntegratedFrame(frameStream.FirstFrame, 5, false, false);
+                    else
+                        pixMap = m_FramePlayer.GetFrame(frameStream.FirstFrame, true);
 
-                    // TODO: It should be possible to rewrite this algorithm a lot faster without having to ApplyDynamicRange and construct bitmaps
-                    //       If necessary it can be moved in TangraCore
+	                var orgPixels = new List<uint>();
+
+                    int sq = Math.Min(64, pixMap.Height / 3);
+	                for (int x = sq; x < 2 * sq; x++)
+	                {
+	                    for (int y = sq; y < 2*sq; y++)
+	                    {
+                            orgPixels.Add(pixMap[x, y]);
+	                    }
+	                }
+
                     for (double coeff = 0.05; coeff < 2.5; coeff += 0.05)
                     {
-                        int dynamicValueTo = (int)(coeff * dyanmicRangeStream.MaxPixelValue + 0.95 * dyanmicRangeStream.MinPixelValue);
+                        dynamicValueTo = (int)(coeff * dyanmicRangeStream.MaxPixelValue + 0.95 * dyanmicRangeStream.MinPixelValue);
 
-                        SetDisplayIntensifyMode(DisplayIntensifyMode.Dynamic, dynamicValueFrom, dynamicValueTo, false);
+                        int range = Math.Max(16, dynamicValueTo - dynamicValueFrom);
 
-                        if (m_FramePlayer.Video.SupportsSoftwareIntegration && frameStream.CountFrames > 5)
-                            pixMap = m_FramePlayer.GetIntegratedFrame(frameStream.FirstFrame, 5, false, false);
-                        else
-                            pixMap = m_FramePlayer.GetFrame(frameStream.FirstFrame, true);
-
-                        BitmapFilter.ApplyDynamicRange(pixMap.DisplayBitmap, pixMap, m_DynamicFromValue, m_DynamicToValue, m_DisplayInvertedMode, m_DisplayHueIntensityMode, EffectiveMaxPixelValue);
-
-                        var dynPixMap = Pixelmap.ConstructFromBitmap(pixMap.DisplayBitmap, TangraConfig.ColourChannel.Red);
-                        int sq = Math.Min(64, pixMap.Height / 3);
-                        double averagePixel = dynPixMap.DisplayBitmapPixels.Skip(pixMap.Width * sq).Take(sq * sq).Average(x => x);
+                        var pixels = new List<uint>();
+                        foreach (var pixelVal in orgPixels)
+                        {
+                            uint dynamicVal = (uint)(255 * (Math.Max(pixelVal, dynamicValueFrom) - dynamicValueFrom) / range);
+                            byte btModified = (byte)(Math.Max(0, Math.Min(255, dynamicVal)));
+                            pixels.Add(btModified);
+                        }
+                        double averagePixel = pixels.Average(x => x);
                         if (averagePixel > TangraConfig.Settings.Generic.MinAutoDynamicRanage && averagePixel < TangraConfig.Settings.Generic.MaxAutoDynamicRanage)
                             break;
                     }
+
+                    m_DynamicFromValue = (int)dynamicValueFrom;
+                    m_DynamicToValue = (int)dynamicValueTo;
 	            }
 	            else
 	            {
