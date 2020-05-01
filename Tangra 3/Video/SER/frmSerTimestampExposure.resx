@@ -117,4 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label7.Text" xml:space="preserve">
+    <value>The jitter should be added as an additional source of error in the error bars of the final report. It is expected to be close to zero for UTC triggered and in-camera UTC timestamps, and non-zero for Windows Clock timestamps.</value>
+  </data>
+  <data name="label9.Text" xml:space="preserve">
+    <value>Different SER recording software may use different time reference for the SER timestamp. This may also differ between camera types. Make sure that you know what is the correct time referrence for your video.</value>
+  </data>
 </root>

@@ -17,7 +17,7 @@ namespace Tangra.Video.SER
         {
             nudExposureMs.Value = (decimal)medianExposure;
             cbxTimeReference.SelectedIndex = 0;
-            pnlExposureJitter.Visible = oneSigma.HasValue;
+            gbExposureJitter.Visible = oneSigma.HasValue;
             if (oneSigma.HasValue)
             {
                 lblJitter.Text = string.Format("{0}", Math.Round(oneSigma.Value, 2));
@@ -40,11 +40,6 @@ namespace Tangra.Video.SER
 
             DialogResult = DialogResult.OK;
             Close();
-        }
-
-        private void cbxTimeReference_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            pnlExposure.Visible = cbxTimeReference.SelectedIndex != 1;
         }
     }
 }
