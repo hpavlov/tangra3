@@ -214,7 +214,7 @@ namespace Tangra.VideoOperations.LightCurves
             if (m_ConfirmedDate.HasValue)
             {
                 rv.FistMeasurementDay = m_ConfirmedDate;
-                rv.FistMeasurementTimeStamp = LCFile.GetTimeForFrame(LCFile.Header.MinFrame);
+                rv.FistMeasurementTimeStamp = LCFile.GetTimeForFirstFrameNoCorrection();
             }
 
 	        rv.Spacing = cbxSpacingOptions.SelectedIndex + 1;
@@ -272,7 +272,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             if (dayConfirmationRequired)
             {
-                DateTime firstTimestamp = LCFile.GetTimeForFrame(LCFile.Header.MinFrame);
+                DateTime firstTimestamp = LCFile.GetTimeForFirstFrameNoCorrection();
 
                 if (firstTimestamp.Year > 1900 && LCFile.Header.TimingType == MeasurementTimingType.EmbeddedTimeForEachFrame)
                 {
@@ -362,7 +362,7 @@ namespace Tangra.VideoOperations.LightCurves
                 }
 
                 var calc = new AtmosphericExtinctionCalculator(m_RAHours, m_DEDeg, m_Longitude, m_Latitude, m_HeightKm);
-                DateTime firstTimestamp = LCFile.GetTimeForFrame(LCFile.Header.MinFrame);
+                DateTime firstTimestamp = LCFile.GetTimeForFirstFrameNoCorrection();
                 if (m_ConfirmedDate != null)
                     firstTimestamp = m_ConfirmedDate.Value.Date.AddTicks(firstTimestamp.Ticks - firstTimestamp.Date.Ticks);
 

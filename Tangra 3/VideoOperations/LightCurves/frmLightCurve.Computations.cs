@@ -742,7 +742,6 @@ namespace Tangra.VideoOperations.LightCurves
 						// Skip all frames before the first frame configured to begin the export from
 						continue;
 
-					string isCorrectedForInstrumentalDelay;
                     double midBinFrameNumber =  firstFrameNoInBin < m_LightCurveController.Context.BinningFirstFrame
                             ? ((m_LightCurveController.Context.BinningFirstFrame - m_LightCurveController.Context.MinFrame) / 2.0) - 0.5
                             : firstFrameNoInBin + (m_LightCurveController.Context.Binning / 2.0) - 0.5;
@@ -754,10 +753,10 @@ namespace Tangra.VideoOperations.LightCurves
                         int midBinFrameNumberInt = (int)midBinFrameNumber;
                         double midBinFrameNumberFrac = midBinFrameNumber - midBinFrameNumberInt;
 
-                        middleBinTime = m_LCFile.GetTimeForFrame(midBinFrameNumberInt, out isCorrectedForInstrumentalDelay);
+                        middleBinTime = m_LCFile.GetTimeForFrame(midBinFrameNumberInt);
                         if (middleBinTime > DateTime.MinValue && midBinFrameNumberFrac > 0.00001 && midBinFrameNumberInt + 1 <= m_Header.MaxFrame)
                         {
-                            DateTime middleBinPlusOneTime = m_LCFile.GetTimeForFrame(midBinFrameNumberInt + 1, out isCorrectedForInstrumentalDelay);
+                            DateTime middleBinPlusOneTime = m_LCFile.GetTimeForFrame(midBinFrameNumberInt + 1);
                             middleBinTime = middleBinTime.AddTicks((long)((middleBinPlusOneTime.Ticks - middleBinTime.Ticks) * midBinFrameNumberFrac));
                         }
                     }
@@ -859,10 +858,10 @@ namespace Tangra.VideoOperations.LightCurves
 						continue;
 
 					uint frameNo = m_LightCurveController.Context.AllReadings[0][i].CurrFrameNo;
-					string isCorrectedForInstrumentalDelay;
-					DateTime currFrameTime = m_LCFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
+                    TimeCorrectonsInfo timeCorrectonsInfo;
+                    DateTime currFrameTime = m_LCFile.GetTimeForFrame(frameNo, out timeCorrectonsInfo);
 
-				    if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) && isCorrectedForInstrumentalDelay == null)
+                    if (!string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) && timeCorrectonsInfo == null)
                         // Single frames not corrected for instrumental delays, where instrumental delays are known, are considered bad times
 				        currFrameTime = DateTime.MaxValue;
 

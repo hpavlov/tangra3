@@ -104,6 +104,7 @@
             this.miLightCurvePlot = new System.Windows.Forms.ToolStripMenuItem();
             this.miLightCurveLine = new System.Windows.Forms.ToolStripMenuItem();
             this.miLightCurveScatter = new System.Windows.Forms.ToolStripMenuItem();
+            this.miShowZeroADULevel = new System.Windows.Forms.ToolStripMenuItem();
             this.miAddins = new System.Windows.Forms.ToolStripMenuItem();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -154,7 +155,6 @@
             this.firstFrameTimer = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.saveWmfFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.miShowZeroADULevel = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlLegend.SuspendLayout();
             this.pnlSmallGraph.SuspendLayout();
             this.pnlMeasurementDetails.SuspendLayout();
@@ -492,6 +492,7 @@
             this.lblFrameTime.Name = "lblFrameTime";
             this.lblFrameTime.Size = new System.Drawing.Size(0, 13);
             this.lblFrameTime.TabIndex = 18;
+            this.lblFrameTime.DoubleClick += new System.EventHandler(this.lblFrameTime_DoubleClick);
             // 
             // pb4
             // 
@@ -1015,6 +1016,14 @@
             this.miLightCurveScatter.Text = "&Scatter";
             this.miLightCurveScatter.Click += new System.EventHandler(this.miLightCurveScatter_Click);
             // 
+            // miShowZeroADULevel
+            // 
+            this.miShowZeroADULevel.CheckOnClick = true;
+            this.miShowZeroADULevel.Name = "miShowZeroADULevel";
+            this.miShowZeroADULevel.Size = new System.Drawing.Size(187, 22);
+            this.miShowZeroADULevel.Text = "Show Zero ADU Level";
+            this.miShowZeroADULevel.CheckedChanged += new System.EventHandler(this.miShowZeroADULevel_CheckedChanged);
+            // 
             // miAddins
             // 
             this.miAddins.Name = "miAddins";
@@ -1413,14 +1422,6 @@
             // 
             this.saveWmfFileDialog.DefaultExt = "emf";
             this.saveWmfFileDialog.Filter = "Enhanced Metafile (*.emf)|*.emf";
-            // 
-            // miShowZeroADULevel
-            // 
-            this.miShowZeroADULevel.CheckOnClick = true;
-            this.miShowZeroADULevel.Name = "miShowZeroADULevel";
-            this.miShowZeroADULevel.Size = new System.Drawing.Size(187, 22);
-            this.miShowZeroADULevel.Text = "Show Zero ADU Level";
-            this.miShowZeroADULevel.CheckedChanged += new System.EventHandler(this.miShowZeroADULevel_CheckedChanged);
             // 
             // frmLightCurve
             // 

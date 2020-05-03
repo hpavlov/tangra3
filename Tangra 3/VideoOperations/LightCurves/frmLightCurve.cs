@@ -1596,11 +1596,10 @@ namespace Tangra.VideoOperations.LightCurves
 				uint interval = GetXAxisInterval(g);
 				uint firstMark = interval * (1 + m_MinDisplayedFrame / interval);
 
-                string isCorrectedForInstrumentalDelay;
 
                 if (m_LightCurveController.Context.XAxisLabels == LightCurveContext.XAxisMode.FrameNo)
                 {
-                    DateTime firstTime = m_LCFile.GetTimeForFrame(firstMark, out isCorrectedForInstrumentalDelay);
+                    DateTime firstTime = m_LCFile.GetTimeForFrame(firstMark);
                     double frameDuration = m_LCFile.Header.SecondsPerFrameComputed();
                     string frameDurStr = string.Empty;
                     if (!double.IsNaN(frameDuration))
@@ -1613,7 +1612,7 @@ namespace Tangra.VideoOperations.LightCurves
                 }
                 else
                 { 
-                    DateTime firstTime = m_LCFile.GetTimeForFrame(m_LCFile.Header.MinFrame, out isCorrectedForInstrumentalDelay);
+                    DateTime firstTime = m_LCFile.GetTimeForFrame(m_LCFile.Header.MinFrame);
 
                     legend = string.Format("{0}", firstTime.ToString("dd MMM yyyy"));
                 }
@@ -2720,6 +2719,103 @@ namespace Tangra.VideoOperations.LightCurves
 
                 RedrawPlot();
             }
+        }
+
+        private static string DOUBLE_CLICK_HINT = "\r\n\r\nDouble click for more details.";
+
+        private void DisplayFrameTime(DateTime timestamp, TimeCorrectonsInfo timeCorrectonsInfo)
+	    {
+	        string frameTimeLbl = timestamp.ToString("HH:mm:ss.fff");
+
+            if (!m_LCFile.Footer.AavNtpNoFittingUsed && !float.IsNaN(m_LCFile.Footer.AavNtpFitOneSigmaError))
+                frameTimeLbl += string.Format(" +/-{0} ms", m_LCFile.Footer.AavNtpFitOneSigmaError.ToString("0.0"));
+
+            lblFrameTime.Text = frameTimeLbl;
+            lblFrameTime.Tag = timeCorrectonsInfo;
+
+            var videoFormat = timeCorrectonsInfo != null ? timeCorrectonsInfo.VideoFileType : m_LCFile.Header.GetVideoFileFormat();
+
+            if (timeCorrectonsInfo != null && timeCorrectonsInfo.Message != null)
+            {
+                lblInstDelayWarning.ForeColor = Color.Green;
+                lblFrameTime.BackColor = SystemColors.Control;
+                toolTip1.SetToolTip(lblInstDelayWarning, timeCorrectonsInfo.Message);
+                toolTip1.SetToolTip(lblFrameTime, timeCorrectonsInfo.Message + DOUBLE_CLICK_HINT);
+            }
+            else if (m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired)
+            {
+                lblInstDelayWarning.ForeColor = Color.Green;
+                lblFrameTime.BackColor = SystemColors.Control;
+
+
+                if (videoFormat == VideoFileFormat.AVI)
+                {
+                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay correction not supported" + DOUBLE_CLICK_HINT);
+                } 
+                else if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2)
+                {
+                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay correction not required" + DOUBLE_CLICK_HINT);
+                }
+                else if (timeCorrectonsInfo != null && timeCorrectonsInfo.VideoFormatType == VideoFormatType.Digital)
+                {
+                    if (timeCorrectonsInfo.NotAffectedByAcquisitionDelays)
+                    {
+                        if (!string.IsNullOrWhiteSpace(m_LCFile.Footer.CameraName))
+                        {
+                            toolTip1.SetToolTip(lblFrameTime, string.Format("Timing correction not required for {0}", m_LCFile.Footer.CameraName) + DOUBLE_CLICK_HINT);
+                        }
+                        else
+                        {
+                            toolTip1.SetToolTip(lblFrameTime, string.Format("Timing correction not required for this {0} recording", videoFormat) + DOUBLE_CLICK_HINT);
+                        }
+                    }
+                    else
+                    {
+                        lblInstDelayWarning.ForeColor = Color.Red;
+                        lblFrameTime.BackColor = Color.FromArgb(244, 206, 231);
+                        toolTip1.SetToolTip(lblInstDelayWarning, "Timing corrections *NOT* applied to the times");
+                        toolTip1.SetToolTip(lblFrameTime, "Timing corrections *NOT* applied to the times" + DOUBLE_CLICK_HINT);
+                    }
+                }
+                else
+                {
+                    lblInstDelayWarning.ForeColor = Color.Red;
+                    lblFrameTime.BackColor = Color.FromArgb(244, 206, 231);
+                    toolTip1.SetToolTip(lblInstDelayWarning, "Timing corrections *NOT* applied but could be required");
+                    toolTip1.SetToolTip(lblFrameTime, "Timing corrections *NOT* applied but could be required" + (timeCorrectonsInfo != null ? DOUBLE_CLICK_HINT : null));
+                }
+            }
+            else
+            {
+                lblInstDelayWarning.ForeColor = Color.Red;
+                lblFrameTime.BackColor = Color.FromArgb(244, 206, 231);
+                if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2 || videoFormat == VideoFileFormat.AVI)
+                {
+                    toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times");
+                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay has *NOT* been applied to the times" + DOUBLE_CLICK_HINT);
+                }
+                else
+                {
+                    toolTip1.SetToolTip(lblInstDelayWarning, "Acquisition delay correction has *NOT* been applied to the times");
+                    toolTip1.SetToolTip(lblFrameTime, "Acquisition delay correction has *NOT* been applied to the times" + DOUBLE_CLICK_HINT);
+                }
+            }
+	    }
+
+        private void lblFrameTime_DoubleClick(object sender, EventArgs e)
+        {
+            TimeCorrectonsInfo info = lblFrameTime.Tag as TimeCorrectonsInfo;
+            if (info != null && info.VideoFormatType == VideoFormatType.Analogue)
+            {
+                var frm = new frmAnalogueSystemTimeCorrectionsInfo(info, lblFrameTime.Text);
+                frm.ShowDialog(this);
+            }
+            else if (info != null && info.VideoFormatType == VideoFormatType.Digital)
+            {
+                var frm = new frmDigitalSystemTimeCorrectionsInfo(info, lblFrameTime.Text);
+                frm.ShowDialog(this);
+            }
+
         }
 	}
 }

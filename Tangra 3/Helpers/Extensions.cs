@@ -15,6 +15,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
+using Tangra.Model.Video;
 using Tangra.VideoOperations.LightCurves;
 
 namespace Tangra.Helpers
@@ -215,6 +216,5 @@ namespace Tangra.Helpers
             else
                 return null;
         }
-        
 	}
 }

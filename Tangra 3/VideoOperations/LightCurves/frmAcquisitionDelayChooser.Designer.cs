@@ -49,12 +49,12 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.pnlTimestamping = new System.Windows.Forms.Panel();
+            this.lblTimestamping = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.lblCameraSystem = new System.Windows.Forms.Label();
             this.llCameraSystemLink = new System.Windows.Forms.LinkLabel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.lblTimestamping = new System.Windows.Forms.Label();
             this.pnlTimingCorrections.SuspendLayout();
             this.pnlReferenceTimeOffset.SuspendLayout();
             this.pnlTimestamping.SuspendLayout();
@@ -243,6 +243,14 @@
             this.pnlTimestamping.Size = new System.Drawing.Size(458, 77);
             this.pnlTimestamping.TabIndex = 21;
             // 
+            // lblTimestamping
+            // 
+            this.lblTimestamping.Location = new System.Drawing.Point(12, 31);
+            this.lblTimestamping.Name = "lblTimestamping";
+            this.lblTimestamping.Size = new System.Drawing.Size(435, 42);
+            this.lblTimestamping.TabIndex = 25;
+            this.lblTimestamping.Text = resources.GetString("lblTimestamping.Text");
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -289,14 +297,6 @@
             this.panel2.Size = new System.Drawing.Size(456, 1);
             this.panel2.TabIndex = 26;
             // 
-            // lblTimestamping
-            // 
-            this.lblTimestamping.Location = new System.Drawing.Point(12, 31);
-            this.lblTimestamping.Name = "lblTimestamping";
-            this.lblTimestamping.Size = new System.Drawing.Size(435, 42);
-            this.lblTimestamping.TabIndex = 25;
-            this.lblTimestamping.Text = resources.GetString("lblTimestamping.Text");
-            // 
             // frmAcquisitionDelayChooser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -319,6 +319,7 @@
             this.Name = "frmAcquisitionDelayChooser";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Camera and Timing Corrections";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmAcquisitionDelayChooser_FormClosing);
             this.pnlTimingCorrections.ResumeLayout(false);
             this.pnlTimingCorrections.PerformLayout();
             this.pnlReferenceTimeOffset.ResumeLayout(false);

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using Tangra.SDK;
 using Tangra.VideoOperations.LightCurves;
+using Tangra.VideoOperations.LightCurves.InfoForms;
 
 namespace Tangra.Addins
 {
@@ -25,13 +26,13 @@ namespace Tangra.Addins
 				// NOTE: Make sure negative backgrounds are sent as negative values (not as the serialized UINTs)
 				? 1.0f * (int)lcMeasurement.TotalBackground 
 				: INVALID_MEASUREMENT_VALUE;
-            string isCorrectedForInstrumentalDelay;
+            TimeCorrectonsInfo timeCorrectonsInfo;
 
             if (dontIncludeTimes || 
                 !lcFile.Footer.ReductionContext.HasEmbeddedTimeStamps /* If the times are entered by the user, only include the times for the frames enterred by the user*/)
             {
                 Timestamp = DateTime.MinValue;
-                isCorrectedForInstrumentalDelay = null;
+                timeCorrectonsInfo = null;
 
 				if ((int)frameNo == lcFile.Header.FirstTimedFrameNo)
 					Timestamp = lcFile.Header.FirstTimedFrameTime;
@@ -40,10 +41,10 @@ namespace Tangra.Addins
             }
             else
             {
-                Timestamp = lcFile.GetTimeForFrame(frameNo, out isCorrectedForInstrumentalDelay);
+                Timestamp = lcFile.GetTimeForFrame(frameNo, out timeCorrectonsInfo);
             }
 
-            IsCorrectedForInstrumentalDelay = lcFile.InstrumentalDelayCorrectionsNotRequired() || !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
+            IsCorrectedForInstrumentalDelay = lcFile.InstrumentalDelayCorrectionsNotRequired() || timeCorrectonsInfo != null;
             IsSuccessful = lcMeasurement.IsSuccessfulReading;
 		}
 
@@ -53,20 +54,20 @@ namespace Tangra.Addins
 			TargetNo = (byte)targetNo;
 			Measurement = binnedMeasurement.IsSuccessfulReading ? (float)binnedMeasurement.AdjustedValue : INVALID_MEASUREMENT_VALUE;
 			Background = binnedMeasurement.IsSuccessfulReading ? (float)binnedMeasurement.BackgroundValue : INVALID_MEASUREMENT_VALUE;
-            string isCorrectedForInstrumentalDelay;
+            TimeCorrectonsInfo timeCorrectonsInfo;
             if (dontIncludeTimes ||
 				/* If the times are entered by the user, only include the times for the first and last bin derived from the frame times enterred by the user*/
 				(!lcFile.Footer.ReductionContext.HasEmbeddedTimeStamps && binnedMeasurement.BinNo != 1 && binnedMeasurement.BinNo != totalBins))
             {
                 Timestamp = DateTime.MinValue;
-                isCorrectedForInstrumentalDelay = null;
+                timeCorrectonsInfo = null;
             }
             else
             {
-                Timestamp = lcFile.GetTimeForFrame(binMiddleFrameNo, out isCorrectedForInstrumentalDelay);
+                Timestamp = lcFile.GetTimeForFrame(binMiddleFrameNo, out timeCorrectonsInfo);
             }
 
-            IsCorrectedForInstrumentalDelay = lcFile.InstrumentalDelayCorrectionsNotRequired() || !string.IsNullOrEmpty(isCorrectedForInstrumentalDelay);
+            IsCorrectedForInstrumentalDelay = lcFile.InstrumentalDelayCorrectionsNotRequired() || timeCorrectonsInfo != null;
             IsSuccessful = binnedMeasurement.IsSuccessfulReading;
 		}
 

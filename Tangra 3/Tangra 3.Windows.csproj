@@ -428,6 +428,19 @@
     <Compile Include="VideoOperations\LightCurves\Helpers\frmStackedSelectionHelpNote.Designer.cs">
       <DependentUpon>frmStackedSelectionHelpNote.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmAnalogueSystemTimeCorrectionsInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmAnalogueSystemTimeCorrectionsInfo.Designer.cs">
+      <DependentUpon>frmAnalogueSystemTimeCorrectionsInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmDigitalSystemTimeCorrectionsInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmDigitalSystemTimeCorrectionsInfo.Designer.cs">
+      <DependentUpon>frmDigitalSystemTimeCorrectionsInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\TimeCorrectonsInfo.cs" />
     <Compile Include="VideoTools\frmCorrectInterlacedDefects.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1293,6 +1306,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\Helpers\frmStackedSelectionHelpNote.resx">
       <DependentUpon>frmStackedSelectionHelpNote.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmAnalogueSystemTimeCorrectionsInfo.resx">
+      <DependentUpon>frmAnalogueSystemTimeCorrectionsInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmDigitalSystemTimeCorrectionsInfo.resx">
+      <DependentUpon>frmDigitalSystemTimeCorrectionsInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmCorrectInterlacedDefects.resx">
       <DependentUpon>frmCorrectInterlacedDefects.cs</DependentUpon>

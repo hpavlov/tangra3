@@ -85,6 +85,11 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             cbxEnterRefertenceTimeOffset.Checked = TangraConfig.Settings.LastUsed.TimingCorrectionsEnteringRefertenceTimeOffset;
+
+            if (videoController.AstroVideoCameraModel != null && videoController.AstroVideoCameraModel.StartsWith("DVTI"))
+            {
+                cbxCameraSystem.SelectedIndex = ((int)TangraConfig.CameraSystem.Dvti) - 1;
+            }
         }
 
         internal bool TimingCorrectionsRequired { get; private set; }
@@ -284,6 +289,25 @@ namespace Tangra.VideoOperations.LightCurves
         private void llCameraSystemLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             ShellHelper.OpenUrl(llCameraSystemLink.Text);
+        }
+
+        private void frmAcquisitionDelayChooser_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing ||
+                e.CloseReason == CloseReason.FormOwnerClosing)
+            {
+                if (DialogResult != DialogResult.OK)
+                {
+                    if (MessageBox.Show(
+                        "Are you sure you want to continue without specifying Aqcuisition Delays? Your timestamps and derived event times in AOTA may not be correct.",
+                        "Tangra",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                    {
+                        e.Cancel = true;
+                    }
+                }
+            }
         }
     }
 }

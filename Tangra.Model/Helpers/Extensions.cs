@@ -194,5 +194,20 @@ namespace Tangra.Model.Helpers
             },
             TaskContinuationOptions.OnlyOnFaulted);
         }
+
+        public static VideoFormatType ToVideoFormatType(this VideoFileFormat format)
+        {
+            FieldInfo fi = format.GetType().GetField(format.ToString());
+
+            VideoFormatTypeAttribute[] attributes =
+                (VideoFormatTypeAttribute[])fi.GetCustomAttributes(
+                typeof(VideoFormatTypeAttribute),
+                false);
+
+            if (attributes.Length > 0)
+                return attributes[0].VideoFormatType;
+            else
+                return VideoFormatType.Analogue;
+        }
     }
 }

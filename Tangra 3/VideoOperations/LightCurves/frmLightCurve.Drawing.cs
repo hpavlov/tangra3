@@ -16,6 +16,7 @@ using Tangra.Model.Astro;
 using Tangra.Helpers;
 using Tangra.Model.Context;
 using Tangra.Model.Video;
+using Tangra.VideoOperations.LightCurves.InfoForms;
 
 namespace Tangra.VideoOperations.LightCurves
 {
@@ -1408,61 +1409,18 @@ namespace Tangra.VideoOperations.LightCurves
 				{
 				    lblFrameNo.Text = firstNonExcludedMeasurement.CurrFrameNo.ToString();
                     if (firstNonExcludedMeasurement.CurrFileName != null) lblFrameNo.Text += string.Format("     {0}", firstNonExcludedMeasurement.CurrFileName);
-					string correctedForInstrumentalDelayMessage = null;
+                    TimeCorrectonsInfo timeCorrectonsInfo;
 					if (m_LCFile.CanDetermineFrameTimes)
 					{
-						string frameTimeLbl = m_LCFile.GetTimeForFrame(firstNonExcludedMeasurement.CurrFrameNo, out correctedForInstrumentalDelayMessage).ToString("HH:mm:ss.fff");
+                        DateTime frameTime = m_LCFile.GetTimeForFrame(firstNonExcludedMeasurement.CurrFrameNo, out timeCorrectonsInfo);
 
-						if (!m_LCFile.Footer.AavNtpNoFittingUsed && !float.IsNaN(m_LCFile.Footer.AavNtpFitOneSigmaError))
-							frameTimeLbl += string.Format(" +/-{0} ms", m_LCFile.Footer.AavNtpFitOneSigmaError.ToString("0.0"));
-
-						lblFrameTime.Text = frameTimeLbl;
-
-                        var videoFormat = m_LCFile.Header.GetVideoFileFormat();
-
-						if (correctedForInstrumentalDelayMessage != null)
-						{
-							lblInstDelayWarning.ForeColor = Color.Green;
-							lblFrameTime.BackColor = SystemColors.Control;
-							toolTip1.SetToolTip(lblInstDelayWarning, correctedForInstrumentalDelayMessage);
-							toolTip1.SetToolTip(lblFrameTime, correctedForInstrumentalDelayMessage);
-						}
-                        else if (m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired)
-                        {
-                            lblInstDelayWarning.ForeColor = Color.Green;
-                            lblFrameTime.BackColor = SystemColors.Control;
-
-                            if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2 || videoFormat == VideoFileFormat.AVI)
-                            {
-                                toolTip1.SetToolTip(lblFrameTime, "Instrumental delay correction not required");
-                            }
-                            else if (!string.IsNullOrWhiteSpace(m_LCFile.Footer.CameraName))
-                            {
-                                toolTip1.SetToolTip(lblFrameTime, string.Format("Timing correction not required for {0}", m_LCFile.Footer.CameraName));
-                            }
-                            else
-                            {
-                                toolTip1.SetToolTip(lblFrameTime, string.Format("Timing correction not required for this {0} recording", videoFormat));
-                            }
-                        }
-						else
-						{
-							lblInstDelayWarning.ForeColor = Color.Red;
-							lblFrameTime.BackColor = Color.FromArgb(244, 206, 231);
-						    if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2 || videoFormat == VideoFileFormat.AVI)
-						    {
-						        toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times");
-						        toolTip1.SetToolTip(lblFrameTime, "Instrumental delay has *NOT* been applied to the times");
-						    }
-						    else
-						    {
-                                toolTip1.SetToolTip(lblInstDelayWarning, "Acquisition delay correction has *NOT* been applied to the times");
-                                toolTip1.SetToolTip(lblFrameTime, "Acquisition delay correction has *NOT* been applied to the times");
-						    }
-						}
+                        DisplayFrameTime(frameTime, timeCorrectonsInfo);
 					}
 					else
+                    {
 						lblFrameTime.Text = "N/A";
+                        lblFrameTime.Tag = null;
+                    }
 				}
 
 	            bool hasMagnitudes = m_LightCurveController.Context.MagnitudeConverter.CanComputeMagnitudes;

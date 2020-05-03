@@ -213,6 +213,7 @@
     <Compile Include="Video\ICustomRenderer.cs" />
     <Compile Include="Video\IFramePlayer.cs" />
     <Compile Include="Video\VideoFileFormat.cs" />
+    <Compile Include="Video\VideoFormatTypeAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Astro\frmPSFViewer.resx">

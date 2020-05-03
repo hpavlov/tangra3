@@ -50,8 +50,7 @@ namespace Tangra.Video.FITS
             if (m_FitsIndex.TryGetValue(lowerFileNameOnly, out frameNo) &&
                 m_LCFile.CanDetermineFrameTimes)
             {
-                string correctedForInstrumentalDelayMessage;
-                return m_LCFile.GetTimeForFrame(frameNo, out correctedForInstrumentalDelayMessage);
+                return m_LCFile.GetTimeForFrame(frameNo);
             }
             return null;
         }
