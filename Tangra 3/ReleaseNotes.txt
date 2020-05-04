@@ -1,5 +1,15 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.7.1 (2020-05-04)
+- Made it possible to apply timing corrections for Digital Video Cameras.
+- Added additional information form about the applied timing corrections.
+- Fixed a problem where AOTA times with SER files could have had an error of half an exposure.
+- Fixed a bug where GaiaDR2 stars could not be retrieved on a system using comma as a decimal separator.
+- Made the 'flip' flags be persisted with the FITS Sequence settings.
+- Improvements in the automatic selection of good dynamic range for all 12-bit and 16-bit videos.
+- Improvements around the new 'Stacked Image View' mode.
+- Other minor improvements and bugfixes.
+
 v3.7.0 (2020-04-13)
 - Added astrometry support for GaiaDR2.
 - Added a new default 'Stacked Image View' when configuring an occultation light curve measurement.
