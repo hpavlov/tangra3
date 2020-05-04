@@ -440,6 +440,12 @@
     <Compile Include="VideoOperations\LightCurves\InfoForms\frmDigitalSystemTimeCorrectionsInfo.Designer.cs">
       <DependentUpon>frmDigitalSystemTimeCorrectionsInfo.cs</DependentUpon>
     </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmSupportedFileFormats.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VideoOperations\LightCurves\InfoForms\frmSupportedFileFormats.Designer.cs">
+      <DependentUpon>frmSupportedFileFormats.cs</DependentUpon>
+    </Compile>
     <Compile Include="VideoOperations\LightCurves\InfoForms\TimeCorrectonsInfo.cs" />
     <Compile Include="VideoTools\frmCorrectInterlacedDefects.cs">
       <SubType>Form</SubType>
@@ -1312,6 +1318,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmDigitalSystemTimeCorrectionsInfo.resx">
       <DependentUpon>frmDigitalSystemTimeCorrectionsInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VideoOperations\LightCurves\InfoForms\frmSupportedFileFormats.resx">
+      <DependentUpon>frmSupportedFileFormats.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VideoTools\frmCorrectInterlacedDefects.resx">
       <DependentUpon>frmCorrectInterlacedDefects.cs</DependentUpon>

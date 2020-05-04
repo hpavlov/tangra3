@@ -15,6 +15,7 @@ using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Helpers;
 using Tangra.VideoOperations.LightCurves.Helpers;
+using Tangra.VideoOperations.LightCurves.InfoForms;
 
 namespace Tangra.VideoOperations.LightCurves
 {
@@ -308,6 +309,12 @@ namespace Tangra.VideoOperations.LightCurves
                     }
                 }
             }
+        }
+
+        private void btnSupportedFileFormats_Click(object sender, EventArgs e)
+        {
+            var frm = new frmSupportedFileFormats();
+            frm.ShowDialog(this);
         }
     }
 }

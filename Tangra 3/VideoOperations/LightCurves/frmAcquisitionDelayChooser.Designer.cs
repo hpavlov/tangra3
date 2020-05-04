@@ -55,6 +55,7 @@
             this.lblCameraSystem = new System.Windows.Forms.Label();
             this.llCameraSystemLink = new System.Windows.Forms.LinkLabel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnSupportedFileFormats = new System.Windows.Forms.Button();
             this.pnlTimingCorrections.SuspendLayout();
             this.pnlReferenceTimeOffset.SuspendLayout();
             this.pnlTimestamping.SuspendLayout();
@@ -297,11 +298,23 @@
             this.panel2.Size = new System.Drawing.Size(456, 1);
             this.panel2.TabIndex = 26;
             // 
+            // btnSupportedFileFormats
+            // 
+            this.btnSupportedFileFormats.Location = new System.Drawing.Point(19, 293);
+            this.btnSupportedFileFormats.Name = "btnSupportedFileFormats";
+            this.btnSupportedFileFormats.Size = new System.Drawing.Size(26, 23);
+            this.btnSupportedFileFormats.TabIndex = 27;
+            this.btnSupportedFileFormats.Text = "?";
+            this.toolTip1.SetToolTip(this.btnSupportedFileFormats, "Supported Timing Corrections for Camera Systems and File Formats by Tangra");
+            this.btnSupportedFileFormats.UseVisualStyleBackColor = true;
+            this.btnSupportedFileFormats.Click += new System.EventHandler(this.btnSupportedFileFormats_Click);
+            // 
             // frmAcquisitionDelayChooser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(479, 332);
+            this.Controls.Add(this.btnSupportedFileFormats);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.lblCameraSystem);
             this.Controls.Add(this.panel1);
@@ -358,5 +371,6 @@
         private System.Windows.Forms.LinkLabel llCameraSystemLink;
         private System.Windows.Forms.Label lblTimestamping;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Button btnSupportedFileFormats;
     }
 }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using Tangra.Model.Helpers;
+using Tangra.VideoOperations.LightCurves.InfoForms;
 
 namespace Tangra.VideoOperations.LightCurves
 {
@@ -65,5 +66,11 @@ namespace Tangra.VideoOperations.LightCurves
 		{
 			cbxCameras.Enabled = rbCorrect.Checked;
 		}
+
+        private void btnSupportedFileFormats_Click(object sender, EventArgs e)
+        {
+            var frm = new frmSupportedFileFormats();
+            frm.ShowDialog(this);
+        }
 	}
 }
