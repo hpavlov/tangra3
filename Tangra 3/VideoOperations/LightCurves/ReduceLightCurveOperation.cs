@@ -441,6 +441,9 @@ namespace Tangra.VideoOperations.LightCurves
                         m_VideoController.SetCursor(Cursors.Default);
                     }
                 }
+
+                if (m_StackedSelectionFrame != null)
+                    m_VideoController.SetStackedSelectionFrameImage(m_StackedSelectionFrame);
             }
         }
 
@@ -450,6 +453,7 @@ namespace Tangra.VideoOperations.LightCurves
                 m_StackedSelectionFrame.Pixelmap.Dispose();
 
             m_StackedSelectionFrame = null;
+            m_VideoController.SetStackedSelectionFrameImage(null);
         }
 
         internal AstroImage GetStackedAstroImage()
@@ -1332,6 +1336,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
 
             m_StackedSelectionFrame = null;
+            m_VideoController.SetStackedSelectionFrameImage(null);
 
 	        string usedTrackerType;
 			m_Tracker = TrackerFactory.CreateTracker(

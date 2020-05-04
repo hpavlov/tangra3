@@ -214,6 +214,7 @@ namespace Tangra.Controller
 			EnsureAllPopUpFormsClosed();
 
 			m_AstroImage = null;
+		    m_StackedSelectionFrameImage = null;
 		    m_TimestampOCR = null;
 			m_CurrentFrameContext = RenderFrameContext.Empty;
 
@@ -585,6 +586,7 @@ namespace Tangra.Controller
             if (IsSerVideo && !TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForSER) return;
             if (IsAstroDigitalVideo && !TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForADV) return;
             if ((IsFitsSequence || IsFitsFile || IsFitsCube) && !TangraConfig.Settings.Generic.AutoDynamicRanageEnabledForFITS) return;
+            double adjustment = IsAstroAnalogueVideo ? 0.5 : 1;
 
 	        try
 	        {
@@ -627,7 +629,7 @@ namespace Tangra.Controller
                             byte btModified = (byte)(Math.Max(0, Math.Min(255, dynamicVal)));
                             pixels.Add(btModified);
                         }
-                        double averagePixel = pixels.Average(x => x);
+                        double averagePixel = pixels.Average(x => x) / adjustment;
                         if (averagePixel > TangraConfig.Settings.Generic.MinAutoDynamicRanage && averagePixel < TangraConfig.Settings.Generic.MaxAutoDynamicRanage)
                             break;
                     }
@@ -974,7 +976,7 @@ namespace Tangra.Controller
 			m_MainForm.BuildRecentFilesMenu();
 		}
 
-        public void SetImage(Pixelmap currentPixelmap, int currentFrameId, RenderFrameContext frameContext, bool isOldFrameRefreshed)
+	    public void SetImage(Pixelmap currentPixelmap, int currentFrameId, RenderFrameContext frameContext, bool isOldFrameRefreshed)
         {
             m_AstroImage = new AstroImage(currentPixelmap);
             m_CurrentFrameContext = frameContext;
@@ -2768,21 +2770,7 @@ namespace Tangra.Controller
             }
             else
             {
-                // Ctrl means fit in smaller area
-                int matrixSize = controlHeld ? 7 : 17;
-
-                if (m_AstroImage != null)
-                {
-                    uint[,] data = m_AstroImage.GetMeasurableAreaPixels(pixel.X, pixel.Y, matrixSize);
-                    m_TargetPsfFit = new PSFFit(pixel.X, pixel.Y);
-					m_TargetPsfFit.Fit(data);
-                    if (m_TargetPsfFit.IsSolved)
-                    {
-                        pixel = new ImagePixel(m_TargetPsfFit.Brightness, m_TargetPsfFit.XCenter, m_TargetPsfFit.YCenter);
-                        //isFit = psfFit.Certainty > 0.25;
-                    }
-					m_TargetBackgroundPixels = m_AstroImage.GetMeasurableAreaPixels(pixel.X, pixel.Y, 35);
-                }
+                LocateObjectAtClickCoordinates(ref pixel, controlHeld);
             }
 
             var args = new ObjectClickEventArgs(
@@ -2828,6 +2816,34 @@ namespace Tangra.Controller
 
             ShowTargetPSF();
         }
+
+        private void LocateObjectAtClickCoordinates(ref ImagePixel pixel, bool controlHeld)
+	    {
+            // Ctrl means fit in smaller area
+            int matrixSize = controlHeld ? 7 : 17;
+
+            var astroImage = m_StackedSelectionFrameImage ?? m_AstroImage;
+
+            if (astroImage != null)
+            {
+                uint[,] data = astroImage.GetMeasurableAreaPixels(pixel.X, pixel.Y, matrixSize);
+                m_TargetPsfFit = new PSFFit(pixel.X, pixel.Y);
+                m_TargetPsfFit.Fit(data);
+                if (m_TargetPsfFit.IsSolved)
+                {
+                    pixel = new ImagePixel(m_TargetPsfFit.Brightness, m_TargetPsfFit.XCenter, m_TargetPsfFit.YCenter);
+                    //isFit = psfFit.Certainty > 0.25;
+                }
+                m_TargetBackgroundPixels = astroImage.GetMeasurableAreaPixels(pixel.X, pixel.Y, 35);
+            }
+	    }
+
+	    private AstroImage m_StackedSelectionFrameImage;
+
+	    internal void SetStackedSelectionFrameImage(AstroImage astroImage)
+	    {
+	        m_StackedSelectionFrameImage = astroImage;
+	    }
 
         public void MouseDoubleClick(Point location)
         {
