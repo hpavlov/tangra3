@@ -1,6 +1,6 @@
 ﻿Tangra3 Release Notes
 ---------------------
-v3.7.1 (2020-05-04)
+v3.7.2 (2020-05-05)
 - Made it possible to apply timing corrections for Digital Video Cameras.
 - Added additional information form about the applied timing corrections.
 - Fixed a problem where AOTA times with SER files could have had an error of half an exposure.
@@ -9,6 +9,7 @@ v3.7.1 (2020-05-04)
 - Improvements in the automatic selection of good dynamic range for all 12-bit and 16-bit videos.
 - Improvements around the new 'Stacked Image View' mode.
 - Other minor improvements and bugfixes.
+- Hotfix for a crash when opening an .lc file. (v3.7.2)
 
 v3.7.0 (2020-04-13)
 - Added astrometry support for GaiaDR2.

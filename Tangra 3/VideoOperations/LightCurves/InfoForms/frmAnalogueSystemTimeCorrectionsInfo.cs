@@ -21,7 +21,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             InitializeComponent();
         }
 
-        public frmAnalogueSystemTimeCorrectionsInfo(TimeCorrectonsInfo info, string finalTimeStamp)
+        public frmAnalogueSystemTimeCorrectionsInfo(TimeCorrectonsInfo info)
             : this()
         {
             this.info = info;
@@ -36,7 +36,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
 
             lblMidFrameTimestamp.Text = info.MidFrameTimestamp.ToString("HH:mm:ss.fff");
             lblRawFrameTimestamp.Text = info.RawFrameTimeStamp != null ? info.RawFrameTimeStamp.Value.ToString("HH:mm:ss.fff") : "N/A";
-            lblFinalFrameTimestamp.Text = finalTimeStamp;
+            lblFinalFrameTimestamp.Text = info.FinalTimestamp.ToString("HH:mm:ss.fff");
         }
     }
 }

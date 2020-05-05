@@ -453,7 +453,8 @@ namespace Tangra.VideoOperations.LightCurves
                 m_StackedSelectionFrame.Pixelmap.Dispose();
 
             m_StackedSelectionFrame = null;
-            m_VideoController.SetStackedSelectionFrameImage(null);
+            if (m_VideoController != null)
+                m_VideoController.SetStackedSelectionFrameImage(null);
         }
 
         internal AstroImage GetStackedAstroImage()

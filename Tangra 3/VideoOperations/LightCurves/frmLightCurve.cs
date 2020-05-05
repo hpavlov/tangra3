@@ -2807,12 +2807,12 @@ namespace Tangra.VideoOperations.LightCurves
             TimeCorrectonsInfo info = lblFrameTime.Tag as TimeCorrectonsInfo;
             if (info != null && info.VideoFormatType == VideoFormatType.Analogue)
             {
-                var frm = new frmAnalogueSystemTimeCorrectionsInfo(info, lblFrameTime.Text);
+                var frm = new frmAnalogueSystemTimeCorrectionsInfo(info);
                 frm.ShowDialog(this);
             }
             else if (info != null && info.VideoFormatType == VideoFormatType.Digital)
             {
-                var frm = new frmDigitalSystemTimeCorrectionsInfo(info, lblFrameTime.Text);
+                var frm = new frmDigitalSystemTimeCorrectionsInfo(info);
                 frm.ShowDialog(this);
             }
 

@@ -18,7 +18,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             InitializeComponent();
         }
 
-        public frmDigitalSystemTimeCorrectionsInfo(TimeCorrectonsInfo info, string finalTimeStamp)
+        public frmDigitalSystemTimeCorrectionsInfo(TimeCorrectonsInfo info)
             : this()
         {
 
@@ -35,8 +35,8 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
             lblAquisitionDelay.Text = info.NotAffectedByAcquisitionDelays ? "-" : (info.AcquisitionDelaySec != null ? string.Format("{0} sec", info.AcquisitionDelaySec) : (info.ReferenceTimeOffsetSec != null ? "-" : "N/A"));
             lblReferenceTimeOffset.Text = info.NotAffectedByAcquisitionDelays ? "-" : (info.ReferenceTimeOffsetSec != null ? string.Format("{0} sec", info.ReferenceTimeOffsetSec) : (info.AcquisitionDelaySec != null ? "-" : "N/A"));
 
-            lblMidFrameTimestamp.Text = info.MidFrameTimestamp.ToString("HH:mm:ss.fff");
-            lblFinalFrameTimestamp.Text = finalTimeStamp;
+            lblMidFrameTimestamp.Text = info.MidFrameTimestamp.ToString("HH:mm:ss.ffffff");
+            lblFinalFrameTimestamp.Text = info.FinalTimestamp.ToString("HH:mm:ss.ffffff");
         }
     }
 }

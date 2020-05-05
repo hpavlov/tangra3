@@ -1413,6 +1413,8 @@ namespace Tangra.VideoOperations.LightCurves
 					if (m_LCFile.CanDetermineFrameTimes)
 					{
                         DateTime frameTime = m_LCFile.GetTimeForFrame(firstNonExcludedMeasurement.CurrFrameNo, out timeCorrectonsInfo);
+                        
+                        if (timeCorrectonsInfo != null) timeCorrectonsInfo.FinalTimestamp = frameTime;
 
                         DisplayFrameTime(frameTime, timeCorrectonsInfo);
 					}

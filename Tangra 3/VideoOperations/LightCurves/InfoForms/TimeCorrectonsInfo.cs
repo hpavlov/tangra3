@@ -81,5 +81,7 @@ namespace Tangra.VideoOperations.LightCurves.InfoForms
         public double? AcquisitionDelaySec { get; set; }
 
         public double? ReferenceTimeOffsetSec { get; set; }
+
+        public DateTime FinalTimestamp { get; set; }
     }
 }
