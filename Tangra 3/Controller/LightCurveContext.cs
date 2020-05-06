@@ -96,6 +96,7 @@ namespace Tangra.Controller
 		public MeasurementTimingType TimingType;
 		public string CameraName;
 		public int AAVFrameIntegration;
+	    public bool IsAstroAnalogueVideo;
 		public bool InstrumentalDelayCorrectionsNotRequired;
 		public uint MinFrame;
 		public uint MaxFrame;

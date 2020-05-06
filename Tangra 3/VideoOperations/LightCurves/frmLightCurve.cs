@@ -316,6 +316,7 @@ namespace Tangra.VideoOperations.LightCurves
             m_LightCurveController.Context.CameraName = m_Footer.CameraName;
             m_LightCurveController.Context.AAVFrameIntegration = m_Footer.AAVFrameIntegration;
             m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired = m_LCFile.InstrumentalDelayCorrectionsNotRequired();
+            m_LightCurveController.Context.IsAstroAnalogueVideo = m_Header.GetVideoFileFormat() == VideoFileFormat.AAV;
             m_LightCurveController.Context.TimingType = m_Header.TimingType;
             m_LightCurveController.Context.MinFrame = m_Header.MinFrame;
             m_LightCurveController.Context.MaxFrame = m_Header.MaxFrame;
@@ -355,7 +356,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             m_CameraCorrectionsHaveBeenAppliedFlag =
                 !string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) || 
-                m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired ||
+                (m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired && m_LightCurveController.Context.IsAstroAnalogueVideo) ||
                 m_LightCurveController.Context.AcquisitionDelayApplied;
 
             m_HasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
@@ -2750,11 +2751,14 @@ namespace Tangra.VideoOperations.LightCurves
 
                 if (videoFormat == VideoFileFormat.AVI)
                 {
-                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay correction not supported" + DOUBLE_CLICK_HINT);
+                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay correction not supported." + DOUBLE_CLICK_HINT);
+                    lblInstDelayWarning.ForeColor = Color.Red;
+                    lblFrameTime.BackColor = Color.FromArgb(244, 206, 231);
+                    toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times.");
                 } 
                 else if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2)
                 {
-                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay correction not required" + DOUBLE_CLICK_HINT);
+                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay correction not required." + DOUBLE_CLICK_HINT);
                 }
                 else if (timeCorrectonsInfo != null && timeCorrectonsInfo.VideoFormatType == VideoFormatType.Digital)
                 {
@@ -2762,27 +2766,27 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         if (!string.IsNullOrWhiteSpace(m_LCFile.Footer.CameraName))
                         {
-                            toolTip1.SetToolTip(lblFrameTime, string.Format("Timing correction not required for {0}", m_LCFile.Footer.CameraName) + DOUBLE_CLICK_HINT);
+                            toolTip1.SetToolTip(lblFrameTime, string.Format("Timing correction not required for {0}.", m_LCFile.Footer.CameraName) + DOUBLE_CLICK_HINT);
                         }
                         else
                         {
-                            toolTip1.SetToolTip(lblFrameTime, string.Format("Timing correction not required for this {0} recording", videoFormat) + DOUBLE_CLICK_HINT);
+                            toolTip1.SetToolTip(lblFrameTime, string.Format("Timing correction not required for this {0} recording.", videoFormat) + DOUBLE_CLICK_HINT);
                         }
                     }
                     else
                     {
                         lblInstDelayWarning.ForeColor = Color.Red;
                         lblFrameTime.BackColor = Color.FromArgb(244, 206, 231);
-                        toolTip1.SetToolTip(lblInstDelayWarning, "Timing corrections *NOT* applied to the times");
-                        toolTip1.SetToolTip(lblFrameTime, "Timing corrections *NOT* applied to the times" + DOUBLE_CLICK_HINT);
+                        toolTip1.SetToolTip(lblInstDelayWarning, "Timing corrections *NOT* applied to the times.");
+                        toolTip1.SetToolTip(lblFrameTime, "Timing corrections *NOT* applied to the times." + DOUBLE_CLICK_HINT);
                     }
                 }
                 else
                 {
                     lblInstDelayWarning.ForeColor = Color.Red;
                     lblFrameTime.BackColor = Color.FromArgb(244, 206, 231);
-                    toolTip1.SetToolTip(lblInstDelayWarning, "Timing corrections *NOT* applied but could be required");
-                    toolTip1.SetToolTip(lblFrameTime, "Timing corrections *NOT* applied but could be required" + (timeCorrectonsInfo != null ? DOUBLE_CLICK_HINT : null));
+                    toolTip1.SetToolTip(lblInstDelayWarning, "Timing corrections *NOT* applied but could be required.");
+                    toolTip1.SetToolTip(lblFrameTime, "Timing corrections *NOT* applied but could be required." + (timeCorrectonsInfo != null ? DOUBLE_CLICK_HINT : null));
                 }
             }
             else
@@ -2791,13 +2795,13 @@ namespace Tangra.VideoOperations.LightCurves
                 lblFrameTime.BackColor = Color.FromArgb(244, 206, 231);
                 if (videoFormat == VideoFileFormat.AAV || videoFormat == VideoFileFormat.AAV2 || videoFormat == VideoFileFormat.AVI)
                 {
-                    toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times");
-                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay has *NOT* been applied to the times" + DOUBLE_CLICK_HINT);
+                    toolTip1.SetToolTip(lblInstDelayWarning, "Instrumental delay has *NOT* been applied to the times.");
+                    toolTip1.SetToolTip(lblFrameTime, "Instrumental delay has *NOT* been applied to the times." + DOUBLE_CLICK_HINT);
                 }
                 else
                 {
-                    toolTip1.SetToolTip(lblInstDelayWarning, "Acquisition delay correction has *NOT* been applied to the times");
-                    toolTip1.SetToolTip(lblFrameTime, "Acquisition delay correction has *NOT* been applied to the times" + DOUBLE_CLICK_HINT);
+                    toolTip1.SetToolTip(lblInstDelayWarning, "Acquisition delay correction has *NOT* been applied to the times.");
+                    toolTip1.SetToolTip(lblFrameTime, "Acquisition delay correction has *NOT* been applied to the times." + DOUBLE_CLICK_HINT);
                 }
             }
 	    }

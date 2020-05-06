@@ -563,7 +563,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             if (Footer.AcquisitionDelayMs != null && Footer.ReferenceTimeToUtcOffsetMs != null)
             {
-                timeCorrectonsInfo.Message = "Acquisition delay and Reference Clock to UTC offset have been applied to the times";
+                timeCorrectonsInfo.Message = "Acquisition delay and Reference Clock to UTC offset have been applied to the times.";
 
                 rv = rv.AddMilliseconds(-1 * Footer.AcquisitionDelayMs.Value + Footer.ReferenceTimeToUtcOffsetMs.Value);
 
@@ -572,7 +572,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
             else if (Footer.AcquisitionDelayMs != null)
             {
-                timeCorrectonsInfo.Message = "Acquisition delay has been applied to the times";
+                timeCorrectonsInfo.Message = "Acquisition delay has been applied to the times.";
 
                 rv = rv.AddMilliseconds(-1*Footer.AcquisitionDelayMs.Value);
 
@@ -580,7 +580,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
             else if (Footer.ReferenceTimeToUtcOffsetMs != null)
             {
-                timeCorrectonsInfo.Message = "Reference Clock to UTC offset has been applied to the times";
+                timeCorrectonsInfo.Message = "Reference Clock to UTC offset has been applied to the times.";
 
                 rv = rv.AddMilliseconds(Footer.ReferenceTimeToUtcOffsetMs.Value);
 
@@ -642,10 +642,10 @@ namespace Tangra.VideoOperations.LightCurves
                 timeCorrectonsInfo.RawTimestampSource = RawTimestampSource.UserEntered;
 
 			    timeCorrectonsInfo.Message = string.Format(
-					"Instrumental delay has been applied to the times\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, headerComputedTime.ToString("HH:mm:ss.fff"));
+					"Instrumental delay has been applied to the times.\r\n\r\nEnd of first field {0}timestamp: {1}", prefix, headerComputedTime.ToString("HH:mm:ss.fff"));
 
                 if (Footer.AAVStackedFrameRate > 1)
-                    timeCorrectonsInfo.Message += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames", Footer.AAVStackedFrameRate);
+                    timeCorrectonsInfo.Message += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames.", Footer.AAVStackedFrameRate);
 			}
 
 			return rv;
@@ -810,10 +810,10 @@ namespace Tangra.VideoOperations.LightCurves
                 }
 
                 timeCorrectonsInfo.Message = string.Format(
-                    "Instrumental delay for x{0} integrated frames has been applied to the times\r\n\r\nEnd of first field {1}timestamp: {2}", integratedFields / 2, prefix, endOfFirstField.ToString("HH:mm:ss.fff"));
+                    "Instrumental delay for x{0} integrated frames has been applied to the times.\r\n\r\nEnd of first field {1}timestamp: {2}", integratedFields / 2, prefix, endOfFirstField.ToString("HH:mm:ss.fff"));
 
                 if (Footer.AAVStackedFrameRate > 1)
-                    timeCorrectonsInfo.Message += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames", Footer.AAVStackedFrameRate);
+                    timeCorrectonsInfo.Message += string.Format("\r\n\r\nThis is a non-integrated video stacked at x{0} frames.", Footer.AAVStackedFrameRate);
             }
 
             if (videoFormat != AnalogueVideoFormat.Unknown)
