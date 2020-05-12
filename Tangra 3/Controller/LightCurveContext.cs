@@ -97,6 +97,7 @@ namespace Tangra.Controller
 		public string CameraName;
 		public int AAVFrameIntegration;
 	    public bool IsAstroAnalogueVideo;
+	    public bool IsDigitalVideo;
 		public bool InstrumentalDelayCorrectionsNotRequired;
 		public uint MinFrame;
 		public uint MaxFrame;

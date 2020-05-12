@@ -311,12 +311,15 @@ namespace Tangra.VideoOperations.LightCurves
             else if (m_Header.FilterType == 2)
                 m_LightCurveController.Context.Filter = LightCurveContext.FilterType.LowPassDifference;
 
+            var videoFormat = m_Header.GetVideoFileFormat();
+
             m_LightCurveController.Context.InstrumentalDelayConfigName = m_Footer.InstrumentalDelayConfigName;
             m_LightCurveController.Context.AcquisitionDelayApplied = m_Footer.AcquisitionDelayMs != null;
             m_LightCurveController.Context.CameraName = m_Footer.CameraName;
             m_LightCurveController.Context.AAVFrameIntegration = m_Footer.AAVFrameIntegration;
             m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired = m_LCFile.InstrumentalDelayCorrectionsNotRequired();
-            m_LightCurveController.Context.IsAstroAnalogueVideo = m_Header.GetVideoFileFormat() == VideoFileFormat.AAV;
+            m_LightCurveController.Context.IsAstroAnalogueVideo = videoFormat == VideoFileFormat.AAV;
+            m_LightCurveController.Context.IsDigitalVideo = videoFormat == VideoFileFormat.ADV || videoFormat == VideoFileFormat.SER || videoFormat == VideoFileFormat.FITS;
             m_LightCurveController.Context.TimingType = m_Header.TimingType;
             m_LightCurveController.Context.MinFrame = m_Header.MinFrame;
             m_LightCurveController.Context.MaxFrame = m_Header.MaxFrame;
@@ -355,8 +358,8 @@ namespace Tangra.VideoOperations.LightCurves
 			bool hasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
 
             m_CameraCorrectionsHaveBeenAppliedFlag =
-                !string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) || 
-                (m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired && m_LightCurveController.Context.IsAstroAnalogueVideo) ||
+                !string.IsNullOrEmpty(m_LightCurveController.Context.InstrumentalDelayConfigName) ||
+                (m_LightCurveController.Context.InstrumentalDelayCorrectionsNotRequired && (m_LightCurveController.Context.IsAstroAnalogueVideo || m_LightCurveController.Context.IsDigitalVideo)) ||
                 m_LightCurveController.Context.AcquisitionDelayApplied;
 
             m_HasEmbeddedTimeStamps = m_Footer.ReductionContext.HasEmbeddedTimeStamps;
