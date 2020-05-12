@@ -137,19 +137,27 @@ namespace Tangra.Video.SER
             equipmentInfo.Observer = rv.Observer;
             equipmentInfo.Telescope = rv.Telescope;
 
-            if (rv.HasTimeStamps || rv.HasUTCTimeStamps || rv.HasFireCaptureTimeStamps)
+            if (args == null)
             {
-                var frmCheckTS = new frmCheckTimeStampsIntegrity(rv);
-                frmCheckTS.ShowDialog(parentForm);
-
-                if (rv.HasTimeStamps || rv.HasUTCTimeStamps)
+                // Only check timestamp integrity if not opened together with existing .lc file
+                if (rv.HasTimeStamps || rv.HasUTCTimeStamps || rv.HasFireCaptureTimeStamps)
                 {
-                    var frmTsExp = new frmSerTimestampExposure(frmCheckTS.MedianExposure, frmCheckTS.OneSigmaExposure);
-                    frmTsExp.ShowDialog(parentForm);
+                    var frmCheckTS = new frmCheckTimeStampsIntegrity(rv);
+                    frmCheckTS.ShowDialog(parentForm);
 
-                    var derivedFrameRate = 1000.0 / frmTsExp.ConfirmedExposure;
-                    rv = new SERVideoStream(fileName, derivedFrameRate, bitPix, grayScaleRGB, serTiming, fireCaptureTimeStamps, frmTsExp.ConfirmedTimeReference);
+                    if (rv.HasTimeStamps || rv.HasUTCTimeStamps)
+                    {
+                        var frmTsExp = new frmSerTimestampExposure(frmCheckTS.MedianExposure, frmCheckTS.OneSigmaExposure);
+                        frmTsExp.ShowDialog(parentForm);
+
+                        var derivedFrameRate = 1000.0 / frmTsExp.ConfirmedExposure;
+                        rv = new SERVideoStream(fileName, derivedFrameRate, bitPix, grayScaleRGB, serTiming, fireCaptureTimeStamps, frmTsExp.ConfirmedTimeReference);
+                    }
                 }
+            }
+            else if (rv.HasTimeStamps || rv.HasUTCTimeStamps)
+            {
+                rv = new SERVideoStream(fileName, args.FrameRate, bitPix, grayScaleRGB, serTiming, fireCaptureTimeStamps, args.ConfirmedTimeReference);
             }
 
             return rv;

@@ -56,6 +56,7 @@ namespace Tangra.Controller
         public int BitPix { get; set; }
         public SerUseTimeStamp SerTiming { get; set; }
         public bool GrayScaleRGB { get; set; }
+        public SerTimeStampReference ConfirmedTimeReference { get; set; }
     }
 
 	public class VideoController : IDisposable, IVideoFrameRenderer, IVideoController, IImagePixelProvider, IFileInfoProvider
@@ -1128,6 +1129,18 @@ namespace Tangra.Controller
             }
 
             return SerUseTimeStamp.None;
+        }
+
+        public SerTimeStampReference GetSerTimeStampReference()
+        {
+            if (m_FramePlayer.Video.Engine == "SER")
+            {
+                var serPlayer = m_FramePlayer.Video as SERVideoStream;
+                if (serPlayer != null)
+                    return serPlayer.TimeStampReference;
+            }
+
+            return SerTimeStampReference.MidFrame;
         }
 
 		public void SetupFrameIntegration(int framesToIntegrate, FrameIntegratingMode frameMode, PixelIntegrationType pixelIntegrationType)        

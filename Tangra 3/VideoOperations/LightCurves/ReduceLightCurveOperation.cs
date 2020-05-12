@@ -2081,8 +2081,12 @@ namespace Tangra.VideoOperations.LightCurves
 				measurementTimingType = MeasurementTimingType.OCRedTimeForEachFrame;
 
             SerUseTimeStamp serTimingType = SerUseTimeStamp.None;
-            if (m_VideoController.IsSerVideo)
+            SerTimeStampReference serTimeStampReference = SerTimeStampReference.MidFrame;
+		    if (m_VideoController.IsSerVideo)
+		    {
                 serTimingType = m_VideoController.GetSerTimingType();
+                serTimeStampReference = m_VideoController.GetSerTimeStampReference();
+		    }
 
 			LCMeasurementHeader finalHeader = new LCMeasurementHeader(
 				m_VideoController.CurrentVideoFileName,
@@ -2098,6 +2102,7 @@ namespace Tangra.VideoOperations.LightCurves
 				LightCurveReductionContext.Instance.LightCurveReductionType,
 				measurementTimingType,
                 serTimingType,
+                serTimeStampReference,
 				(int)LightCurveReductionContext.Instance.NoiseMethod,
 				(int)LightCurveReductionContext.Instance.DigitalFilter,
 				matrixSizes.ToArray(), apertures.ToArray(), fixedFlags.ToArray(), psfGroupIds.ToArray(), (float)m_Tracker.PositionTolerance);
