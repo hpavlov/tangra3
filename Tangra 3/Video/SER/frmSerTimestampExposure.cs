@@ -12,7 +12,7 @@ namespace Tangra.Video.SER
 {
     public partial class frmSerTimestampExposure : Form
     {
-        public frmSerTimestampExposure(double medianExposure, double? oneSigma)
+        public frmSerTimestampExposure(double medianExposure, double? oneSigma, int droppedFrames, double droppedFramesPercentage)
             : this()
         {
             nudExposureMs.Value = (decimal)medianExposure;
@@ -21,6 +21,18 @@ namespace Tangra.Video.SER
             if (oneSigma.HasValue)
             {
                 lblJitter.Text = string.Format("{0}", Math.Round(oneSigma.Value, 2));
+                lblJitterMs.Left = lblJitter.Right + 2;
+
+                if (droppedFrames > 0)
+                {
+                    lblDroppedFrames.Text = string.Format("Dropped Frames: {0} ({1:0.0}%)", droppedFrames, droppedFramesPercentage);
+                    lblDroppedFrames.Left = lblJitterMs.Right + 5;
+                    lblDroppedFrames.Visible = true;
+                }
+                else
+                {
+                    lblDroppedFrames.Visible = false;
+                }
             }
         }
 

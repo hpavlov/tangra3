@@ -19,6 +19,10 @@ namespace Tangra.Video.SER
 
         public double OneSigmaExposure { get; private set; }
 
+        public int DroppedFrames { get; private set; }
+
+        public double DroppedFramesPercentage { get; private set; }
+
         public frmCheckTimeStampsIntegrity()
         {
             InitializeComponent();
@@ -37,6 +41,7 @@ namespace Tangra.Video.SER
             progressBar.Maximum = m_Stream.LastFrame;
             progressBar.Minimum = m_Stream.FirstFrame;
             var exposures = new List<double>();
+            var timestamps = new List<DateTime>();
 
             for (int i = m_Stream.FirstFrame; i <= m_Stream.LastFrame; i++)
             {
@@ -77,9 +82,15 @@ namespace Tangra.Video.SER
                     }
 
                     if (m_Stream.HasUTCTimeStamps && tsUtc != TimeSpan.Zero)
+                    {
+                        timestamps.Add(frameInfo.TimeStampUtc);
                         exposures.Add(tsUtc.TotalMilliseconds);
+                    }
                     else if (ts != TimeSpan.Zero)
+                    {
+                        timestamps.Add(frameInfo.TimeStampUtc);
                         exposures.Add(ts.TotalMilliseconds);
+                    }
                 }
 
                 prevFrameInfo = frameInfo;
@@ -89,6 +100,39 @@ namespace Tangra.Video.SER
                 if (i % 100 == 0)
                     Application.DoEvents();
             }
+
+            // Fist estimate assuming no dropped frames
+            MedianExposure = exposures.Median();
+
+            DroppedFrames = 0;
+            DroppedFramesPercentage = 0;
+
+            if (timestamps.Count > 2)
+            {
+                exposures.Clear();
+
+                var currTs = timestamps[0];
+                for (int i = 1; i < timestamps.Count; i++)
+                {
+                    int frameGap = 1;
+                    var nextTs = currTs.AddMilliseconds(MedianExposure);
+                    while (Math.Abs((nextTs - timestamps[i]).TotalMilliseconds) > MedianExposure / 10 && nextTs < timestamps[i])
+                    {
+                        DroppedFrames++;
+                        nextTs = nextTs.AddMilliseconds(MedianExposure);
+                        frameGap++;
+                    }
+
+                    exposures.Add((timestamps[i] - currTs).TotalMilliseconds / frameGap);
+                    currTs = timestamps[i];
+                }
+
+                DroppedFramesPercentage = DroppedFrames * 100.0 / (timestamps.Count + DroppedFrames);
+
+                // Second estimate, adjustment for dropped frames.
+                MedianExposure = exposures.Median();
+            }
+
 
             progressBar.Value = m_Stream.LastFrame;
             progressBar.Update();

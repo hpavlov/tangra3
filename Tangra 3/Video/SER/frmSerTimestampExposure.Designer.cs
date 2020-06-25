@@ -38,13 +38,14 @@
             this.label6 = new System.Windows.Forms.Label();
             this.lblJitter = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.lblJitterMs = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.gbExposureJitter = new System.Windows.Forms.GroupBox();
             this.gbExposure = new System.Windows.Forms.GroupBox();
             this.label9 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblDroppedFrames = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nudExposureMs)).BeginInit();
             this.gbExposureJitter.SuspendLayout();
             this.gbExposure.SuspendLayout();
@@ -146,14 +147,14 @@
             this.label1.TabIndex = 22;
             this.label1.Text = "Jitter          :";
             // 
-            // label4
+            // lblJitterMs
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(193, 13);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(20, 13);
-            this.label4.TabIndex = 23;
-            this.label4.Text = "ms";
+            this.lblJitterMs.AutoSize = true;
+            this.lblJitterMs.Location = new System.Drawing.Point(193, 13);
+            this.lblJitterMs.Name = "lblJitterMs";
+            this.lblJitterMs.Size = new System.Drawing.Size(20, 13);
+            this.lblJitterMs.TabIndex = 23;
+            this.lblJitterMs.Text = "ms";
             // 
             // label7
             // 
@@ -174,9 +175,10 @@
             // 
             // gbExposureJitter
             // 
+            this.gbExposureJitter.Controls.Add(this.lblDroppedFrames);
             this.gbExposureJitter.Controls.Add(this.label7);
             this.gbExposureJitter.Controls.Add(this.label6);
-            this.gbExposureJitter.Controls.Add(this.label4);
+            this.gbExposureJitter.Controls.Add(this.lblJitterMs);
             this.gbExposureJitter.Controls.Add(this.lblJitter);
             this.gbExposureJitter.Controls.Add(this.label1);
             this.gbExposureJitter.Location = new System.Drawing.Point(12, 170);
@@ -216,6 +218,17 @@
             this.groupBox1.TabIndex = 29;
             this.groupBox1.TabStop = false;
             // 
+            // lblDroppedFrames
+            // 
+            this.lblDroppedFrames.AutoSize = true;
+            this.lblDroppedFrames.ForeColor = System.Drawing.Color.Red;
+            this.lblDroppedFrames.Location = new System.Drawing.Point(234, 13);
+            this.lblDroppedFrames.Name = "lblDroppedFrames";
+            this.lblDroppedFrames.Size = new System.Drawing.Size(103, 13);
+            this.lblDroppedFrames.TabIndex = 28;
+            this.lblDroppedFrames.Text = "(Dropped Frames: 3)";
+            this.lblDroppedFrames.Visible = false;
+            // 
             // frmSerTimestampExposure
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -251,12 +264,13 @@
         private System.Windows.Forms.Label lblJitter;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label lblJitterMs;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.GroupBox gbExposureJitter;
         private System.Windows.Forms.GroupBox gbExposure;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label lblDroppedFrames;
     }
 }
