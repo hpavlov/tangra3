@@ -85,6 +85,7 @@ namespace Tangra.Model.Image
         private double m_TotalReading;
         private double m_TotalBackground;
         private float m_TotalPixels;
+        private float m_TotalBackgroundPixels;
         private uint[,] m_PixelData;
         private float m_XCenter;
         private float m_YCenter;
@@ -159,6 +160,11 @@ namespace Tangra.Model.Image
             get { return m_TotalPixels; }
         }
 
+        public float TotalBackgroundPixels
+        {
+            get { return m_TotalBackgroundPixels; }
+        }
+
         public uint SaturationValue
         {
             get { return m_SaturationValue; }
@@ -190,6 +196,7 @@ namespace Tangra.Model.Image
             m_PixelData = matrix;
 
             m_TotalPixels = 0;
+		    m_TotalBackgroundPixels = 0;
 
 			m_TotalReading = GetReading(
 				m_Aperture,
@@ -203,6 +210,8 @@ namespace Tangra.Model.Image
                     PSFFit fit = new PSFFit(x0Int, y0Int);
                     fit.Fit(matrix, matrixSize);
 
+                    m_TotalBackgroundPixels = matrixSize * matrixSize;
+
                     if (!fit.IsSolved)
                         m_TotalBackground = 0;
                     else
@@ -212,6 +221,7 @@ namespace Tangra.Model.Image
 				{
                     int offset = (35 - side) / 2;
                     m_TotalBackground = Get3DPolynomialBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, backgroundModel);
+                    m_TotalBackgroundPixels = backgroundArea.GetLength(0) * backgroundArea.GetLength(1);
 				}
 	            else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
 	            {
@@ -222,7 +232,7 @@ namespace Tangra.Model.Image
                         backgroundArea = GetImagePixelsCallback(x0Int, y0Int, 71);
                         offset += 17;
                     }
-                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
+                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor, out m_TotalBackgroundPixels);
 		            m_TotalBackground = (uint) Math.Round(m_TotalPixels*(float) bgFromAnnulus);
 	            }
 	            else
@@ -328,6 +338,7 @@ namespace Tangra.Model.Image
             if (useNumericalQadrature)
             {
                 double r0Square = fit.R0 * fit.R0;
+                m_TotalBackgroundPixels = 0;
 
                 m_TotalReading = Integration.IntegrationOverCircularArea(
                     delegate(double x, double y)
@@ -344,6 +355,7 @@ namespace Tangra.Model.Image
                 if (m_BackgroundMethod == TangraConfig.BackgroundMethod.PSFBackground)
                 {
 					m_TotalBackground = Math.PI * m_Aperture * m_Aperture * fit.I0;
+                    m_TotalBackgroundPixels = (float)(Math.PI * m_Aperture * m_Aperture);
                 }
 				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
 				{
@@ -354,11 +366,13 @@ namespace Tangra.Model.Image
                     m_TotalBackground = Integration.IntegrationOverCircularArea(
                         (x, y) => fit.UsesBackgroundModel ? fit.GetFittedBackgroundModelValue(x, y) : backgroundModel.ComputeValue(x + offset, y + offset),
                         m_Aperture);
+
+                    m_TotalBackgroundPixels = (float)(Math.PI * m_Aperture * m_Aperture);
 				}
                 else
                 {
                     int offset = (35 - fit.MatrixSize) / 2;
-                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
+                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor, out m_TotalBackgroundPixels);
 					m_TotalBackground = Math.PI * m_Aperture * m_Aperture * (float)bgFromAnnulus;
                 }
             }
@@ -420,6 +434,7 @@ namespace Tangra.Model.Image
             m_PixelData = matrix;
 
             m_TotalPixels = 0;
+		    m_TotalBackgroundPixels = 0;
 
             double varR0Sq = fit.GetVariance();
             varR0Sq = varR0Sq * varR0Sq * 2;
@@ -451,6 +466,8 @@ namespace Tangra.Model.Image
                         m_TotalBackground = 0;
                     else
                         m_TotalBackground = (uint)Math.Round(m_TotalPixels * psfBackground);
+
+                    m_TotalBackgroundPixels = (float)(Math.PI * m_Aperture * m_Aperture);
                 }
 				else if (m_BackgroundMethod == TangraConfig.BackgroundMethod.Background3DPolynomial)
 				{
@@ -460,16 +477,14 @@ namespace Tangra.Model.Image
                     m_TotalBackground = Integration.IntegrationOverCircularArea(
                         (x, y) => fit.GetFittedBackgroundModelValue(x, y),
                         m_Aperture);
+
+				    m_TotalBackgroundPixels = (float)(Math.PI * m_Aperture * m_Aperture);
 				}
-                else if (m_BackgroundMethod != TangraConfig.BackgroundMethod.PSFBackground)
-                {
-                    int offset = (35 - fit.MatrixSize) / 2;
-                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor);
-                    m_TotalBackground = (uint)Math.Round(m_TotalPixels * (float)bgFromAnnulus);
-                }
                 else
                 {
-                    throw new ApplicationException("Measurement error. Correlation: AFP-102B");
+                    int offset = (35 - fit.MatrixSize) / 2;
+                    double bgFromAnnulus = GetBackground(backgroundArea, m_Aperture, m_XCenter + offset, m_YCenter + offset, bgAnnulusFactor, out m_TotalBackgroundPixels);
+                    m_TotalBackground = (uint)Math.Round(m_TotalPixels * (float)bgFromAnnulus);
                 }
 
                 if (!fit.IsSolved || // The PSF solution failed, mark the reading invalid
@@ -720,7 +735,7 @@ namespace Tangra.Model.Image
                 ref totalBgPixels);
 		}
 
-		private double GetBackground(uint[,] pixels, float signalApertureRadius, double x0, double y0, float bgAnnulusFactor)
+		private double GetBackground(uint[,] pixels, float signalApertureRadius, double x0, double y0, float bgAnnulusFactor, out float totalBgPixels)
         {
             int nWidth = pixels.GetLength(0);
             int nHeight = pixels.GetLength(1);
@@ -744,6 +759,8 @@ namespace Tangra.Model.Image
                         allBgReadings.Add(reading);
                     }
                 }
+
+		    totalBgPixels = allBgReadings.Count();
 
             switch (m_BackgroundMethod)
             {
@@ -909,7 +926,7 @@ namespace Tangra.Model.Image
             }
             while (numRemovedPoints > 0 && allBgReadings.Count > 0);
 
-            return 1.0 * sum / allBgReadings.Count; ;
+            return 1.0 * sum / allBgReadings.Count;
         }
 
 		public NotMeasuredReasons MeasureObject(

@@ -1014,8 +1014,14 @@ namespace Tangra.Controller
 
 	        if (!isOldFrameRefreshed)
 	        {
-				m_TargetPsfFit = null;
-				ShowTargetPSF();
+	            if (m_TargetPsfFit != null)
+	            {
+                    ImagePixel pix = new ImagePixel(m_TargetPsfFit.XCenter, m_TargetPsfFit.YCenter);
+                    m_TargetPsfFit = null;
+	                LocateObjectAtClickCoordinates(ref pix, false);
+	            }
+
+				ShowTargetPSF(false);
 			}
 		}
 
@@ -2404,7 +2410,7 @@ namespace Tangra.Controller
 
                 PositionTargetPSFViewerForm();
 
-				ShowTargetPSF();
+				ShowTargetPSF(false);
 
 				UsageStats.Instance.TargetPSFViewerFormShown++;
 				UsageStats.Instance.Save();
@@ -2426,10 +2432,10 @@ namespace Tangra.Controller
             }
         }
 
-        private void ShowTargetPSF()
+        private void ShowTargetPSF(bool userSelection)
         {
             if (m_TargetPSFViewerForm != null && m_FramePlayer.Video != null)
-				m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix, m_FramePlayer.Video.GetAav16NormVal(), m_TargetBackgroundPixels);
+                m_TargetPSFViewerForm.ShowTargetPSF(m_TargetPsfFit, m_FramePlayer.Video.BitPix, m_FramePlayer.Video.GetAav16NormVal(), m_TargetBackgroundPixels, userSelection);
         }
 
         public void ToggleQhyHeaderForm()
@@ -2827,7 +2833,7 @@ namespace Tangra.Controller
 					m_ZoomedImageView.ClearZoomedImage();
 			}
 
-            ShowTargetPSF();
+            ShowTargetPSF(true);
         }
 
         private void LocateObjectAtClickCoordinates(ref ImagePixel pixel, bool controlHeld)

@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmTargetPSFViewerForm));
             this.picPixels = new System.Windows.Forms.PictureBox();
             this.picFIT = new System.Windows.Forms.PictureBox();
@@ -45,7 +46,7 @@
             this.lblSNR = new System.Windows.Forms.Label();
             this.lblNoise = new System.Windows.Forms.Label();
             this.lblBackground = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
+            this.lblSnrCaption = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
@@ -63,9 +64,13 @@
             this.label14 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.cbMeaMethod = new System.Windows.Forms.ComboBox();
+            this.msSnrCalcType = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.miSnrFromPsf = new System.Windows.Forms.ToolStripMenuItem();
+            this.miSnrFromAperture = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.picPixels)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picFIT)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMeasuringAperture)).BeginInit();
+            this.msSnrCalcType.SuspendLayout();
             this.SuspendLayout();
             // 
             // picPixels
@@ -214,14 +219,15 @@
             this.lblBackground.TabIndex = 23;
             this.lblBackground.Text = "0.0";
             // 
-            // label9
+            // lblSnrCaption
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(230, 311);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(42, 13);
-            this.label9.TabIndex = 22;
-            this.label9.Text = "SNR = ";
+            this.lblSnrCaption.AutoSize = true;
+            this.lblSnrCaption.Location = new System.Drawing.Point(230, 311);
+            this.lblSnrCaption.Name = "lblSnrCaption";
+            this.lblSnrCaption.Size = new System.Drawing.Size(42, 13);
+            this.lblSnrCaption.TabIndex = 22;
+            this.lblSnrCaption.Text = "SNR = ";
+            this.lblSnrCaption.Click += new System.EventHandler(this.lblSnrCaption_Click);
             // 
             // label10
             // 
@@ -247,9 +253,9 @@
             this.label12.Font = new System.Drawing.Font("Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
             this.label12.Location = new System.Drawing.Point(121, 311);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(25, 13);
+            this.label12.Size = new System.Drawing.Size(19, 13);
             this.label12.TabIndex = 26;
-            this.label12.Text = "1-s";
+            this.label12.Text = "1s";
             // 
             // label6
             // 
@@ -257,9 +263,9 @@
             this.label6.Font = new System.Drawing.Font("Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
             this.label6.Location = new System.Drawing.Point(382, 311);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(25, 13);
+            this.label6.Size = new System.Drawing.Size(19, 13);
             this.label6.TabIndex = 29;
-            this.label6.Text = "1-s";
+            this.label6.Text = "1s";
             // 
             // lblFitVariance
             // 
@@ -401,6 +407,28 @@
             this.cbMeaMethod.TabIndex = 40;
             this.cbMeaMethod.SelectedIndexChanged += new System.EventHandler(this.cbMeaMethod_SelectedIndexChanged);
             // 
+            // msSnrCalcType
+            // 
+            this.msSnrCalcType.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miSnrFromPsf,
+            this.miSnrFromAperture});
+            this.msSnrCalcType.Name = "msSnrCalcType";
+            this.msSnrCalcType.Size = new System.Drawing.Size(175, 70);
+            // 
+            // miSnrFromPsf
+            // 
+            this.miSnrFromPsf.Name = "miSnrFromPsf";
+            this.miSnrFromPsf.Size = new System.Drawing.Size(174, 22);
+            this.miSnrFromPsf.Text = "SNR from PSF";
+            this.miSnrFromPsf.Click += new System.EventHandler(this.miSnr_Clicked);
+            // 
+            // miSnrFromAperture
+            // 
+            this.miSnrFromAperture.Name = "miSnrFromAperture";
+            this.miSnrFromAperture.Size = new System.Drawing.Size(174, 22);
+            this.miSnrFromAperture.Text = "SNR from Aperture";
+            this.miSnrFromAperture.Click += new System.EventHandler(this.miSnr_Clicked);
+            // 
             // frmTargetPSFViewerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -424,7 +452,7 @@
             this.Controls.Add(this.lblSNR);
             this.Controls.Add(this.lblNoise);
             this.Controls.Add(this.lblBackground);
-            this.Controls.Add(this.label9);
+            this.Controls.Add(this.lblSnrCaption);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.btnCopy);
@@ -449,6 +477,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.picPixels)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picFIT)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMeasuringAperture)).EndInit();
+            this.msSnrCalcType.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -472,7 +501,7 @@
 		private System.Windows.Forms.Label lblSNR;
 		private System.Windows.Forms.Label lblNoise;
 		private System.Windows.Forms.Label lblBackground;
-		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.Label lblSnrCaption;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.Label label12;
@@ -490,5 +519,8 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.ComboBox cbMeaMethod;
+        private System.Windows.Forms.ContextMenuStrip msSnrCalcType;
+        private System.Windows.Forms.ToolStripMenuItem miSnrFromPsf;
+        private System.Windows.Forms.ToolStripMenuItem miSnrFromAperture;
 	}
 }

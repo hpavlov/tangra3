@@ -15,6 +15,7 @@ using Tangra.Astrometry;
 using Tangra.Controller;
 using Tangra.Model.Astro;
 using Tangra.Model.Config;
+using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.VideoOperations;
 using Tangra.VideoOperations.LightCurves;
@@ -29,13 +30,17 @@ namespace Tangra
 		private uint m_NormVal;
 	    private MeasurementsHelper m_Measurer;
 	    private VideoController m_VideoController;
+	    private bool m_SnrFromPsf = true;
 
         private TangraConfig.BackgroundMethod m_BackgroundMethod = TangraConfig.BackgroundMethod.PSFBackground;
         private TangraConfig.PhotometryReductionMethod m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
 
+	    private double m_Noise;
 		private float m_Aperture;
 		private float m_InnerRadius;
 		private float m_OuterRadius;
+
+        private List<double> m_SnrData = new List<double>();
 
 		public frmTargetPSFViewerForm()
 		{
@@ -49,6 +54,9 @@ namespace Tangra
             m_VideoController = videoController;
             m_PSFFit = null;
             cbMeaMethod.SelectedIndex = 0;
+
+            miSnrFromAperture.Checked = !m_SnrFromPsf;
+            miSnrFromPsf.Checked = m_SnrFromPsf;
         }
 
 		private void frmTargetPSFViewerForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -86,13 +94,18 @@ namespace Tangra
 			}
 		}
 
-		public void ShowTargetPSF(PSFFit psfFit, int bpp, uint aav16Normval, uint[,] backgroundPixels)
+        public void ShowTargetPSF(PSFFit psfFit, int bpp, uint aav16Normval, uint[,] backgroundPixels, bool userSelection)
 		{
 			m_PSFFit = psfFit;
 			m_Bpp = bpp;
 			m_NormVal = bpp == 16 ? aav16Normval : 0;
 
 			picFIT.Image = new Bitmap(picFIT.Width, picFIT.Height);
+
+            if (userSelection)
+            {
+                m_SnrData.Clear();
+            }
 
 			if (m_PSFFit != null)
 			{
@@ -280,18 +293,12 @@ namespace Tangra
 				{
 					residualsSquareSum += (background - bgPixel) * (background - bgPixel);
 				}
-				double noise = Math.Sqrt(residualsSquareSum / (bgPixels.Count - 1));
+				m_Noise = Math.Sqrt(residualsSquareSum / (bgPixels.Count - 1));
 				
 				lblBackground.Text = background.ToString("0.0");
-				lblNoise.Text = noise.ToString("0.0");
+                lblNoise.Text = m_Noise.ToString("0.0");
 
-				if (m_PSFFit != null)
-				{
-					double snr = m_PSFFit.GetSNR();
-                    lblSNR.Text = snr.ToString("0.0");
-				}
-				else
-					lblSNR.Text = "N/A";
+			    CalculateSNR();
 
 				if (m_PSFFit != null)
 				{
@@ -311,6 +318,40 @@ namespace Tangra
 				lblSNR.Text = "N/A";
 			}
 		}
+
+	    private void CalculateSNR()
+	    {
+            double snr = double.NaN;
+            if (m_SnrFromPsf)
+            {
+                if (m_PSFFit != null)
+                {
+                    snr = m_PSFFit.GetSNR();
+                }
+            }
+            else
+            {
+                if (m_Measurer != null)
+                {
+                    snr = (m_Measurer.TotalReading - m_Measurer.TotalBackground) / (Math.Sqrt(1 + 9 * m_Measurer.TotalPixels * m_Noise * m_Noise * (1 + 1 / m_Measurer.TotalBackgroundPixels)));
+                }
+            }
+
+            if (!double.IsNaN(snr))
+            {
+                if (m_SnrData.Count > 100)
+                {
+                    m_SnrData.RemoveAt(0);
+                }
+
+                m_SnrData.Add(snr);
+
+                lblSNR.Text = m_SnrData.Count > 3 ? m_SnrData.Median().ToString("0.0") : snr.ToString("0.0");
+                lblSNR.ForeColor = m_SnrData.Count > 3 ? Color.BlueViolet : Color.Black;
+            }
+            else
+                lblSNR.Text = "N/A";
+	    }
 
 		private void btnCopy_Click(object sender, EventArgs e)
 		{
@@ -396,5 +437,44 @@ namespace Tangra
 			g.DrawEllipse(s_AperturePen, x0 - m_InnerRadius, y0 - m_InnerRadius, 2 * m_InnerRadius, 2 * m_InnerRadius);
 			g.DrawEllipse(s_AperturePen, x0 - m_OuterRadius, y0 - m_OuterRadius, 2 * m_OuterRadius, 2 * m_OuterRadius);
 		}
+
+        private void lblSnrCaption_Click(object sender, EventArgs e)
+        {
+            msSnrCalcType.Show(lblSnrCaption, 5, 5);
+        }
+
+        private void miSnr_Clicked(object sender, EventArgs e)
+        {
+            if (sender == miSnrFromPsf)
+            {
+                if (miSnrFromPsf.Checked)
+                {
+                    miSnrFromPsf.Checked = false;
+                    miSnrFromAperture.Checked = true;
+                }
+                else
+                {
+                    miSnrFromPsf.Checked = true;
+                    miSnrFromAperture.Checked = false;
+                }
+            }
+            else if (sender == miSnrFromAperture)
+            {
+                if (miSnrFromAperture.Checked)
+                {
+                    miSnrFromPsf.Checked = true;
+                    miSnrFromAperture.Checked = false;
+                }
+                else
+                {
+                    miSnrFromPsf.Checked = false;
+                    miSnrFromAperture.Checked = true;
+                }
+            }
+
+            m_SnrFromPsf = miSnrFromPsf.Checked;
+            m_SnrData.Clear();
+            CalculateSNR();
+        }
 	}
 }
