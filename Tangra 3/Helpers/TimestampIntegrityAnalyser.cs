@@ -17,13 +17,16 @@ namespace Tangra.Helpers
 
         public double DroppedFramesPercentage { get; private set; }
 
+        public bool HasTooManyDroppedFrames { get; private set; }
+
         public void Calculate(List<double> exposuresMs, List<DateTime> orderedTimestamps)
         {
             // Fist estimate assuming no dropped frames
             MedianExposureMs = exposuresMs.Median();
-            OneSigmaExposureMs = 0;
+            OneSigmaExposureMs = Math.Sqrt(exposuresMs.Select(x => (x - MedianExposureMs) * (x - MedianExposureMs)).Sum() / (exposuresMs.Count - 1));
             DroppedFrames = 0;
             DroppedFramesPercentage = 0;
+            HasTooManyDroppedFrames = false;
 
             if (orderedTimestamps.Count > 2)
             {
@@ -39,18 +42,31 @@ namespace Tangra.Helpers
                         DroppedFrames++;
                         nextTs = nextTs.AddMilliseconds(MedianExposureMs);
                         frameGap++;
+
+                        if (DroppedFrames >= orderedTimestamps.Count * 2)
+                        {
+                            HasTooManyDroppedFrames = true;
+                            break;
+                        }
                     }
 
                     exposuresMs.Add((orderedTimestamps[i] - currTs).TotalMilliseconds / frameGap);
                     currTs = orderedTimestamps[i];
+
+                    if (HasTooManyDroppedFrames)
+                    {
+                        break;
+                    }
+                }
+
+                if (!HasTooManyDroppedFrames)
+                {
+                    // Second estimate, adjustment for dropped frames.
+                    MedianExposureMs = exposuresMs.Median();
+                    OneSigmaExposureMs = Math.Sqrt(exposuresMs.Select(x => (x - MedianExposureMs) * (x - MedianExposureMs)).Sum() / (exposuresMs.Count - 1));
                 }
 
                 DroppedFramesPercentage = DroppedFrames * 100.0 / (orderedTimestamps.Count + DroppedFrames);
-
-                // Second estimate, adjustment for dropped frames.
-                MedianExposureMs = exposuresMs.Median();
-
-                OneSigmaExposureMs = Math.Sqrt(exposuresMs.Select(x => (x - MedianExposureMs) * (x - MedianExposureMs)).Sum() / (exposuresMs.Count - 1));
             }
         }
     }

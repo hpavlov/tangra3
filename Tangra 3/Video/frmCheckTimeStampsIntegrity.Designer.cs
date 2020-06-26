@@ -1,4 +1,4 @@
-﻿namespace Tangra.Video.SER
+﻿namespace Tangra.Video
 {
     partial class frmCheckTimeStampsIntegrity
     {
@@ -57,7 +57,8 @@
             this.MinimizeBox = false;
             this.Name = "frmCheckTimeStampsIntegrity";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Check SER Timestamps Integrity";
+            this.Text = "Checking SER Timestamps Integrity";
+            this.Load += new System.EventHandler(this.frmCheckTimeStampsIntegrity_Load);
             this.Shown += new System.EventHandler(this.frmCheckTimeStampsIntegrity_Shown);
             this.ResumeLayout(false);
 

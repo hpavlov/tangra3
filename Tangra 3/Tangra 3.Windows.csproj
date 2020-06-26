@@ -1105,10 +1105,10 @@
     <Compile Include="Video\FITS\IFITSStream.cs" />
     <Compile Include="Video\ReInterlacingVideoStream.cs" />
     <Compile Include="Video\RotatedVideoStream.cs" />
-    <Compile Include="Video\SER\frmCheckTimeStampsIntegrity.cs">
+    <Compile Include="Video\frmCheckTimeStampsIntegrity.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Video\SER\frmCheckTimeStampsIntegrity.Designer.cs">
+    <Compile Include="Video\frmCheckTimeStampsIntegrity.Designer.cs">
       <DependentUpon>frmCheckTimeStampsIntegrity.cs</DependentUpon>
     </Compile>
     <Compile Include="Video\SER\frmSerTimestampExposure.cs">
@@ -1558,7 +1558,7 @@
     <EmbeddedResource Include="Video\frmJumpToFrame.resx">
       <DependentUpon>frmJumpToFrame.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Video\SER\frmCheckTimeStampsIntegrity.resx">
+    <EmbeddedResource Include="Video\frmCheckTimeStampsIntegrity.resx">
       <DependentUpon>frmCheckTimeStampsIntegrity.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\SER\frmEnterSERFileInfo.resx">

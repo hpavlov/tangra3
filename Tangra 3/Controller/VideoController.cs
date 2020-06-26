@@ -376,9 +376,15 @@ namespace Tangra.Controller
                         {
                             AdvFileMetadataInfo fileMetadataInfo;
                             GeoLocationInfo geoLocation;
-                            frameStream = AstroDigitalVideoStream.OpenFile(fileName, out fileMetadataInfo, out geoLocation);
+                            frameStream = AstroDigitalVideoStream.OpenFile(fileName, this, out fileMetadataInfo, out geoLocation);
                             if (frameStream != null)
                             {
+                                var adv2Str = frameStream as AstroDigitalVideoStreamV2;
+                                if (adv2Str != null && adv2Str.IntegratedAAVFrames == 0 /* Not an AAV file*/)
+                                {
+                                    CheckJitterStats(adv2Str);
+                                }
+
                                 TangraContext.Current.UsingADV = true;
                                 m_OverlayManager.InitAdvFile(fileMetadataInfo, geoLocation, frameStream.FirstFrame);
                             }
@@ -451,6 +457,18 @@ namespace Tangra.Controller
                     }					
 				});
 	    }
+
+        private void CheckJitterStats(AstroDigitalVideoStreamV2 stream)
+        {
+            var frmCheckTS = new frmCheckTimeStampsIntegrity(stream);
+            ShowDialog(frmCheckTS);
+
+            if (frmCheckTS.DroppedFrames > 0 || frmCheckTS.OneSigmaExposureMs > 2)
+            {
+                var frmTsExp = new frmJitterAndDroppedFrameStats(frmCheckTS.MedianExposureMs, frmCheckTS.OneSigmaExposureMs, frmCheckTS.DroppedFrames, frmCheckTS.DroppedFramesPercentage, frmCheckTS.HasTooManyDroppedFrames, frmCheckTS.NonUtcTimestampedFrames);
+                ShowDialog(frmTsExp);
+            }
+        }
 
         private void InformUserAboutNegativePixels()
         {

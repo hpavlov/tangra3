@@ -8,9 +8,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Tangra.Controller;
 using Tangra.Helpers;
 using Tangra.Model.Config;
 using Tangra.Model.Context;
@@ -18,6 +20,7 @@ using Tangra.Model.Helpers;
 using Tangra.Model.Image;
 using Tangra.Model.Numerical;
 using Tangra.Model.Video;
+using Tangra.Model.VideoOperations;
 using Tangra.PInvoke;
 using Tangra.Video.AstroDigitalVideo;
 using Tangra.View.CustomRenderers;
@@ -46,7 +49,7 @@ namespace Tangra.Video
 
 	public class AstroDigitalVideoStream : IFrameStream
 	{
-        public static IFrameStream OpenFile(string fileName, out AdvFileMetadataInfo fileMetadataInfo, out GeoLocationInfo geoLocation)
+        public static IFrameStream OpenFile(string fileName, VideoController videoController, out AdvFileMetadataInfo fileMetadataInfo, out GeoLocationInfo geoLocation)
 		{
             fileMetadataInfo = new AdvFileMetadataInfo();
 			geoLocation = new GeoLocationInfo();
@@ -60,13 +63,15 @@ namespace Tangra.Video
 			        var adv1 = new AstroDigitalVideoStream(fileName, ref fileMetadataInfo, ref geoLocation);
 			        if (adv1.IsStatusChannelOnly)
 			        {
-                        TangraContext.Current.CustomRenderer = new AavStatusChannelOnlyRenderer(adv1);
+			            TangraContext.Current.CustomRenderer = new AavStatusChannelOnlyRenderer(adv1);
 			            return null;
 			        }
 			        rv = adv1;
 			    }
 			    else
-			        rv = AstroDigitalVideoStreamV2.OpenFile(fileName, out fileMetadataInfo, out geoLocation);
+			    {
+                    rv = AstroDigitalVideoStreamV2.OpenFile(fileName, out fileMetadataInfo, out geoLocation);
+			    }
 
 			    TangraContext.Current.RenderingEngine = fileMetadataInfo.Engine == "AAV" ? "AstroAnalogueVideo" : "AstroDigitalVideo";
 
@@ -86,7 +91,7 @@ namespace Tangra.Video
 			return null;
 		}
 
-		private string m_FileName;
+	    private string m_FileName;
 		private int m_Width;
 		private int m_Height;
 		private double m_FrameRate;

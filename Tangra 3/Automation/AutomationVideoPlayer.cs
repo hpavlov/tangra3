@@ -36,7 +36,7 @@ namespace Tangra.Automation
             {
                 AdvFileMetadataInfo fileMetadataInfo;
                 GeoLocationInfo geoLocation;
-                frameStream = AstroDigitalVideoStream.OpenFile(fileName, out fileMetadataInfo, out geoLocation);
+                frameStream = AstroDigitalVideoStream.OpenFile(fileName, null, out fileMetadataInfo, out geoLocation);
             }
             else if (fileExtension == ".avi")
             {

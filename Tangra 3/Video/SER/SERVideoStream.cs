@@ -147,7 +147,7 @@ namespace Tangra.Video.SER
 
                     if (rv.HasTimeStamps || rv.HasUTCTimeStamps)
                     {
-                        var frmTsExp = new frmSerTimestampExposure(frmCheckTS.MedianExposureMs, frmCheckTS.OneSigmaExposureMs, frmCheckTS.DroppedFrames, frmCheckTS.DroppedFramesPercentage);
+                        var frmTsExp = new frmSerTimestampExposure(frmCheckTS.MedianExposureMs, frmCheckTS.OneSigmaExposureMs, frmCheckTS.DroppedFrames, frmCheckTS.DroppedFramesPercentage, frmCheckTS.HasTooManyDroppedFrames);
                         frmTsExp.ShowDialog(parentForm);
 
                         var derivedFrameRate = 1000.0 / frmTsExp.ConfirmedExposure;

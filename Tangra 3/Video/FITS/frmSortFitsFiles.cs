@@ -100,6 +100,7 @@ namespace Tangra.Video.FITS
         public double OneSigmaExposureMs { get; private set; }
         public int DroppedFrames { get; private set; }
         public double DroppedFramesPercentage { get; private set; }
+        public bool HasTooManyDroppedFrames { get; private set; }
 
         internal class FitsFileFormatInfoRecord
         {
@@ -245,10 +246,11 @@ namespace Tangra.Video.FITS
                     OneSigmaExposureMs = analyser.OneSigmaExposureMs;
                     DroppedFrames = analyser.DroppedFrames;
                     DroppedFramesPercentage = analyser.DroppedFramesPercentage;
+                    HasTooManyDroppedFrames = analyser.HasTooManyDroppedFrames;
 
                     if (analyser.DroppedFrames > 0 || analyser.OneSigmaExposureMs > 2)
                     {
-                        var frm = new frmJitterAndDroppedFrameStats(MedianExposureMs, OneSigmaExposureMs, DroppedFrames, DroppedFramesPercentage);
+                        var frm = new frmJitterAndDroppedFrameStats(MedianExposureMs, OneSigmaExposureMs, DroppedFrames, DroppedFramesPercentage, HasTooManyDroppedFrames);
                         frm.ShowDialog(this);
                     }
                 }
