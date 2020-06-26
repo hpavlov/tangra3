@@ -532,7 +532,7 @@ namespace Tangra.Model.Astro
 			throw new NotImplementedException();
 		}
 
-		public void DrawDataPixels(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal)
+        public void DrawDataPixels(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal, Func<uint, byte?> dynPixConv = null)
 		{
 			throw new NotImplementedException();
 		}
@@ -637,7 +637,7 @@ namespace Tangra.Model.Astro
 			return m_Residuals[x, y];
 		}
 
-		public void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal)
+		public void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal, Func<uint, byte?> dynPixConv = null)
 		{
 			throw new NotImplementedException();
 		}

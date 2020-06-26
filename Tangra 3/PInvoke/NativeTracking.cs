@@ -166,9 +166,9 @@ namespace Tangra.PInvoke
 			return m_Residuals[y * MatrixSize + x];
 		}
 
-		public void DrawDataPixels(System.Drawing.Graphics g, System.Drawing.Rectangle rect, float aperture, System.Drawing.Pen aperturePen, int bpp, uint normVal)
+        public void DrawDataPixels(System.Drawing.Graphics g, System.Drawing.Rectangle rect, float aperture, System.Drawing.Pen aperturePen, int bpp, uint normVal, Func<uint, byte?> dynPixConv = null)
 		{
-			PSFFit.DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this);
+            PSFFit.DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this, dynPixConv);
 		}
 
 		public void DrawGraph(System.Drawing.Graphics g, System.Drawing.Rectangle rect, int bpp, uint normVal, float aperture = 0)

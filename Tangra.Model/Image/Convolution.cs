@@ -788,6 +788,13 @@ namespace Tangra.Model.Image
             }
         }
 
+        public static byte CalcDynamicRange(int fromValue, int toValue, uint pixelVal)
+	    {
+            int range = Math.Max(16, toValue - fromValue);
+            uint dynamicVal = (uint)(255 * (Math.Max(pixelVal, fromValue) - fromValue) / range);
+            return (byte)(Math.Max(0, Math.Min(255, dynamicVal)));
+	    }
+
         public static void ApplyDynamicRange(Bitmap bitmap, Pixelmap pixelmap, int fromValue, int toValue, bool invert, bool hueIntensity, uint effectiveMaxPixelValue)
 		{
 			int width = bitmap.Width;

@@ -47,14 +47,14 @@ namespace Tangra.Model.Astro
 		double GetPSFValueAt(double x, double y);
 		double GetResidualAt(int x, int y);
 
-		void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal);
+		void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal, Func<uint, byte?> dynValConv = null);
 		void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal, float aperture = 0);
 	}
 
     public interface IPSFFit
     {
 		void DrawGraph(Graphics g, Rectangle rect, int bpp, uint normVal, float aperture = 0);
-		void DrawDataPixels(Graphics g, Rectangle rect, int bpp, uint normVal);
+        void DrawDataPixels(Graphics g, Rectangle rect, int bpp, uint normVal, Func<uint, byte?> dynValConv = null);
         int MatrixSize { get; }
     }
 
@@ -1032,6 +1032,11 @@ namespace Tangra.Model.Astro
 			else if (bpp == 16 && normVal != 0) maxZ = normVal;
 			else if (bpp == 16 && normVal == 0) maxZ = 65535;
 
+		    if (bpp == 16 && trackedPsf.IMax + trackedPsf.I0 < maxZ)
+		    {
+		        maxZ = Math.Min(trackedPsf.IMax + 2 * trackedPsf.I0, maxZ);
+		    }
+
             int totalSteps = 100;
 
 			float halfWidth = (float)trackedPsf.MatrixSize / 2.0f;
@@ -1178,17 +1183,17 @@ namespace Tangra.Model.Astro
 
         }
 
-		public void DrawDataPixels(Graphics g, Rectangle rect, int bpp, uint normVal)
+        public void DrawDataPixels(Graphics g, Rectangle rect, int bpp, uint normVal, Func<uint, byte?> dynamicRangeCalc = null)
         {
-			DrawDataPixels(g, rect, 1, Pens.Yellow, bpp, normVal);
+            DrawDataPixels(g, rect, 1, Pens.Yellow, bpp, normVal, dynamicRangeCalc);
         }
 
-		public void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal)
+        public void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal, Func<uint, byte?> dynamicRangeCalc = null)
 		{
-			DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this);
+            DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this, dynamicRangeCalc);
 		}
 
-		public static void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal, ITrackedObjectPsfFit trackedPsf)
+        public static void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal, ITrackedObjectPsfFit trackedPsf, Func<uint, byte?> dynamicRangeCalc = null)
         {
             try
             {
@@ -1198,23 +1203,35 @@ namespace Tangra.Model.Astro
                 if (coeff == 0) return;
 
 				int size = trackedPsf.MatrixSize;
+                double i0 = trackedPsf.I0;
 
                 for (int x = 0; x < size; x++)
                 {
                     for (int y = 0; y < size; y++)
                     {
 						double z = Math.Round(trackedPsf.GetPSFValueAt(x, y) + trackedPsf.GetResidualAt(x, y));
+                        byte val = 0;
 
-						if (bpp == 16 && normVal == 0)
-							z = z * 255.0f / 65535;
-						else if (bpp == 14)
-							z = z * 255.0f / 16383;
-						else if (bpp == 12) 
-							z = z * 255.0f / 4095;
-						else if (bpp == 16 && normVal > 0)
-							z = z * 255.0f / normVal;
+                        if (dynamicRangeCalc != null)
+                        {
+                            var dynVal = dynamicRangeCalc((uint) z);
+                            if (dynVal.HasValue)
+                                val = dynVal.Value;
+                        }
+                        else
+                        {
+                            if (bpp == 16 && normVal == 0)
+                                z = z * 255.0f / 65535;
+                            else if (bpp == 14)
+                                z = z * 255.0f / 16383;
+                            else if (bpp == 12)
+                                z = z * 255.0f / 4095;
+                            else if (bpp == 16 && normVal > 0)
+                                z = z * 255.0f / normVal;
 
-                        byte val = (byte) (Math.Max(0, Math.Min(255, z)));
+                            val = (byte)(Math.Max(0, Math.Min(255, z)));
+                        }
+
                         g.FillRectangle(AllGrayBrushes.GrayBrush(val), rect.Left + x*coeff, rect.Top + y*coeff, coeff, coeff);
                     }
                 }

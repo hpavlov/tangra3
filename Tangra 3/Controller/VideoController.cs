@@ -1132,6 +1132,11 @@ namespace Tangra.Controller
 			get { return m_DynamicToValue; }
 		}
 
+	    public DisplayIntensifyMode DisplayIntensifyMode
+	    {
+	        get { return m_DisplayIntensifyMode; }
+	    }
+
 	    public string CurrentVideoFileName
 	    {
             get { return m_FramePlayer.Video == null ? null : m_FramePlayer.Video.FileName; }

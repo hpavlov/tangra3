@@ -208,7 +208,18 @@ namespace Tangra
 
 			using (Graphics g = Graphics.FromImage(picPixels.Image))
 			{
-                m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), aperture, Pens.Lime, m_Bpp, m_NormVal);
+                m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), aperture, Pens.Lime, m_Bpp, m_NormVal, (x) =>
+                    {
+                        if (m_VideoController.DisplayIntensifyMode == DisplayIntensifyMode.Dynamic &&
+                            m_VideoController.DynamicToValue - m_VideoController.DynamicFromValue > 0)
+                        {
+                            return BitmapFilter.CalcDynamicRange(m_VideoController.DynamicFromValue, m_VideoController.DynamicToValue, (uint)x);
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    });
 				g.Save();
 			}
             picPixels.Invalidate();
@@ -411,7 +422,10 @@ namespace Tangra
             if (m_PSFFit != null)
             {
                 MeasureCurrentPSF();
-                DrawPsf();                
+                DrawPsf();
+
+                m_SnrData.Clear();
+                CalculateSNR();
             }
         }
 
