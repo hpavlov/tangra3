@@ -23,6 +23,7 @@ namespace Tangra.Video.FITS
         private FitsType m_FitsType;
         private Header[] m_FitsHeaders;
         private DateTime?[] m_FitsTimestamps;
+        private List<double> m_FitsExposures = new List<double>();
         private bool m_SortedByTimeStamp = false;
 
         private int m_FilesWithoutExposure = 0;
@@ -53,10 +54,11 @@ namespace Tangra.Video.FITS
             InitializeComponent();
         }
 
-        public frmSortFitsFiles(VideoController videoController)
+        public frmSortFitsFiles(VideoController videoController, bool isFitsVideo)
             : this()
         {
             m_VideoController = videoController;
+            m_IsFitsVideo = isFitsVideo;
         }
 
         internal void SetFiles(string[] fitsFiles, FitsType fitsType)
@@ -92,6 +94,13 @@ namespace Tangra.Video.FITS
         public int BitPix { get; private set; }
         public int NegPixCorrection { get; private set; }
 
+        public bool m_IsFitsVideo { get; private set; }
+
+        public double MedianExposureMs { get; private set; }
+        public double OneSigmaExposureMs { get; private set; }
+        public int DroppedFrames { get; private set; }
+        public double DroppedFramesPercentage { get; private set; }
+
         internal class FitsFileFormatInfoRecord
         {
             public string FirstFile;
@@ -123,9 +132,9 @@ namespace Tangra.Video.FITS
                 }
             }
 
-
             m_FitsHeaders = new Header[m_FitsFiles.Length];
             m_FitsTimestamps = new DateTime?[m_FitsFiles.Length];
+            m_FitsExposures.Clear();
 
             pbar.Minimum = 0;
             pbar.Maximum = m_FitsFiles.Length;
@@ -173,7 +182,10 @@ namespace Tangra.Video.FITS
                         m_FitsTimestamps[i] = timestamp;
 
                         if (timestamp != null && fitsExposure.HasValue)
+                        {
                             m_FilesWithExposure++;
+                            m_FitsExposures.Add(fitsExposure.Value);
+                        }
                         else
                             m_FilesWithoutExposure++;
                     }
@@ -210,14 +222,47 @@ namespace Tangra.Video.FITS
         {
             timer1.Enabled = false;
             m_SortedByTimeStamp = true;
+
             if (m_FilesWithExposure == 0 && m_FilesWithoutExposure > 0)
             {
                 // Not sorting by timestamp and using filenames instead, because
                 // FITS heades were set to be ignored by the user in the Choose FITS Headers dialog
                 m_SortedByTimeStamp = false;
             }
-            else if (m_FilesWithExposure > 0 && m_FilesWithoutExposure > 0)
-                MessageBox.Show(string.Format("{0} out of {1} of the FITS files have a missing exposure (checked headers: EXPOSURE, EXPTIME and RAWTIME). Please treat the reported timestamps with suspicion and expect inconsistencies.", m_FilesWithoutExposure, m_FilesWithoutExposure + m_FilesWithExposure), "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            else
+            {
+                if (m_FitsExposures.Count > 3 && m_IsFitsVideo)
+                {
+                    // Calculate jitter statistics for FITS videos
+                    var exposuresMs = m_FitsExposures.Select(x => x * 1000.0).ToList();
+                    var sortedTimestamps = m_FitsTimestamps.Where(x => x.HasValue).Select(x => x.Value).ToList();
+                    sortedTimestamps.Sort();
+
+                    var analyser = new TimestampIntegrityAnalyser();
+                    analyser.Calculate(exposuresMs, sortedTimestamps);
+
+                    MedianExposureMs = analyser.MedianExposureMs;
+                    OneSigmaExposureMs = analyser.OneSigmaExposureMs;
+                    DroppedFrames = analyser.DroppedFrames;
+                    DroppedFramesPercentage = analyser.DroppedFramesPercentage;
+
+                    if (analyser.DroppedFrames > 0 || analyser.OneSigmaExposureMs > 2)
+                    {
+                        var frm = new frmJitterAndDroppedFrameStats(MedianExposureMs, OneSigmaExposureMs, DroppedFrames, DroppedFramesPercentage);
+                        frm.ShowDialog(this);
+                    }
+                }
+
+                if (m_FilesWithExposure > 0 && m_FilesWithoutExposure > 0)
+                {
+                    MessageBox.Show(
+                        string.Format(
+                            "{0} out of {1} of the FITS files have a missing exposure (checked headers: EXPOSURE, EXPTIME and RAWTIME). Please treat the reported timestamps with suspicion and expect inconsistencies.",
+                            m_FilesWithoutExposure, m_FilesWithoutExposure + m_FilesWithExposure), "Tangra",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+
             DialogResult = DialogResult.OK;
             Close();
         }

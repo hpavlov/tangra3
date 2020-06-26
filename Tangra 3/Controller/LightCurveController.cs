@@ -188,7 +188,7 @@ namespace Tangra.Controller
                         ((string[])videoFile).Length > 0)
                     {
                         var fitsFiles = (string[])videoFile;
-                        if (m_VideoController.OpenFitsFileSequence(Path.GetDirectoryName(fitsFiles[0]), fitsFiles, new LCFITSTimeStampReader(lcFile), null, 0, flipVertically, flipHorizontally, (int)lcFile.Data[0][0].CurrFrameNo))
+                        if (m_VideoController.OpenFitsFileSequence(Path.GetDirectoryName(fitsFiles[0]), fitsFiles, new LCFITSTimeStampReader(lcFile), null, 0, flipVertically, flipHorizontally, null, (int)lcFile.Data[0][0].CurrFrameNo))
                         {
                             TangraContext.Current.CanPlayVideo = false;
                             if (lcFile.Footer.FitsDynamicFromValue != -1 && lcFile.Footer.FitsDynamicToValue != -1)

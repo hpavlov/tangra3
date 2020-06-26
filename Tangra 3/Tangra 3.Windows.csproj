@@ -151,6 +151,7 @@
     <Compile Include="Config\frmChooseFirstTimeOcrSettings.Designer.cs">
       <DependentUpon>frmChooseFirstTimeOcrSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\TimestampIntegrityAnalyser.cs" />
     <Compile Include="VideoOperations\LightCurves\frmAcquisitionDelayChooser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -1036,6 +1037,18 @@
     <Compile Include="Video\AstroDigitalVideo\Interfaces.cs" />
     <Compile Include="Video\AstroDigitalVideo\UI\AdvTagValuePair.cs" />
     <Compile Include="Video\BMPFileSequenceStream.cs" />
+    <Compile Include="Video\FITS\frmChooseFitsRecordingType.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\FITS\frmChooseFitsRecordingType.Designer.cs">
+      <DependentUpon>frmChooseFitsRecordingType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Video\frmJitterAndDroppedFrameStats.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Video\frmJitterAndDroppedFrameStats.Designer.cs">
+      <DependentUpon>frmJitterAndDroppedFrameStats.cs</DependentUpon>
+    </Compile>
     <Compile Include="Video\IDynamicRangeStream.cs" />
     <Compile Include="Video\FITS\FITSFileSequenceStream.cs" />
     <Compile Include="Video\FITS\FitsTimestampHelper.cs" />
@@ -1512,6 +1525,9 @@
     <EmbeddedResource Include="Video\AstroDigitalVideo\frmAdvViewer.resx">
       <DependentUpon>frmAdvViewer.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Video\FITS\frmChooseFitsRecordingType.resx">
+      <DependentUpon>frmChooseFitsRecordingType.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Video\FITS\frmChooseTimeHeaders.resx">
       <DependentUpon>frmChooseTimeHeaders.cs</DependentUpon>
     </EmbeddedResource>
@@ -1535,6 +1551,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Video\frmIntegrationDetection.resx">
       <DependentUpon>frmIntegrationDetection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Video\frmJitterAndDroppedFrameStats.resx">
+      <DependentUpon>frmJitterAndDroppedFrameStats.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Video\frmJumpToFrame.resx">
       <DependentUpon>frmJumpToFrame.cs</DependentUpon>

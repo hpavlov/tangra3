@@ -31,13 +31,14 @@ namespace Tangra.Video.FITS
 
         private int m_NegPixCorrection;
 
-        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, IFITSTimeStampReader timeStampReader, int firstFrameNo, int? bitBix, int negPixCorrection)
+        public static FITSFileSequenceStream OpenFolder(string[] fitsFiles, IFITSTimeStampReader timeStampReader, int firstFrameNo, int? bitBix, int negPixCorrection, bool? isFitsVideo)
         {
 			UsageStats.Instance.ProcessedFitsFolderFiles++;
 			UsageStats.Instance.Save();
 
             var rv = new FITSFileSequenceStream(fitsFiles, timeStampReader, firstFrameNo, bitBix, negPixCorrection);
 	        rv.FileName = Path.GetDirectoryName(fitsFiles[0]);
+            rv.IsFitsVideo = isFitsVideo;
 	        return rv;
         }
 
@@ -168,6 +169,8 @@ namespace Tangra.Video.FITS
         }
 
         public string FileName { get; private set; }
+
+        public bool? IsFitsVideo { get; private set; }
 
         public uint GetAav16NormVal()
         {

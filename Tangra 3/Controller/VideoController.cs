@@ -269,11 +269,15 @@ namespace Tangra.Controller
                 }
                 else if (fitsType == FitsType.RGBFrames)
                 {
-                    ShowMessageBox("Tangra currently doesn't support FITS images with 3 axis with an RGB colour planes. It these files have been created in MaximDL then use the 'Convert to mono' function before opening them in Tangra.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowMessageBox("Tangra currently doesn't support FITS images with 3 axis with an RGB colour planes. If these files have been created in MaximDL then use the 'Convert to mono' function before opening them in Tangra.", "Tangra", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
 
-                var frm = new frmSortFitsFiles(this);
+                var frm2 = new frmChooseFitsRecordingType();
+                ShowDialog(frm2);
+                var isFitsVideo = frm2.IsFitsVideo;
+
+                var frm = new frmSortFitsFiles(this, isFitsVideo);
                 frm.SetFiles(fitsFiles, fitsType);
                 frm.StartPosition = FormStartPosition.CenterParent;
 
@@ -286,7 +290,7 @@ namespace Tangra.Controller
                     }
                     fitsFiles = frm.GetSortedFiles();
 
-                    return OpenFitsFileSequence(folderName, fitsFiles, frm.TimeStampReader, frm.BitPix, frm.NegPixCorrection, frm.FlipVertically, frm.FlipHorizontally);
+                    return OpenFitsFileSequence(folderName, fitsFiles, frm.TimeStampReader, frm.BitPix, frm.NegPixCorrection, frm.FlipVertically, frm.FlipHorizontally, isFitsVideo);
                 }
                 else
                     return false;
@@ -295,7 +299,7 @@ namespace Tangra.Controller
 
 	    public bool OpenFitsFileSequence(
             string folderName, string[] sortedFitsFiles, IFITSTimeStampReader fitsTimeStampReader,
-            int? bitBix, int negPixCorrection, bool flipVertically, bool flipHorizontally, int firstFrameNo = 0)
+            int? bitBix, int negPixCorrection, bool flipVertically, bool flipHorizontally, bool? isFitsVideo, int firstFrameNo = 0)
 		{
             TangraContext.Current.IsFitsStream = false;
 		    TangraContext.Current.IsAviFile = false;
@@ -306,7 +310,7 @@ namespace Tangra.Controller
                     folderName,
                     () =>
                     {
-                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, firstFrameNo, bitBix, negPixCorrection);
+                        FITSFileSequenceStream stream = FITSFileSequenceStream.OpenFolder(sortedFitsFiles, fitsTimeStampReader, firstFrameNo, bitBix, negPixCorrection, isFitsVideo);
 
                         SetFlipSettings(flipVertically, flipHorizontally);
 

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Tangra.Helpers;
 using Tangra.Model.Helpers;
 using Tangra.PInvoke;
 
@@ -15,9 +16,9 @@ namespace Tangra.Video.SER
     {
         private SERVideoStream m_Stream;
 
-        public double MedianExposure { get; private set; }
+        public double MedianExposureMs { get; private set; }
 
-        public double OneSigmaExposure { get; private set; }
+        public double OneSigmaExposureMs { get; private set; }
 
         public int DroppedFrames { get; private set; }
 
@@ -101,53 +102,17 @@ namespace Tangra.Video.SER
                     Application.DoEvents();
             }
 
-            // Fist estimate assuming no dropped frames
-            MedianExposure = exposures.Median();
+            var analyser = new TimestampIntegrityAnalyser();
+            analyser.Calculate(exposures, timestamps);
 
-            DroppedFrames = 0;
-            DroppedFramesPercentage = 0;
-
-            if (timestamps.Count > 2)
-            {
-                exposures.Clear();
-
-                var currTs = timestamps[0];
-                for (int i = 1; i < timestamps.Count; i++)
-                {
-                    int frameGap = 1;
-                    var nextTs = currTs.AddMilliseconds(MedianExposure);
-                    while (Math.Abs((nextTs - timestamps[i]).TotalMilliseconds) > MedianExposure / 10 && nextTs < timestamps[i])
-                    {
-                        DroppedFrames++;
-                        nextTs = nextTs.AddMilliseconds(MedianExposure);
-                        frameGap++;
-                    }
-
-                    exposures.Add((timestamps[i] - currTs).TotalMilliseconds / frameGap);
-                    currTs = timestamps[i];
-                }
-
-                DroppedFramesPercentage = DroppedFrames * 100.0 / (timestamps.Count + DroppedFrames);
-
-                // Second estimate, adjustment for dropped frames.
-                MedianExposure = exposures.Median();
-            }
-
+            MedianExposureMs = analyser.MedianExposureMs;
+            OneSigmaExposureMs = analyser.OneSigmaExposureMs;
+            DroppedFrames = analyser.DroppedFrames;
+            DroppedFramesPercentage = analyser.DroppedFramesPercentage;
 
             progressBar.Value = m_Stream.LastFrame;
             progressBar.Update();
             Application.DoEvents();
-
-            MedianExposure = exposures.Median();
-
-            if (exposures.Count > 2)
-            {
-                OneSigmaExposure = Math.Sqrt(exposures.Select(x => (x - MedianExposure) * (x - MedianExposure)).Sum() / (exposures.Count - 1));
-            }
-            else
-            {
-                OneSigmaExposure = 0;
-            }
 
             Close();
         }
