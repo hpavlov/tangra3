@@ -1345,6 +1345,7 @@ namespace Tangra.VideoOperations.LightCurves
 				m_StackedAstroImage.Height,
 				LightCurveReductionContext.Instance.LightCurveReductionType,
 				m_VideoController.GetVideoFileFormat(),
+                m_VideoController.IsFitsVideo,
 				m_StateMachine.MeasuringStars,
 				out usedTrackerType);
 

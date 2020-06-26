@@ -15,7 +15,14 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
 {
     internal static class TrackerFactory
     {
-		public static ITracker CreateTracker(int imageWidth, int imageHeight, LightCurveReductionType lightCurveReductionType, VideoFileFormat fileFormat, List<TrackedObjectConfig> measuringStars, out string usedTrackerType)
+		public static ITracker CreateTracker(
+            int imageWidth, 
+            int imageHeight, 
+            LightCurveReductionType lightCurveReductionType,
+            VideoFileFormat fileFormat, 
+            bool isFitsVideo,
+            List<TrackedObjectConfig> measuringStars, 
+            out string usedTrackerType)
         {
             // NOTE: Figure out what tracker to create based on the type of event, number of objects and their intensity
             bool createRefiningTracker = TangraConfig.Settings.Tracking.SelectedEngine == TangraConfig.TrackingEngine.TrackingWithRefining;
@@ -33,7 +40,7 @@ namespace Tangra.VideoOperations.LightCurves.Tracking
             }
 
 			bool createFITSFileTracker = lightCurveReductionType == LightCurveReductionType.VariableStarOrTransit &&
-			                             fileFormat == VideoFileFormat.FITS;
+                                         fileFormat == VideoFileFormat.FITS && !isFitsVideo;
 
 			if (lightCurveReductionType == LightCurveReductionType.Asteroidal || lightCurveReductionType == LightCurveReductionType.VariableStarOrTransit)
             {

@@ -1430,6 +1430,15 @@ namespace Tangra.Controller
             get { return m_FramePlayer.Video.Engine == ThreeAxisFITSCubeFrameStream.CUBE_3D_FITS_FILE_ENGINE; }
         }
 
+	    public bool IsFitsVideo
+	    {
+	        get
+	        {
+	            return (m_FramePlayer.Video is FITSFileSequenceStream) &&
+	                   ((FITSFileSequenceStream) m_FramePlayer.Video).IsFitsVideo == true;
+	        }
+	    }
+
         public bool IsFitsFile
         {
             get { return m_FramePlayer.Video.Engine == SingleFITSFileFrameStream.SINGLE_FITS_FILE_ENGINE; }
