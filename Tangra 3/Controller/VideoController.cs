@@ -2875,7 +2875,7 @@ namespace Tangra.Controller
         private void LocateObjectAtClickCoordinates(ref ImagePixel pixel, bool controlHeld)
 	    {
             // Ctrl means fit in smaller area
-            int matrixSize = controlHeld ? 7 : 17;
+            int matrixSize = controlHeld ? 17 : 35;
 
             var astroImage = m_StackedSelectionFrameImage ?? m_AstroImage;
 

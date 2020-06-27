@@ -65,7 +65,7 @@
             this.label16 = new System.Windows.Forms.Label();
             this.cbMeaMethod = new System.Windows.Forms.ComboBox();
             this.msSnrCalcType = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.miSnrFromPsf = new System.Windows.Forms.ToolStripMenuItem();
+            this.miSnrFromPeakValues = new System.Windows.Forms.ToolStripMenuItem();
             this.miSnrFromAperture = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.picPixels)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picFIT)).BeginInit();
@@ -410,22 +410,22 @@
             // msSnrCalcType
             // 
             this.msSnrCalcType.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miSnrFromPsf,
+            this.miSnrFromPeakValues,
             this.miSnrFromAperture});
             this.msSnrCalcType.Name = "msSnrCalcType";
-            this.msSnrCalcType.Size = new System.Drawing.Size(175, 70);
+            this.msSnrCalcType.Size = new System.Drawing.Size(190, 70);
             // 
-            // miSnrFromPsf
+            // miSnrFromPeakValues
             // 
-            this.miSnrFromPsf.Name = "miSnrFromPsf";
-            this.miSnrFromPsf.Size = new System.Drawing.Size(174, 22);
-            this.miSnrFromPsf.Text = "SNR from PSF";
-            this.miSnrFromPsf.Click += new System.EventHandler(this.miSnr_Clicked);
+            this.miSnrFromPeakValues.Name = "miSnrFromPeakValues";
+            this.miSnrFromPeakValues.Size = new System.Drawing.Size(189, 22);
+            this.miSnrFromPeakValues.Text = "SNR from Peak Values";
+            this.miSnrFromPeakValues.Click += new System.EventHandler(this.miSnr_Clicked);
             // 
             // miSnrFromAperture
             // 
             this.miSnrFromAperture.Name = "miSnrFromAperture";
-            this.miSnrFromAperture.Size = new System.Drawing.Size(174, 22);
+            this.miSnrFromAperture.Size = new System.Drawing.Size(189, 22);
             this.miSnrFromAperture.Text = "SNR from Aperture";
             this.miSnrFromAperture.Click += new System.EventHandler(this.miSnr_Clicked);
             // 
@@ -520,7 +520,7 @@
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.ComboBox cbMeaMethod;
         private System.Windows.Forms.ContextMenuStrip msSnrCalcType;
-        private System.Windows.Forms.ToolStripMenuItem miSnrFromPsf;
+        private System.Windows.Forms.ToolStripMenuItem miSnrFromPeakValues;
         private System.Windows.Forms.ToolStripMenuItem miSnrFromAperture;
 	}
 }

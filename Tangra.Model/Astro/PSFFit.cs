@@ -1193,6 +1193,30 @@ namespace Tangra.Model.Astro
             DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this, dynamicRangeCalc);
 		}
 
+        public void DrawDataPixels(Graphics g, Rectangle rect, float aperture, float innerRadius, float outernRadius, Pen aperturePen, int bpp, uint normVal, Func<uint, byte?> dynamicRangeCalc = null)
+        {
+            DrawDataPixels(g, rect, aperture, aperturePen, bpp, normVal, this, dynamicRangeCalc);
+            int coeff = rect.Width / MatrixSize;
+            if (innerRadius > 0 && outernRadius > 0)
+            {
+                var apClr = aperturePen.Color;
+                using (Pen bgPen = new Pen(Color.FromArgb(80, apClr.R, apClr.G, apClr.B)))
+                {
+                    g.DrawEllipse(
+                        bgPen,
+                        rect.Left + ((float) X0_Matrix - innerRadius + 0.5f)*coeff,
+                        rect.Top + ((float)Y0_Matrix - innerRadius + 0.5f) * coeff,
+                        innerRadius*2*coeff, innerRadius*2*coeff);
+
+                    g.DrawEllipse(
+                        bgPen,
+                        rect.Left + ((float)X0_Matrix - outernRadius + 0.5f) * coeff,
+                        rect.Top + ((float)Y0_Matrix - outernRadius + 0.5f) * coeff,
+                        outernRadius*2*coeff, outernRadius*2*coeff);
+                }
+            }
+        }
+
         public static void DrawDataPixels(Graphics g, Rectangle rect, float aperture, Pen aperturePen, int bpp, uint normVal, ITrackedObjectPsfFit trackedPsf, Func<uint, byte?> dynamicRangeCalc = null)
         {
             try
@@ -1212,7 +1236,7 @@ namespace Tangra.Model.Astro
 						double z = Math.Round(trackedPsf.GetPSFValueAt(x, y) + trackedPsf.GetResidualAt(x, y));
                         byte val = 0;
 
-                        if (dynamicRangeCalc != null)
+                        if (dynamicRangeCalc != null && normVal == 0)
                         {
                             var dynVal = dynamicRangeCalc((uint) z);
                             if (dynVal.HasValue)
@@ -1297,12 +1321,22 @@ namespace Tangra.Model.Astro
 	    private double? m_SNR;
 	    public double GetSNR()
 	    {
-	        // Adopting the method of estimating the SNR used by Astrometrica here
+	        // Method of estimating the SNR used by Astrometrica:
 	        //--------------------------------------------------------------------
 	        // Herbert Raab: What I do in Astrometrica is sinly to calculate the Peak SNR from the value of the brightest pixel and the StdDev from the photometric annulus.
 	        // I do not use the PeakPSFAmplitude, as this value is very much variable for noisy sources, and most targets are faint and thus noisy. 
 	        // (For the same reason, I do simple aperture photometry, than do photometry by calculating the flux from the value of the volume of the PSF curve - 
 	        // it gives more consistent values on faint targets.)
+
+            // Similar method is discussed in: https://www.researchgate.net/profile/Nguyen_Vuong/post/How_to_calculate_limit_of_detection_limit_of_quantification_and_signal_to_noise_ratio/attachment/59d6445cc49f478072ead2d2/AS%3A273815119040512%401442294020170/download/Methods+for+the+determination+of+limit+of+detection+and.pdf
+            // In this work SNR is calculated as:
+            // 
+            //                Peak Value Above Base Line
+            //   SNR = -------------------------------------------------------------
+            //          Peak-to-Peak noise variation in 20 FWHM zone around the peak
+            //
+            // In Tangra I adopt the above method with the caveat that noise peaks may not be determined in 20 FWHM intervals
+
 
 	        if (m_SNR.HasValue)
 	            return m_SNR.Value;
@@ -1315,38 +1349,37 @@ namespace Tangra.Model.Astro
 
             int width = m_Residuals.GetLength(0);
             int height = m_Residuals.GetLength(1);
+
+            double bgWidthInFwhm = (Math.Min(width, height) - FWHM) / FWHM;
 	        
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
                     double pixelValue = m_Residuals[x, y] + GetValue(x, y);
-                    bgValues.Add(pixelValue);
 
                     double centerDistance = ImagePixel.ComputeDistance(x, m_X0, y, m_Y0);
-                    if (centerDistance < FWHM && pixelValue > peakPixel) peakPixel = pixelValue;                        
+                    if (centerDistance < FWHM)
+                    {
+                        if (pixelValue > peakPixel) peakPixel = pixelValue;
+                    }
+                    else if (centerDistance > 1.5 * FWHM)
+                    {
+                        bgValues.Add(pixelValue);
+                    }
                 }
             }
 
-	        double medianBackground;
-	        double stdDevNoise;
-
-	        for (int i = 0; i < 10; i++)
-	        {
-                medianBackground = bgValues.Median();
-                stdDevNoise = Math.Sqrt(bgValues.Select(x => (x - medianBackground) * (x - medianBackground)).Sum() / (bgValues.Count - 1));
-
-                int numRemoved = bgValues.RemoveAll(x => Math.Abs(x - medianBackground) > 3 * stdDevNoise);
-	            if (numRemoved == 0)
-	                break;
-	        }
 
 	        if (bgValues.Count > 2)
 	        {
-	            medianBackground = bgValues.Median();
-                stdDevNoise = Math.Sqrt(bgValues.Select(x => (x - medianBackground) * (x - medianBackground)).Sum() / (bgValues.Count - 1));
+                double medianBackground = bgValues.Median();
+                double halfPeakToPeakNoise = (bgValues.Max() - bgValues.Min()) / 2.0;
+                double stdDevNoise = Math.Sqrt(bgValues.Select(x => (x - medianBackground) * (x - medianBackground)).Sum() / (bgValues.Count - 1));
+
                 if (m_IStarMax > m_Saturation) peakPixel = m_IStarMax;
-                m_SNR = (peakPixel - medianBackground) / (3 * stdDevNoise);
+                if (m_IStarMax < stdDevNoise) peakPixel = m_IStarMax;
+                m_SNR = (peakPixel - medianBackground) / halfPeakToPeakNoise;
 	        }
             else
                 m_SNR = double.NaN;

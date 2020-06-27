@@ -30,7 +30,7 @@ namespace Tangra
 		private uint m_NormVal;
 	    private MeasurementsHelper m_Measurer;
 	    private VideoController m_VideoController;
-	    private bool m_SnrFromPsf = true;
+	    private bool m_SnrFromPeakValues = false;
 
         private TangraConfig.BackgroundMethod m_BackgroundMethod = TangraConfig.BackgroundMethod.PSFBackground;
         private TangraConfig.PhotometryReductionMethod m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
@@ -55,8 +55,8 @@ namespace Tangra
             m_PSFFit = null;
             cbMeaMethod.SelectedIndex = 0;
 
-            miSnrFromAperture.Checked = !m_SnrFromPsf;
-            miSnrFromPsf.Checked = m_SnrFromPsf;
+            miSnrFromAperture.Checked = !m_SnrFromPeakValues;
+            miSnrFromPeakValues.Checked = m_SnrFromPeakValues;
         }
 
 		private void frmTargetPSFViewerForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -111,7 +111,7 @@ namespace Tangra
 			{
 				DrawPsf();
 
-				int side = m_PSFFit.MatrixSize * 16;
+				int side = Math.Min(17, m_PSFFit.MatrixSize) * 16;
 				picPixels.Width = side;
 				picPixels.Height = side;
 				picPixels.Image = new Bitmap(side, side);
@@ -205,10 +205,13 @@ namespace Tangra
             if (m_PSFFit == null) return;
 
             float aperture = (float) nudMeasuringAperture.Value;
+            m_Aperture = aperture;
+            m_InnerRadius = (float)(TangraConfig.Settings.Photometry.AnnulusInnerRadius * aperture);
+            m_OuterRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + m_InnerRadius * m_InnerRadius);
 
 			using (Graphics g = Graphics.FromImage(picPixels.Image))
 			{
-                m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), aperture, Pens.Lime, m_Bpp, m_NormVal, (x) =>
+                m_PSFFit.DrawDataPixels(g, new Rectangle(0, 0, picPixels.Width, picPixels.Height), aperture, m_InnerRadius, m_OuterRadius, Pens.Lime, m_Bpp, m_NormVal, (x) =>
                     {
                         if (m_VideoController.DisplayIntensifyMode == DisplayIntensifyMode.Dynamic &&
                             m_VideoController.DynamicToValue - m_VideoController.DynamicFromValue > 0)
@@ -262,13 +265,6 @@ namespace Tangra
                 tbxBg.Text = "ERR";
                 tbxSmBG.Text = "ERR";
             }
-
-			// Show the apertures in the main view
-	        m_Aperture = aperture;
-			m_InnerRadius = (float)(TangraConfig.Settings.Photometry.AnnulusInnerRadius * aperture);
-			m_OuterRadius = (float)Math.Sqrt(TangraConfig.Settings.Photometry.AnnulusMinPixels / Math.PI + m_InnerRadius * m_InnerRadius);
-
-			//m_VideoController.RefreshCurrentFrame();
         }
 
 		private void CalculateAndDisplayBackground(uint[,] backgroundPixels)
@@ -333,7 +329,7 @@ namespace Tangra
 	    private void CalculateSNR()
 	    {
             double snr = double.NaN;
-            if (m_SnrFromPsf)
+            if (m_SnrFromPeakValues)
             {
                 if (m_PSFFit != null)
                 {
@@ -344,7 +340,8 @@ namespace Tangra
             {
                 if (m_Measurer != null)
                 {
-                    snr = (m_Measurer.TotalReading - m_Measurer.TotalBackground) / (Math.Sqrt(1 + 9 * m_Measurer.TotalPixels * m_Noise * m_Noise * (1 + 1 / m_Measurer.TotalBackgroundPixels)));
+                    var signal = m_Measurer.TotalReading - m_Measurer.TotalBackground;
+                    snr = signal / (Math.Sqrt(signal + m_Measurer.TotalPixels * m_Noise * m_Noise * (1 + 1 / m_Measurer.TotalBackgroundPixels)));
                 }
             }
 
@@ -459,36 +456,27 @@ namespace Tangra
 
         private void miSnr_Clicked(object sender, EventArgs e)
         {
-            if (sender == miSnrFromPsf)
+            bool selectionChanged = false;
+
+            if (sender == miSnrFromPeakValues && !miSnrFromPeakValues.Checked)
             {
-                if (miSnrFromPsf.Checked)
-                {
-                    miSnrFromPsf.Checked = false;
-                    miSnrFromAperture.Checked = true;
-                }
-                else
-                {
-                    miSnrFromPsf.Checked = true;
-                    miSnrFromAperture.Checked = false;
-                }
+                miSnrFromPeakValues.Checked = true;
+                miSnrFromAperture.Checked = false;
+                selectionChanged = true;
             }
-            else if (sender == miSnrFromAperture)
+            else if (sender == miSnrFromAperture && !miSnrFromAperture.Checked)
             {
-                if (miSnrFromAperture.Checked)
-                {
-                    miSnrFromPsf.Checked = true;
-                    miSnrFromAperture.Checked = false;
-                }
-                else
-                {
-                    miSnrFromPsf.Checked = false;
-                    miSnrFromAperture.Checked = true;
-                }
+                miSnrFromPeakValues.Checked = false;
+                miSnrFromAperture.Checked = true;
+                selectionChanged = true;
             }
 
-            m_SnrFromPsf = miSnrFromPsf.Checked;
-            m_SnrData.Clear();
-            CalculateSNR();
+            if (selectionChanged)
+            {
+                m_SnrFromPeakValues = miSnrFromPeakValues.Checked;
+                m_SnrData.Clear();
+                CalculateSNR();
+            }
         }
 	}
 }
