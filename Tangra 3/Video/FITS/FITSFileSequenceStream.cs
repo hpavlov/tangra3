@@ -112,8 +112,9 @@ namespace Tangra.Video.FITS
                 var match = NUMBERED_FITS_FILE.Match(fileNameOnly);
                 if (!match.Success)
                     return null;
-                int thisFrameNo = int.Parse(match.Groups[1].Value);
-                if (firstFrameNo == null)
+
+                int thisFrameNo;
+                if (int.TryParse(match.Groups[1].Value, out thisFrameNo) && firstFrameNo == null)
                 {
                     firstFrameNo = thisFrameNo;
                 }
