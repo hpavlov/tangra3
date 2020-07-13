@@ -209,5 +209,30 @@ namespace Tangra.Model.Helpers
             else
                 return ParseExposureCase2(header, out isMidPoint, out fitsExposure);
         }
+
+        public string GetTimeStampHeaders()
+        {
+            var headers = new List<string>();
+
+            if (m_Config.IsTimeStampAndExposure)
+            {
+                headers.Add(m_Config.ExposureHeader);
+                headers.Add(m_Config.TimeStampHeader);
+                if (m_Config.TimeStampIsDateTimeParts) headers.Add(m_Config.TimeStampHeader2);
+            }
+            else
+            {
+                headers.Add(m_Config.ExposureHeader);
+                headers.Add(m_Config.TimeStampHeader);
+                headers.Add(m_Config.TimeStamp2Header);
+                if (m_Config.TimeStamp2IsDateTimeParts)
+                {
+                    headers.Add(m_Config.TimeStampHeader2);
+                    headers.Add(m_Config.TimeStamp2Header2);
+                }
+            }
+
+            return string.Join(", ", headers.Take(headers.Count - 1)) + " and " + headers[headers.Count - 1];
+        }
     }
 }

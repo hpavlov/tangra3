@@ -188,7 +188,10 @@ namespace Tangra.Video.FITS
                             m_FitsExposures.Add(fitsExposure.Value);
                         }
                         else
+                        {
                             m_FilesWithoutExposure++;
+                            Trace.WriteLine(string.Format("No timestamps found in '{0}'. Checked Headers: {1}", Path.GetFileName(m_FitsFiles[i]), TimeStampReader != null ? TimeStampReader.GetTimeStampHeaders() : "N/A"));
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -259,8 +262,10 @@ namespace Tangra.Video.FITS
                 {
                     MessageBox.Show(
                         string.Format(
-                            "{0} out of {1} of the FITS files have a missing exposure (checked headers: EXPOSURE, EXPTIME and RAWTIME). Please treat the reported timestamps with suspicion and expect inconsistencies.",
-                            m_FilesWithoutExposure, m_FilesWithoutExposure + m_FilesWithExposure), "Tangra",
+                            "{0} out of {1} of the FITS files have a missing exposure (checked headers: {2}). Please treat the reported timestamps with suspicion and expect inconsistencies.",
+                            m_FilesWithoutExposure, 
+                            m_FilesWithoutExposure + m_FilesWithExposure, 
+                            TimeStampReader != null ? TimeStampReader.GetTimeStampHeaders() : "N/A"), "Tangra",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
