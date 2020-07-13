@@ -30,7 +30,7 @@ namespace Tangra
 		private uint m_NormVal;
 	    private MeasurementsHelper m_Measurer;
 	    private VideoController m_VideoController;
-	    private bool m_SnrFromPeakValues = false;
+	    private bool m_SnrFromPeakValues = true;
 
         private TangraConfig.BackgroundMethod m_BackgroundMethod = TangraConfig.BackgroundMethod.PSFBackground;
         private TangraConfig.PhotometryReductionMethod m_SignalMethod = TangraConfig.PhotometryReductionMethod.PsfPhotometry;
@@ -354,7 +354,8 @@ namespace Tangra
 
                 m_SnrData.Add(snr);
 
-                lblSNR.Text = m_SnrData.Count > 3 ? m_SnrData.Median().ToString("0.0") : snr.ToString("0.0");
+                var snrMed = m_SnrData.Count > 3 ? m_SnrData.Median() : snr;
+                lblSNR.Text = snrMed > 0 ? snrMed.ToString("0.0") : "N/A";
                 lblSNR.ForeColor = m_SnrData.Count > 3 ? Color.BlueViolet : Color.Black;
             }
             else

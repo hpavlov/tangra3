@@ -1334,9 +1334,10 @@ namespace Tangra.Model.Astro
             //                Peak Value Above Base Line
             //   SNR = -------------------------------------------------------------
             //          Peak-to-Peak noise variation in 20 FWHM zone around the peak
-            //
-            // In Tangra I adopt the above method with the caveat that noise peaks may not be determined in 20 FWHM intervals
 
+            // In Tangra I adopt a method influensed by the two method discussed above. The caltulation is this of Astrometrica with the following caveat:
+            //
+            // - For saturated sources I use the Peak PSF Amplitude above base
 
 	        if (m_SNR.HasValue)
 	            return m_SNR.Value;
@@ -1378,8 +1379,7 @@ namespace Tangra.Model.Astro
                 double stdDevNoise = Math.Sqrt(bgValues.Select(x => (x - medianBackground) * (x - medianBackground)).Sum() / (bgValues.Count - 1));
 
                 if (m_IStarMax > m_Saturation) peakPixel = m_IStarMax;
-                if (m_IStarMax < stdDevNoise) peakPixel = m_IStarMax;
-                m_SNR = (peakPixel - medianBackground) / halfPeakToPeakNoise;
+                m_SNR = (peakPixel - medianBackground) / stdDevNoise;
 	        }
             else
                 m_SNR = double.NaN;
