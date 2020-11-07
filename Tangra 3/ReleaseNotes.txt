@@ -1,5 +1,8 @@
 ﻿Tangra3 Release Notes
 ---------------------
+v3.x.x (xxxx-xx-xx)
+- Fixed incorrectly calculated timestamps when using software integration with SER files.
+
 v3.7.3 (2020-05-12)
 - Fixed an AOTA-integration issue with plain AVI files. (broken in 3.7.2)
 - No longer asking for SER file timing details when opening an already processed .lc file.

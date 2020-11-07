@@ -450,7 +450,12 @@ HRESULT SERGetIntegratedFrame(int startFrameNo, int framesToIntegrate, bool isSl
 		IntegrationManagerFreeResources();
 
 		if (m_SerFile->HasTimeStamps) {		
-			unsigned __int64 timeStampUtc64 = GetUInt64Average(firstFrameInfo.TimeStampUtc64, lastFrameInfo.TimeStampUtc64);
+			unsigned __int64 timeStampUtc64;
+			if (framesToIntegrate > 1)
+				timeStampUtc64 = GetUInt64Average(firstFrameInfo.TimeStampUtc64, lastFrameInfo.TimeStampUtc64);
+			else
+				timeStampUtc64 = firstFrameInfo.TimeStampUtc64;
+				
 			frameInfo->TimeStampUtcLo= timeStampUtc64 & 0xFFFFFFFF;
 			frameInfo->TimeStampUtcHi = timeStampUtc64 >> 32;
 		}
