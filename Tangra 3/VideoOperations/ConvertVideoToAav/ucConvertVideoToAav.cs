@@ -258,6 +258,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 gbxSection.Visible = false;
                 gbxIntegrationRate.Visible = false;
                 btnDetectIntegrationRate.Visible = false;
+                btnUseNoIntegration.Visible = false;
                 btnConvert.Enabled = false;
                 pbar.Visible = false;
                 btnCancel.Enabled = false;
@@ -269,6 +270,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 btnConfirmPosition.Enabled = false;
                 gbxSection.Visible = true;
                 btnDetectIntegrationRate.Visible = true;
+                btnUseNoIntegration.Visible = true;
                 btnConvert.Enabled = false;
                 m_RoiSelector.Enabled = false;
                 m_RoiSelector.DisplayOnlyMode = true;
@@ -279,6 +281,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 btnUseIntegrationRate.Visible = true;
                 btnUseIntegrationRate.Enabled = true;
                 btnDetectIntegrationRate.Enabled = false;
+                btnUseNoIntegration.Enabled = false;
                 nudFirstFrame.Enabled = false;
                 gbxIntegrationRate.Visible = true;
                 gbxIntegrationRate.Enabled = true;
@@ -293,6 +296,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
             {
                 btnConvert.Enabled = true;
                 btnDetectIntegrationRate.Enabled = false;
+                btnUseNoIntegration.Enabled = false;
                 btnUseIntegrationRate.Visible = false;
                 nudFirstFrame.Enabled = false;
                 gbxIntegrationRate.Visible = true;
@@ -316,6 +320,7 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 gbxCameraInfo.Enabled = false;
                 pnlFirstField.Enabled = false;
                 btnDetectIntegrationRate.Enabled = false;
+                btnUseNoIntegration.Enabled = false;
                 btnCancel.Enabled = true;
                 m_RoiSelector.Enabled = false;
                 m_RoiSelector.DisplayOnlyMode = false;
@@ -361,17 +366,10 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 {
                     if (frm.IntegratedFrames != null)
                     {
-                        nudIntegratedFrames.SetNUDValue(frm.IntegratedFrames.Interval);
-                        nudStartingAtFrame.SetNUDValue(frm.IntegratedFrames.StartingAtFrame);
-
-                        m_State = AavConfigState.ReadyToConvert;
-                        var reinterlacedStream = m_VideoController.FramePlayer.Video as ReInterlacingVideoStream;
-                        if (reinterlacedStream != null && (reinterlacedStream.Mode == ReInterlaceMode.ShiftOneField || reinterlacedStream.Mode == ReInterlaceMode.SwapFields))
-                            rbFirstFieldBottom.Checked = true;
-                        UpdateControlState();
+                        UpdateSuggestedIntegrationRate(frm.IntegratedFrames.Interval, frm.IntegratedFrames.StartingAtFrame);
                         return;
                     }
-                }            
+                }
             }
 
             if (m_VideoController.ShowMessageBox(
@@ -382,6 +380,28 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
                 m_State = AavConfigState.ManualIntegrationRateEntry;
                 UpdateControlState();
             }
+        }
+
+        private void btnUseNoIntegration_Click(object sender, EventArgs e)
+        {
+            var frm = new frmCorrectInterlacedDefects(m_VideoController);
+            if (frm.ShowDialog() == DialogResult.OK)
+            {
+                UpdateSuggestedIntegrationRate(1, m_VideoController.VideoFirstFrame);
+            }
+        }
+
+        private void UpdateSuggestedIntegrationRate(int integrationRate, int startingAtFrame)
+        {
+            nudIntegratedFrames.SetNUDValue(integrationRate);
+            nudStartingAtFrame.SetNUDValue(startingAtFrame);
+
+            m_State = AavConfigState.ReadyToConvert;
+            var reinterlacedStream = m_VideoController.FramePlayer.Video as ReInterlacingVideoStream;
+            if (reinterlacedStream != null && (reinterlacedStream.Mode == ReInterlaceMode.ShiftOneField || reinterlacedStream.Mode == ReInterlaceMode.SwapFields))
+                rbFirstFieldBottom.Checked = true;
+
+            UpdateControlState();
         }
 
         private void nudStartingAtFrame_ValueChanged(object sender, EventArgs e)
