@@ -119,18 +119,19 @@ namespace Tangra.Config
 			if (currentNode != null)
 			{
 				string newTitle = "Tangra Settings";
-
-				if (currentNode.Parent == null)
-				{
-					// Select the first sibling
-					if (currentNode.Nodes.Count > 0)
-						newTitle = string.Format("Tangra Settings - {0} - {1}", currentNode.Text, currentNode.Nodes[0].Text);
-					else
-						newTitle = string.Format("Tangra Settings - {0}", currentNode.Text);
-				}
-				else
+				
+				if (currentNode.Level == 0)
+                {
+					newTitle = string.Format("Tangra Settings - {0}", currentNode.Text);
+                }
+				else if (currentNode.Level == 1)
+                {
 					newTitle = string.Format("Tangra Settings - {0} - {1}", currentNode.Parent.Text, currentNode.Text);
-
+                }
+				else if (currentNode.Level == 2) // haven't been able to test this as don't have this many levels in the Tangra Settings form
+                {
+					newTitle = string.Format("Tangra Settings - {0} - {1} - {2}", currentNode.Parent.Parent.Text, currentNode.Parent.Text, currentNode.Text);
+                }
 				this.Text = newTitle;
 			}
 		}
