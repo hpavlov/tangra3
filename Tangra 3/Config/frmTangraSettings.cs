@@ -121,17 +121,17 @@ namespace Tangra.Config
 				string newTitle = "Tangra Settings";
 				
 				if (currentNode.Level == 0)
-                {
+				{
 					newTitle = string.Format("Tangra Settings - {0}", currentNode.Text);
-                }
+				}
 				else if (currentNode.Level == 1)
-                {
+				{
 					newTitle = string.Format("Tangra Settings - {0} - {1}", currentNode.Parent.Text, currentNode.Text);
-                }
+				}
 				else
-                {
+				{
 					newTitle = string.Format("Tangra Settings - {0} - {1} - {2}", currentNode.Parent.Parent.Text, currentNode.Parent.Text, currentNode.Text);
-                }
+				}
 				this.Text = newTitle;
 			}
 		}
