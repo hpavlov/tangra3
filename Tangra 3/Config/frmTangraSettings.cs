@@ -128,7 +128,7 @@ namespace Tangra.Config
                 {
 					newTitle = string.Format("Tangra Settings - {0} - {1}", currentNode.Parent.Text, currentNode.Text);
                 }
-				else if (currentNode.Level == 2) // haven't been able to test this as don't have this many levels in the Tangra Settings form
+				else
                 {
 					newTitle = string.Format("Tangra Settings - {0} - {1} - {2}", currentNode.Parent.Parent.Text, currentNode.Parent.Text, currentNode.Text);
                 }
