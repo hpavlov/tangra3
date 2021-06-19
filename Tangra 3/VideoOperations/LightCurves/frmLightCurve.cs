@@ -1634,10 +1634,10 @@ namespace Tangra.VideoOperations.LightCurves
                         legend += ", Background-Only, ";
                         break;
                     case ProcessingType.SignalDividedByNoise:
-                        legend += ", Signal-devided by-Noise, ";
+                        legend += ", Signal-divided by-Noise, ";
                         break;
                     case ProcessingType.SignalDividedByBackground:
-                        legend += ", Signal-devided by-Background, ";
+                        legend += ", Signal-divided by-Background, ";
                         break;
                 }
 
