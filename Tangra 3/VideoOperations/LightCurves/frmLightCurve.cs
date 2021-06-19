@@ -1551,15 +1551,17 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miSaveAsImage_Click(object sender, EventArgs e)
         {
-			if (m_Graph == null) return;
+            if (m_Graph == null) return;
+
             Bitmap bmp = AddImageLegend();
 
-			if (saveImageDialog.ShowDialog(this) == DialogResult.OK)
-			{
+
+            if (saveImageDialog.ShowDialog(this) == DialogResult.OK)
+            {
                 bmp.Save(
-					saveImageDialog.FileName,
-					GetImageFormatFromFileExtension(Path.GetExtension(saveImageDialog.FileName)));
-			}
+                    saveImageDialog.FileName,
+                    GetImageFormatFromFileExtension(Path.GetExtension(saveImageDialog.FileName)));
+            }
         }
 
         private ImageFormat GetImageFormatFromFileExtension(string fileExt)
