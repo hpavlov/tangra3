@@ -495,9 +495,6 @@ namespace Tangra.Model.Config
 		    public static float REJECTION_BACKGROUND_PIXELS_STD_DEV = 6.0f;
 
             public bool UseStackedSelection = true;
-
-            // public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.png; // *****
-
         }
 
 		public enum TrackingEngine
@@ -662,14 +659,12 @@ namespace Tangra.Model.Config
 			DontExportEventTimes
 		}
 
-        public enum SaveAsImageFormat // ******
+        public enum SaveAsImageFormat
         {
             png,
             bmp,
             jpg
         }
-
-//        public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.png; // ****
 
         [Serializable]
 		public class GenericSettings
@@ -719,7 +714,7 @@ namespace Tangra.Model.Config
             public bool AutoDynamicRanageEnabledForADV = true;
             public bool AutoDynamicRanageEnabledForFITS = true;
 
-            public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.png; // ****
+            public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.png;
             
         }
 
@@ -777,9 +772,6 @@ namespace Tangra.Model.Config
             public string TimingCorrectionsCameraName;
             public double? TimingCorrectionsAquisitionDelay;
             public bool TimingCorrectionsEnteringRefertenceTimeOffset = true;
-
-            //public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.png; // ****
-            //public SaveAsImageFormat? SaveAsImageFileType = null;
         }
 
         [Serializable]
@@ -1193,9 +1185,6 @@ namespace Tangra.Model.Config
 
 				SmallGraphFocusBackgroundBrushColor = TangraConfig.Settings.Color.SmallGraphFocusBackground;
 				SelectionCursorColor = TangraConfig.Settings.Color.SelectionCursorColor;
-
-                // SaveAsImageType = TangraConfig.Settings.Generic.SaveAsImageFileType; // *****
-
             }
 
 			public void Save()
@@ -1218,8 +1207,6 @@ namespace Tangra.Model.Config
 
 				TangraConfig.Settings.Color.SmallGraphFocusBackground = SmallGraphFocusBackgroundBrushColor;
 				TangraConfig.Settings.Color.SelectionCursorColor = SelectionCursorColor;
-
-                //TangraConfig.Settings.Generic.SaveAsImageFileType = SaveAsImageType; // *****
 
 				TangraConfig.Settings.Save();
 			}

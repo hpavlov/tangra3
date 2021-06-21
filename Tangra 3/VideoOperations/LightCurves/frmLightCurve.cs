@@ -1569,7 +1569,7 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-        private void SetSaveAsImageFormatToLastUsed() // ***
+        private void SetSaveAsImageFormatToLastUsed()
         {
 
             switch (TangraConfig.Settings.Generic.SaveAsImageFileType)
@@ -1588,7 +1588,7 @@ namespace Tangra.VideoOperations.LightCurves
             return;
         }
 
-        private void SaveLastUsedSaveAsImageFormat(string fileExt) // ***
+        private void SaveLastUsedSaveAsImageFormat(string fileExt)
         {
             switch (fileExt.ToLower())
             {
