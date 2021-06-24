@@ -1574,13 +1574,13 @@ namespace Tangra.VideoOperations.LightCurves
 
             switch (TangraConfig.Settings.Generic.SaveAsImageFileType)
             {
-                case TangraConfig.SaveAsImageFormat.bmp:
+                case TangraConfig.SaveAsImageFormat.Bmp:
                     saveImageDialog.Filter = "Bitmap(*.bmp) | *.bmp |PNG Image(*.png) | *.png |JPEG Image(*.jpg) | *.jpg";
                     break;
-                case TangraConfig.SaveAsImageFormat.jpg:
+                case TangraConfig.SaveAsImageFormat.Jpg:
                     saveImageDialog.Filter = "JPEG Image(*.jpg) | *.jpg|Bitmap(*.bmp) | *.bmp |PNG Image(*.png) | *.png ";
                     break;
-                case TangraConfig.SaveAsImageFormat.png:
+                case TangraConfig.SaveAsImageFormat.Png:
                     saveImageDialog.Filter = "PNG Image(*.png) | *.png |JPEG Image(*.jpg) | *.jpg|Bitmap(*.bmp) | *.bmp ";
                     break;
             }
@@ -1593,13 +1593,13 @@ namespace Tangra.VideoOperations.LightCurves
             switch (fileExt.ToLower())
             {
                 case ".bmp":
-                    TangraConfig.Settings.Generic.SaveAsImageFileType = TangraConfig.SaveAsImageFormat.bmp;
+                    TangraConfig.Settings.Generic.SaveAsImageFileType = TangraConfig.SaveAsImageFormat.Bmp;
                     break;
                 case ".jpg":
-                    TangraConfig.Settings.Generic.SaveAsImageFileType = TangraConfig.SaveAsImageFormat.jpg;
+                    TangraConfig.Settings.Generic.SaveAsImageFileType = TangraConfig.SaveAsImageFormat.Jpg;
                     break;
                 case ".png":
-                    TangraConfig.Settings.Generic.SaveAsImageFileType = TangraConfig.SaveAsImageFormat.png;
+                    TangraConfig.Settings.Generic.SaveAsImageFileType = TangraConfig.SaveAsImageFormat.Png;
                     break;
             }
 

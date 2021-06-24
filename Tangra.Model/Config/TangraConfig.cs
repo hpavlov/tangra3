@@ -661,9 +661,9 @@ namespace Tangra.Model.Config
 
         public enum SaveAsImageFormat
         {
-            png,
-            bmp,
-            jpg
+            Png,
+            Bmp,
+            Jpg
         }
 
         [Serializable]
@@ -714,7 +714,7 @@ namespace Tangra.Model.Config
             public bool AutoDynamicRanageEnabledForADV = true;
             public bool AutoDynamicRanageEnabledForFITS = true;
 
-            public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.png;
+            public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.Png;
             
         }
 
