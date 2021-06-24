@@ -1584,7 +1584,6 @@ namespace Tangra.VideoOperations.LightCurves
                     saveImageDialog.Filter = "PNG Image(*.png) | *.png |JPEG Image(*.jpg) | *.jpg|Bitmap(*.bmp) | *.bmp ";
                     break;
             }
-
             return;
         }
 
