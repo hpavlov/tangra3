@@ -715,7 +715,6 @@ namespace Tangra.Model.Config
             public bool AutoDynamicRanageEnabledForFITS = true;
 
             public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.Png;
-            
         }
 
         [Serializable]

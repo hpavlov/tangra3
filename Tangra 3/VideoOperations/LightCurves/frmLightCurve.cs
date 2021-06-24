@@ -1603,7 +1603,7 @@ namespace Tangra.VideoOperations.LightCurves
                     break;
             }
 
-            TangraConfig.Settings.Save();         
+            TangraConfig.Settings.Save();
 
             return;
         }
