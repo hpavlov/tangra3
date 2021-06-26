@@ -1559,13 +1559,13 @@ namespace Tangra.VideoOperations.LightCurves
 
             if (saveImageDialog.ShowDialog(this) == DialogResult.OK)
             {
-                string file_ext = Path.GetExtension(saveImageDialog.FileName);
+                string fileExtension = Path.GetExtension(saveImageDialog.FileName);
 
                 bmp.Save(
                     saveImageDialog.FileName,
-                    GetImageFormatFromFileExtension(file_ext));
+                    GetImageFormatFromFileExtension(fileExtension));
 
-                SaveLastUsedSaveAsImageFormat(file_ext);
+                SaveLastUsedSaveAsImageFormat(fileExtension);
             }
         }
 
