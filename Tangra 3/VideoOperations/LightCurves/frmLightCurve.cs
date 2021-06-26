@@ -28,6 +28,7 @@ using Tangra.Model.Video;
 using Tangra.Model.VideoOperations;
 using Tangra.Resources;
 using Tangra.SDK;
+using Tangra.Video;
 using Tangra.VideoOperations.LightCurves.Helpers;
 using Tangra.VideoOperations.LightCurves.InfoForms;
 using Tangra.VideoOperations.LightCurves.Report;
@@ -1553,9 +1554,9 @@ namespace Tangra.VideoOperations.LightCurves
         {
             if (m_Graph == null) return;
 
-            Bitmap bmp = AddImageLegend();
+            AutoSuggestSaveAsImageFileName();
 
-            SetSaveAsImageFormatToLastUsed();
+            Bitmap bmp = AddImageLegend();
 
             if (saveImageDialog.ShowDialog(this) == DialogResult.OK)
             {
@@ -1569,21 +1570,31 @@ namespace Tangra.VideoOperations.LightCurves
             }
         }
 
-        private void SetSaveAsImageFormatToLastUsed()
+        private void AutoSuggestSaveAsImageFileName()
         {
+            TangraConfig.SaveAsImageFormat saveAsImageFormat = TangraConfig.Settings.Generic.SaveAsImageFileType;
 
-            switch (TangraConfig.Settings.Generic.SaveAsImageFileType)
+            string imageFileExtension;
+
+            switch (saveAsImageFormat)
             {
                 case TangraConfig.SaveAsImageFormat.Bmp:
-                    saveImageDialog.Filter = "Bitmap(*.bmp) | *.bmp |PNG Image(*.png) | *.png |JPEG Image(*.jpg) | *.jpg";
+                    imageFileExtension = ".bmp";
                     break;
                 case TangraConfig.SaveAsImageFormat.Jpg:
-                    saveImageDialog.Filter = "JPEG Image(*.jpg) | *.jpg|Bitmap(*.bmp) | *.bmp |PNG Image(*.png) | *.png ";
+                    imageFileExtension = ".jpg";
                     break;
-                case TangraConfig.SaveAsImageFormat.Png:
-                    saveImageDialog.Filter = "PNG Image(*.png) | *.png |JPEG Image(*.jpg) | *.jpg|Bitmap(*.bmp) | *.bmp ";
+                default:
+                    imageFileExtension = ".png";
                     break;
             }
+
+            string fileName = TangraContext.Current.FileName;
+
+            fileName = Path.ChangeExtension(Path.GetFileName(fileName), imageFileExtension);
+
+            saveImageDialog.FileName = fileName;
+
             return;
         }
 
