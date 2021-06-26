@@ -1163,9 +1163,6 @@ namespace Tangra.Model.Config
 
 			public static Font LabelsFont = new Font(FontFamily.GenericMonospace, 9);
 
-            public SaveAsImageFormat SaveAsImageType;
-
-
             public void Load()
 			{
 				BackgroundColor = TangraConfig.Settings.Color.LightcurvesBackground;
