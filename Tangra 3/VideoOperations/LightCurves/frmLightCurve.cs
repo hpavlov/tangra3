@@ -1589,11 +1589,13 @@ namespace Tangra.VideoOperations.LightCurves
                     break;
             }
 
-            string fileName = TangraContext.Current.FileName;
+            saveImageDialog.FileName = Path.ChangeExtension(Path.GetFileName(TangraContext.Current.FileName), imageFileExtension);
 
-            fileName = Path.ChangeExtension(Path.GetFileName(fileName), imageFileExtension);
-
-            saveImageDialog.FileName = fileName;
+            if (!string.IsNullOrEmpty(m_LCFilePath) && File.Exists(m_LCFilePath))
+            {
+                saveImageDialog.InitialDirectory = Path.GetDirectoryName(m_LCFilePath);
+                saveImageDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_LCFilePath), imageFileExtension);
+            }
 
             return;
         }
@@ -1731,6 +1733,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miExportTangraCSV_Click(object sender, EventArgs e)
         {
+            saveCSVDialog.FileName = Path.ChangeExtension(Path.GetFileName(TangraContext.Current.FileName), ".csv");
+
             if (!string.IsNullOrEmpty(m_LCFilePath) && File.Exists(m_LCFilePath))
             {
                 saveCSVDialog.InitialDirectory = Path.GetDirectoryName(m_LCFilePath);
@@ -2740,6 +2744,8 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void miSaveAsVectorImage_Click(object sender, EventArgs e)
         {
+            saveWmfFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(TangraContext.Current.FileName), ".emf");
+
             if (!string.IsNullOrEmpty(m_LCFilePath) && File.Exists(m_LCFilePath))
             {
                 saveWmfFileDialog.InitialDirectory = Path.GetDirectoryName(m_LCFilePath);
