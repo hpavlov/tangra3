@@ -1556,6 +1556,7 @@ namespace Tangra.VideoOperations.LightCurves
 
             AutoSuggestSaveAsImageFileName();
 
+
             Bitmap bmp = AddImageLegend();
 
             if (saveImageDialog.ShowDialog(this) == DialogResult.OK)
