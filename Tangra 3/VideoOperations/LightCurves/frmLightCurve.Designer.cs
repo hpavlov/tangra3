@@ -1406,7 +1406,7 @@
             // saveImageDialog
             // 
             this.saveImageDialog.DefaultExt = "png";
-            this.saveImageDialog.Filter = "Bitmap (*.bmp)|*.bmp|JPEG Image (*.jpg)|*.jpg|PNG Image (*.png)|*.png";
+            this.saveImageDialog.Filter = "PNG Image (*.png)|*.png|Bitmap (*.bmp)|*.bmp|JPEG Image (*.jpg)|*.jpg";
             // 
             // saveCSVDialog
             // 
