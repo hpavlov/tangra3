@@ -495,7 +495,7 @@ namespace Tangra.Model.Config
 		    public static float REJECTION_BACKGROUND_PIXELS_STD_DEV = 6.0f;
 
             public bool UseStackedSelection = true;
-		}
+        }
 
 		public enum TrackingEngine
 		{
@@ -659,6 +659,13 @@ namespace Tangra.Model.Config
 			DontExportEventTimes
 		}
 
+        public enum SaveAsImageFormat
+        {
+            Png,
+            Bmp,
+            Jpg
+        }
+
         [Serializable]
 		public class GenericSettings
 		{
@@ -706,7 +713,10 @@ namespace Tangra.Model.Config
             public bool AutoDynamicRanageEnabledForSER = true;
             public bool AutoDynamicRanageEnabledForADV = true;
             public bool AutoDynamicRanageEnabledForFITS = true;
-		}
+
+            public SaveAsImageFormat SaveAsImageFileType = SaveAsImageFormat.Png;
+
+        }
 
         [Serializable]
         public class LastUsedSettings
@@ -1153,7 +1163,7 @@ namespace Tangra.Model.Config
 
 			public static Font LabelsFont = new Font(FontFamily.GenericMonospace, 9);
 
-			public void Load()
+            public void Load()
 			{
 				BackgroundColor = TangraConfig.Settings.Color.LightcurvesBackground;
 				GridLinesColor = TangraConfig.Settings.Color.LightcurvesGrid;
@@ -1172,7 +1182,7 @@ namespace Tangra.Model.Config
 
 				SmallGraphFocusBackgroundBrushColor = TangraConfig.Settings.Color.SmallGraphFocusBackground;
 				SelectionCursorColor = TangraConfig.Settings.Color.SelectionCursorColor;
-			}
+            }
 
 			public void Save()
 			{
