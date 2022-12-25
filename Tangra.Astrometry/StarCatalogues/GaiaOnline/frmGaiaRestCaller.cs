@@ -57,6 +57,8 @@ namespace Tangra.StarCatalogues.GaiaOnline
             this.radiusDeg = radiusDeg;
             this.limitMag = limitMag;
             this.limitStars = limitStars;
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }
 
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -161,11 +163,11 @@ namespace Tangra.StarCatalogues.GaiaOnline
         {
             NameValueCollection outgoingQueryString = HttpUtility.ParseQueryString(String.Empty);
 
-            var QUERY = @"SELECT solution_id, designation, source_id, ref_epoch, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error, phot_g_mean_mag, bp_rp, phot_variable_flag
-            FROM gdr2.gaia_source
+            var QUERY = @"SELECT solution_id, designation, source_id, ref_epoch, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error, phot_g_mean_mag, bp_rp
+            FROM gaiaedr3.gaia_source
             WHERE pos @ scircle(spoint(RADIANS({0}), RADIANS({1})), RADIANS({2})) AND(phot_g_mean_mag <= {3}) ORDER BY phot_g_mean_mag LIMIT {4}";
             outgoingQueryString.Add("QUERY", string.Format(QUERY, raDeg, deDeg, radiusDeg, limitMag, limitStars, CultureInfo.InvariantCulture));
-            outgoingQueryString.Add("LANG", "postgresql-9.6");
+            outgoingQueryString.Add("LANG", "PostgreSQL");
             outgoingQueryString.Add("QUEUE", "5m");
             outgoingQueryString.Add("PHASE", "RUN");
 

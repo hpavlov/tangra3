@@ -36,7 +36,6 @@ namespace Tangra.StarCatalogues.GaiaOnline
         private double m_PmDeErrMasYear;
         private double m_phot_g_mean_mag;
         private double m_bp_rp;
-        private string m_phot_variable_flag;
 
         public GaiaDR2Entry(XmlNode node)
         {
@@ -64,7 +63,6 @@ namespace Tangra.StarCatalogues.GaiaOnline
             // 13 <FIELD name="pmdec_error" unit="Angular Velocity[mas/year]" ucd="stat.error;pos.pm;pos.eq.dec" datatype="double" />
             // 14 <FIELD name="phot_g_mean_mag" unit="Magnitude[mag]" ucd="phot.mag;stat.mean;em.opt" datatype="float" />
             // 15 <FIELD name="bp_rp" unit="Magnitude[mag]" ucd="phot.color" datatype="float" />
-            // 16 <FIELD name="phot_variable_flag" ucd="meta.code;src.var" arraysize="4000" datatype="char" />
             m_SolutionId = data[0];
             m_Designation = data[1];
             if (m_Designation != null)
@@ -134,8 +132,6 @@ namespace Tangra.StarCatalogues.GaiaOnline
                 m_bp_rp = 0;
             }
 
-            m_phot_variable_flag = data[16];
-
             m_MatchedStarDesignation = null;
         }
 
@@ -157,7 +153,6 @@ namespace Tangra.StarCatalogues.GaiaOnline
             m_PmDeErrMasYear = clone.m_PmDeErrMasYear;
             m_phot_g_mean_mag = clone.m_phot_g_mean_mag;
             m_bp_rp = clone.m_bp_rp;
-            m_phot_variable_flag = clone.m_phot_variable_flag;
             m_MatchedStarDesignation = matchedDesignation;
         }
 
@@ -313,7 +308,6 @@ namespace Tangra.StarCatalogues.GaiaOnline
             bw.Write(m_PmDeErrMasYear);
             bw.Write(m_phot_g_mean_mag);
             bw.Write(m_bp_rp);
-            bw.Write(m_phot_variable_flag);
         }
 
         public GaiaDR2Entry(BinaryReader br)
@@ -336,7 +330,6 @@ namespace Tangra.StarCatalogues.GaiaOnline
             m_PmDeErrMasYear = br.ReadDouble();
             m_phot_g_mean_mag = br.ReadDouble();
             m_bp_rp = br.ReadDouble();
-            m_phot_variable_flag = br.ReadString();
 
             if (version > 1)
             {

@@ -1,8 +1,13 @@
 ﻿Tangra3 Release Notes
 ---------------------
-v3.x.x (xxxx-xx-xx)
+v3.7.5 (2022-12-25)
+- Fixed broken access to online Gaia EDR3 TAP.
+
+v3.7.4 (2022-02-17)
 - Fixed incorrectly calculated timestamps when using software integration with SER files.
 - Made it possible to create AAV files with no integration and with analogue field corrections.
+- Added interlaced video correction dialog for all AVI videos, before AAV conversion.
+- Fix cosmetic 'bug'where  the Tangra Settings form title includes the first child node's name even when haven't selected that child yet.
 
 v3.7.3 (2020-05-12)
 - Fixed an AOTA-integration issue with plain AVI files. (broken in 3.7.2)

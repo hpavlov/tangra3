@@ -55,9 +55,9 @@
             this.cbxUseGaia.AutoSize = true;
             this.cbxUseGaia.Location = new System.Drawing.Point(199, 22);
             this.cbxUseGaia.Name = "cbxUseGaia";
-            this.cbxUseGaia.Size = new System.Drawing.Size(175, 17);
+            this.cbxUseGaia.Size = new System.Drawing.Size(182, 17);
             this.cbxUseGaia.TabIndex = 50;
-            this.cbxUseGaia.Text = "Use GaiaDR2 positions (Online)";
+            this.cbxUseGaia.Text = "Use GaiaEDR3 positions (Online)";
             this.cbxUseGaia.UseVisualStyleBackColor = true;
             this.cbxUseGaia.CheckedChanged += new System.EventHandler(this.cbxUseGaia_CheckedChanged);
             // 
@@ -128,9 +128,9 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label2.Location = new System.Drawing.Point(4, 61);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(246, 13);
+            this.label2.Size = new System.Drawing.Size(254, 13);
             this.label2.TabIndex = 50;
-            this.label2.Text = "How to obtain an API Token for Gaia DR2";
+            this.label2.Text = "How to obtain an API Token for Gaia EDR3";
             // 
             // llRegisterAccount
             // 
