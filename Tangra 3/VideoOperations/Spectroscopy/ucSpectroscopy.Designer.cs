@@ -28,67 +28,67 @@
         /// </summary>
         private void InitializeComponent()
         {
-			this.picSpectra = new System.Windows.Forms.PictureBox();
-			this.btnMeasure = new System.Windows.Forms.Button();
-			this.lblSelectStarNote = new System.Windows.Forms.Label();
-			this.btnShowSpectra = new System.Windows.Forms.Button();
-			((System.ComponentModel.ISupportInitialize)(this.picSpectra)).BeginInit();
-			this.SuspendLayout();
-			// 
-			// picSpectra
-			// 
-			this.picSpectra.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.picSpectra.Location = new System.Drawing.Point(13, 16);
-			this.picSpectra.Name = "picSpectra";
-			this.picSpectra.Size = new System.Drawing.Size(221, 46);
-			this.picSpectra.TabIndex = 0;
-			this.picSpectra.TabStop = false;
-			this.picSpectra.Visible = false;
-			// 
-			// btnMeasure
-			// 
-			this.btnMeasure.Enabled = false;
-			this.btnMeasure.Location = new System.Drawing.Point(13, 83);
-			this.btnMeasure.Name = "btnMeasure";
-			this.btnMeasure.Size = new System.Drawing.Size(221, 23);
-			this.btnMeasure.TabIndex = 1;
-			this.btnMeasure.Text = "Multi-Frame Measurement";
-			this.btnMeasure.UseVisualStyleBackColor = true;
-			this.btnMeasure.Click += new System.EventHandler(this.btnMeasure_Click);
-			// 
-			// lblSelectStarNote
-			// 
-			this.lblSelectStarNote.AutoSize = true;
-			this.lblSelectStarNote.Location = new System.Drawing.Point(42, 22);
-			this.lblSelectStarNote.Name = "lblSelectStarNote";
-			this.lblSelectStarNote.Size = new System.Drawing.Size(154, 13);
-			this.lblSelectStarNote.TabIndex = 2;
-			this.lblSelectStarNote.Text = "Please select a star to measure";
-			// 
-			// btnShowSpectra
-			// 
-			this.btnShowSpectra.Location = new System.Drawing.Point(13, 83);
-			this.btnShowSpectra.Name = "btnShowSpectra";
-			this.btnShowSpectra.Size = new System.Drawing.Size(221, 23);
-			this.btnShowSpectra.TabIndex = 3;
-			this.btnShowSpectra.Text = "Display Spectra";
-			this.btnShowSpectra.UseVisualStyleBackColor = true;
-			this.btnShowSpectra.Visible = false;
-			this.btnShowSpectra.Click += new System.EventHandler(this.btnShowSpectra_Click);
-			// 
-			// ucSpectroscopy
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.Controls.Add(this.lblSelectStarNote);
-			this.Controls.Add(this.picSpectra);
-			this.Controls.Add(this.btnMeasure);
-			this.Controls.Add(this.btnShowSpectra);
-			this.Name = "ucSpectroscopy";
-			this.Size = new System.Drawing.Size(249, 243);
-			((System.ComponentModel.ISupportInitialize)(this.picSpectra)).EndInit();
-			this.ResumeLayout(false);
-			this.PerformLayout();
+            this.picSpectra = new System.Windows.Forms.PictureBox();
+            this.btnMeasure = new System.Windows.Forms.Button();
+            this.lblSelectStarNote = new System.Windows.Forms.Label();
+            this.btnShowSpectra = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.picSpectra)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // picSpectra
+            // 
+            this.picSpectra.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.picSpectra.Location = new System.Drawing.Point(13, 16);
+            this.picSpectra.Name = "picSpectra";
+            this.picSpectra.Size = new System.Drawing.Size(221, 46);
+            this.picSpectra.TabIndex = 0;
+            this.picSpectra.TabStop = false;
+            this.picSpectra.Visible = false;
+            // 
+            // btnMeasure
+            // 
+            this.btnMeasure.Enabled = false;
+            this.btnMeasure.Location = new System.Drawing.Point(13, 83);
+            this.btnMeasure.Name = "btnMeasure";
+            this.btnMeasure.Size = new System.Drawing.Size(221, 23);
+            this.btnMeasure.TabIndex = 1;
+            this.btnMeasure.Text = "Multi-Frame Measurement";
+            this.btnMeasure.UseVisualStyleBackColor = true;
+            this.btnMeasure.Click += new System.EventHandler(this.btnMeasure_Click);
+            // 
+            // lblSelectStarNote
+            // 
+            this.lblSelectStarNote.AutoSize = true;
+            this.lblSelectStarNote.Location = new System.Drawing.Point(22, 25);
+            this.lblSelectStarNote.Name = "lblSelectStarNote";
+            this.lblSelectStarNote.Size = new System.Drawing.Size(198, 26);
+            this.lblSelectStarNote.TabIndex = 2;
+            this.lblSelectStarNote.Text = "Please select a star to measure and \r\nthen roughly align the line on the spectra";
+            // 
+            // btnShowSpectra
+            // 
+            this.btnShowSpectra.Location = new System.Drawing.Point(13, 83);
+            this.btnShowSpectra.Name = "btnShowSpectra";
+            this.btnShowSpectra.Size = new System.Drawing.Size(221, 23);
+            this.btnShowSpectra.TabIndex = 3;
+            this.btnShowSpectra.Text = "Display Spectra";
+            this.btnShowSpectra.UseVisualStyleBackColor = true;
+            this.btnShowSpectra.Visible = false;
+            this.btnShowSpectra.Click += new System.EventHandler(this.btnShowSpectra_Click);
+            // 
+            // ucSpectroscopy
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblSelectStarNote);
+            this.Controls.Add(this.picSpectra);
+            this.Controls.Add(this.btnMeasure);
+            this.Controls.Add(this.btnShowSpectra);
+            this.Name = "ucSpectroscopy";
+            this.Size = new System.Drawing.Size(249, 243);
+            ((System.ComponentModel.ISupportInitialize)(this.picSpectra)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 

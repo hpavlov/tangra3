@@ -312,42 +312,26 @@ namespace Tangra.VideoOperations.Spectroscopy
         {
             if (m_OperationState == SpectroscopyState.ChoosingStar && e.Gausian != null && e.Gausian.IsSolved && e.Gausian.Certainty > 0.2)
             {
-                float bestAngle = m_SpectroscopyController.LocateSpectraAngle(e.Gausian);
+                SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
+                SelectedStarFWHM = e.Gausian.FWHM;
+                m_SelectedStarGaussian = e.Gausian;
+                MeasurementAreaWing = (int)(2 * Math.Ceiling(SelectedStarFWHM));
+                BackgroundAreaWing = MeasurementAreaWing;
+                BackgroundAreaGap = 5;
 
-                if (float.IsNaN(bestAngle))
-                {
-                    SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
-                    SelectedStarFWHM = e.Gausian.FWHM;
-                    m_SelectedStarGaussian = e.Gausian;
-                    MeasurementAreaWing = (int)(2 * Math.Ceiling(SelectedStarFWHM));
-                    BackgroundAreaWing = MeasurementAreaWing;
-                    BackgroundAreaGap = 5;
+                SelectedAnglePoint = Point.Empty;
+                m_ControlPanel.ClearSpectra();
 
-                    SelectedAnglePoint = Point.Empty;
-                    m_ControlPanel.ClearSpectra();
-
-                    m_OperationState = SpectroscopyState.ChoosingAngleManually;
-                }
-                else
-                {
-                    SelectedStar = new ImagePixel(e.Gausian.XCenter, e.Gausian.YCenter);
-                    SelectedStarFWHM = e.Gausian.FWHM;
-                    m_SelectedStarGaussian = e.Gausian;
-					MeasurementAreaWing = (int)(2 * Math.Ceiling(SelectedStarFWHM));
-					BackgroundAreaWing = MeasurementAreaWing;
-                    BackgroundAreaGap = 5;
-
-                    SetBestAngle(bestAngle);
-                }
+                m_OperationState = SpectroscopyState.ChoosingAngleManually;
 
                 m_VideoController.RedrawCurrentFrame(false, true);
             }
             else if (m_OperationState == SpectroscopyState.ChoosingAngleManually && SelectedStar != null)
             {
-                double atanAgnle = 180 * Math.Atan((SelectedStar.YDouble - e.Pixel.YDouble)/(e.Pixel.XDouble - SelectedStar.XDouble)) / Math.PI;
-                if (atanAgnle < 0) atanAgnle = 360 + atanAgnle;
-                int roughAngle = (int) atanAgnle;
-                float bestAngle = m_SpectroscopyController.LocateSpectraAngle(e.Gausian, roughAngle);
+                double atanAgnle = 180 * Math.Atan((SelectedStar.YDouble - e.Pixel.YDouble) / (e.Pixel.XDouble - SelectedStar.XDouble)) / Math.PI;
+                //if (atanAgnle < 0) atanAgnle = 360 + atanAgnle; // MCF
+                int roughAngle = (int)atanAgnle;
+                float bestAngle = m_SpectroscopyController.LocateSpectraAngle(roughAngle);
                 if (!float.IsNaN(bestAngle))
                 {
                     SetBestAngle(bestAngle);
