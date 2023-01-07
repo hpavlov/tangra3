@@ -13,7 +13,6 @@ using Tangra.Model.Config;
 using Tangra.Model.Context;
 using Tangra.Model.Helpers;
 using Tangra.Model.Video;
-using Tangra.VideoOperations.LightCurves;
 using Tangra.VideoOperations.Spectroscopy;
 using Tangra.VideoOperations.Spectroscopy.Helpers;
 
@@ -21,35 +20,35 @@ namespace Tangra.Controller
 {
     public class SpectroscopyController
     {
-		private object m_SyncLock = new object();
+        private object m_SyncLock = new object();
 
-		private VideoController m_VideoController;
-		private frmViewSpectra m_ViewSpectraForm;
-		private Form m_MainFormView;
+        private VideoController m_VideoController;
+        private frmViewSpectra m_ViewSpectraForm;
+        private Form m_MainFormView;
         private SpectraCalibrator m_SpectraCalibrator;
         private MasterSpectra m_CurrentSpectra;
         private TangraConfig.PersistedConfiguration m_Configuration;
 
-		private TangraConfig.SpectraViewDisplaySettings m_DisplaySettings;
+        private TangraConfig.SpectraViewDisplaySettings m_DisplaySettings;
 
-		public TangraConfig.SpectraViewDisplaySettings DisplaySettings
-		{
-			get { return m_DisplaySettings; }
-		}
+        public TangraConfig.SpectraViewDisplaySettings DisplaySettings
+        {
+            get { return m_DisplaySettings; }
+        }
 
         internal SpectraReductionContext SpectraReductionContext { get; private set; }
 
         internal SpectroscopyController(Form mainFormView, VideoController videoController)
-		{
-			m_MainFormView = mainFormView;
-			m_VideoController = videoController;
-			m_ViewSpectraForm = null;
+        {
+            m_MainFormView = mainFormView;
+            m_VideoController = videoController;
+            m_ViewSpectraForm = null;
             SpectraReductionContext = new SpectraReductionContext();
 
-			m_DisplaySettings = new TangraConfig.SpectraViewDisplaySettings();
-			m_DisplaySettings.Load();
-			m_DisplaySettings.Initialize();
-		}
+            m_DisplaySettings = new TangraConfig.SpectraViewDisplaySettings();
+            m_DisplaySettings.Load();
+            m_DisplaySettings.Initialize();
+        }
 
         internal bool HasCalibratedConfiguration()
         {
@@ -67,222 +66,73 @@ namespace Tangra.Controller
             return false;
         }
 
-        internal float LocateSpectraAngle(PSFFit selectedStar, int? roughStartingAngle = null)
+        internal float LocateSpectraAngle(int roughStartingAngle)
         {
-            float x0 = (float)selectedStar.XCenter;
-            float y0 = (float)selectedStar.YCenter;
-            uint brigthness10 = (uint)(0.1 * selectedStar.Brightness);
-            uint brigthness20 = (uint)(0.2 * selectedStar.Brightness);
-            uint brigthness40 = (uint)(0.4 * selectedStar.Brightness);
-            uint bgFromPsf = (uint)(selectedStar.I0); 
-
-            int minDistance = (int)(10 * selectedStar.FWHM);
-            int clearDist =  (int)(2 * selectedStar.FWHM);
 
             AstroImage image = m_VideoController.GetCurrentAstroImage(false);
 
-            float width = image.Width;
-            float height = image.Height;
+            MorphologicalFilters blackAndWhiteImage = new MorphologicalFilters(image);
+            blackAndWhiteImage.WriteOriginalImageToFile(@"C:\Temp\original.png");
 
-            uint[] angles = new uint[360];
-            uint[] sums = new uint[360];
-            uint[] pixAbove10Perc = new uint[360];
-            uint[] pixAbove20Perc = new uint[360];
-            uint[] pixAbove40Perc = new uint[360];
+            blackAndWhiteImage.BorderExclusionSize = 15;
 
-            int diagonnalPixels = (int)Math.Ceiling(Math.Sqrt(image.Width * image.Width + image.Height * image.Height));
+            blackAndWhiteImage.ConvertGreyScaleImageToBlackAndWhite();
+            //Console.WriteLine("fraction of white pixels = {0}", blackAndWhiteImage.FractionOfWhitePixels);
+            //blackAndWhiteImage.WriteBlackAndWhiteImageToFile(@"C:\Temp\InitialBW.png");
+            blackAndWhiteImage.ApplyDilationFilter();
+            //blackAndWhiteImage.WriteBlackAndWhiteImageToFile(@"C:\Temp\DilatedBW.png");
+            blackAndWhiteImage.ApplyErosionFilter();
+            //blackAndWhiteImage.WriteBlackAndWhiteImageToFile(@"C:\Temp\ErodedBW.png");
 
-            int iFrom = 0;
-            int iTo = 360;
-            if (roughStartingAngle.HasValue)
-            {
-                iFrom = roughStartingAngle.Value - 10;
-                iTo = roughStartingAngle.Value + 10;
-            }
+            blackAndWhiteImage.AutoDetectAndRemoveTimeStamp();
 
-            bool peakFound = false;
-            for (int i = iFrom; i < iTo; i++)
-            {
-                var mapper = new RotationMapper(image.Width, image.Height, i);
-                PointF p1 = mapper.GetDestCoords(x0, y0);
-                float x1 = p1.X;
-                float y1 = p1.Y;
+            // Now apply the morphological thinning filter
+            blackAndWhiteImage.ApplyThinningFilter();
+            //blackAndWhiteImage.WriteBlackAndWhiteImageToFile(@"C:\Temp\ThinnedBW.png");
 
-                uint rowSum = 0;
-                uint pixAbove10 = 0;
-                uint pixAbove10Max = 0;
-                bool prevPixAbove10 = false;
-                uint pixAbove20 = 0;
-                uint pixAbove20Max = 0;
-                bool prevPixAbove20 = false;
-                uint pixAbove40 = 0;
-                uint pixAbove40Max = 0;
-                bool prevPixAbove40 = false;
-                
-                for (int d = minDistance; d < diagonnalPixels; d++)
-                {
-                    PointF p = mapper.GetSourceCoords(x1 + d, y1);
+            // Now identify the line segment(s) using the Hough transform
 
-                    if (p.X >= 0 && p.X < width && p.Y >= 0 && p.Y < height)
-                    {
-                        uint value = image.Pixelmap[(int) p.X, (int) p.Y];
-                        rowSum += value;
-                        PointF pu = mapper.GetSourceCoords(x1 + d, y1 + clearDist);
-                        PointF pd = mapper.GetSourceCoords(x1 + d, y1 - clearDist);
-                        if (pu.X >= 0 && pu.X < width && pu.Y >= 0 && pu.Y < height &&
-                            pd.X >= 0 && pd.X < width && pd.Y >= 0 && pd.Y < height)
-                        {
-                            uint value_u = image.Pixelmap[(int)pu.X, (int)pu.Y];
-                            uint value_d = image.Pixelmap[(int)pd.X, (int)pd.Y];
-                            if ((value - bgFromPsf) > brigthness10 && value > value_u && value > value_d)
-                            {
-                                if (prevPixAbove10) pixAbove10++;
-                                prevPixAbove10 = true;
-                            }
-                            else
-                            {
-                                prevPixAbove10 = false;
-                                if (pixAbove10Max < pixAbove10) pixAbove10Max = pixAbove10;
-                                pixAbove10 = 0;
-                                peakFound = true;
-                            }
-
-                            if ((value - bgFromPsf) > brigthness20 && value > value_u && value > value_d)
-                            {
-                                if (prevPixAbove20) pixAbove20++;
-                                prevPixAbove20 = true;
-                            }
-                            else
-                            {
-                                prevPixAbove20 = false;
-                                if (pixAbove20Max < pixAbove20) pixAbove20Max = pixAbove20;
-                                pixAbove20 = 0;
-                                peakFound = true;
-                            }
-
-                            if ((value - bgFromPsf) > brigthness40 && value > value_u && value > value_d)
-                            {
-                                if (prevPixAbove40) pixAbove40++;
-                                prevPixAbove40 = true;
-                            }
-                            else
-                            {
-                                prevPixAbove40 = false;
-                                if (pixAbove40Max < pixAbove40) pixAbove40Max = pixAbove40;
-                                pixAbove40 = 0;
-                                peakFound = true;
-                            } 
-                        }
-                        else
-                        {
-                            prevPixAbove10 = false;
-                            if (pixAbove10Max < pixAbove10) pixAbove10Max = pixAbove10;
-                            pixAbove10 = 0;
-
-                            prevPixAbove20 = false;
-                            if (pixAbove20Max < pixAbove20) pixAbove20Max = pixAbove20;
-                            pixAbove20 = 0;
-
-                            prevPixAbove40 = false;
-                            if (pixAbove40Max < pixAbove40) pixAbove40Max = pixAbove40;
-                            pixAbove40 = 0;
-
-                            peakFound = true;
-                        }
-                    }
-                }
-
-                angles[i] = (uint)i;
-                sums[i] = rowSum;
-                pixAbove10Perc[i] = pixAbove10Max;
-                pixAbove20Perc[i] = pixAbove20Max;
-                pixAbove40Perc[i] = pixAbove40Max;
-            }
-
-            if (!peakFound)
-                return float.NaN;
-
-            var angles10 = new List<uint>(angles).ToArray();
-            var angles20 = new List<uint>(angles).ToArray();
-            var angles40 = new List<uint>(angles).ToArray();
-
-            Array.Sort(sums, angles);
-            Array.Sort(pixAbove10Perc, angles10);
-            Array.Sort(pixAbove20Perc, angles20);
-            Array.Sort(pixAbove40Perc, angles40);
-
-            uint roughAngle = angles[359];
-
-            if (pixAbove10Perc[358] * 2 < pixAbove10Perc[359])
-            {
-                // If second best at 10% id a lot smaller score than the top 10% scopem then this is it
-                roughAngle = angles10[359];
-            }
-            else
-            {
-                if (Math.Abs((int)angles[358] - (int)angles[359]) > 3)// or for large stars the two best can be sequential angles
-                    return float.NaN;
-            }
-
-            uint bestSum = 0;
-            float bestAngle = 0f;
-
-            for (float a = roughAngle - 1; a < roughAngle + 1; a += 0.02f)
-            {
-                var mapper = new RotationMapper(image.Width, image.Height, a);
-                PointF p1 = mapper.GetDestCoords(x0, y0);
-                float x1 = p1.X;
-                float y1 = p1.Y;
-
-                uint rowSum = 0;
-
-                for (int d = minDistance; d < diagonnalPixels; d++)
-                {
-                    PointF p = mapper.GetSourceCoords(x1 + d, y1);
-
-                    if (p.X >= 0 && p.X < width && p.Y >= 0 && p.Y < height)
-                    {
-                        uint pixVal = image.Pixelmap[(int)p.X, (int)p.Y];
-                        rowSum += pixVal;
-                    }
-                }
-
-                if (rowSum > bestSum)
-                {
-                    bestSum = rowSum;
-                    bestAngle = a;
-                }
-            }
-
-            return bestAngle;
+            int roughHoughAngle = blackAndWhiteImage.CalculateRoughHoughAngle((int)roughStartingAngle);
+            //Console.WriteLine("Debugging - checking spectra to hough angle calculation: rough starting angle = {0}, hough angle = {1}", roughStartingAngle, roughHoughAngle);
+            //Stopwatch s = Stopwatch.StartNew();
+            blackAndWhiteImage.CalculateHoughTransformOfImage(roughHoughAngle);
+            //s.Stop();
+            //Console.WriteLine("Hough Transform took {0} ms", s.ElapsedMilliseconds);
+            //blackAndWhiteImage.WriteHoughImageToFile(@"C:\Temp\Hough.png");
+            blackAndWhiteImage.MaximumAllowedNumberOfLines = 1;
+            double houghAngle = blackAndWhiteImage.GetHoughAngle(roughHoughAngle);
+            float bestAngle0 = blackAndWhiteImage.CalculateBestAngle(houghAngle);
+            //Console.WriteLine("Debugging - checking hough to spectra angles: hough angle = {0}, spectra angle = {1}", houghAngle, bestAngle0);
+            //blackAndWhiteImage.WriteHoughImageToFile(@"C:\Temp\HoughWithPeaks.png");
+            return bestAngle0;
         }
 
-		internal MasterSpectra ComputeResult(
-            List<Spectra> allFramesSpectra, 
-            PixelCombineMethod frameCombineMethod, 
-            bool useFineAdjustments, 
+        internal MasterSpectra ComputeResult(
+            List<Spectra> allFramesSpectra,
+            PixelCombineMethod frameCombineMethod,
+            bool useFineAdjustments,
             int? alignmentAbsorptionLinePos,
             int startingFrameIndex = 1,
             int? frameCountToProcess = null)
         {
-			var masterSpectra = new MasterSpectra();
+            var masterSpectra = new MasterSpectra();
 
             if (allFramesSpectra.Count > 0)
             {
                 masterSpectra.ZeroOrderPixelNo = allFramesSpectra[0].ZeroOrderPixelNo;
                 masterSpectra.ZeroOrderFWHM = allFramesSpectra[0].ZeroOrderFWHM;
                 masterSpectra.SignalAreaWidth = allFramesSpectra[0].SignalAreaWidth;
-				masterSpectra.BackgroundAreaHalfWidth = allFramesSpectra[0].BackgroundAreaHalfWidth;
-				masterSpectra.BackgroundAreaGap = allFramesSpectra[0].BackgroundAreaGap;
+                masterSpectra.BackgroundAreaHalfWidth = allFramesSpectra[0].BackgroundAreaHalfWidth;
+                masterSpectra.BackgroundAreaGap = allFramesSpectra[0].BackgroundAreaGap;
                 masterSpectra.MaxPixelValue = allFramesSpectra[0].MaxPixelValue;
-				masterSpectra.MaxSpectraValue = allFramesSpectra[0].MaxSpectraValue;
+                masterSpectra.MaxSpectraValue = allFramesSpectra[0].MaxSpectraValue;
                 for (int i = 0; i < allFramesSpectra[0].Points.Count; i++)
                     masterSpectra.Points.Add(new SpectraPoint(allFramesSpectra[0].Points[i]));
 
-	            int pixelArrWidth = allFramesSpectra[0].Pixels.GetLength(0);
-				int pixelArrHeight = allFramesSpectra[0].Pixels.GetLength(1);
+                int pixelArrWidth = allFramesSpectra[0].Pixels.GetLength(0);
+                int pixelArrHeight = allFramesSpectra[0].Pixels.GetLength(1);
 
-				masterSpectra.InitialisePixelArray(pixelArrWidth);
+                masterSpectra.InitialisePixelArray(pixelArrWidth);
                 masterSpectra.CombinedMeasurements = 1;
 
                 var originalMasterPoints = new List<SpectraPoint>();
@@ -291,16 +141,16 @@ namespace Tangra.Controller
                 if (frameCountToProcess == null && startingFrameIndex == 1)
                     frameCountToProcess = allFramesSpectra.Count;
 
-	            if (frameCombineMethod == PixelCombineMethod.Average)
-	            {
-	                float fwhmSum = 0;
-	                int fwhmCount = 0;
+                if (frameCombineMethod == PixelCombineMethod.Average)
+                {
+                    float fwhmSum = 0;
+                    int fwhmCount = 0;
 
                     for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
-					{
+                    {
                         if (i < 0 || i > allFramesSpectra.Count - 1) continue;
 
-						Spectra nextSpectra = allFramesSpectra[i];
+                        Spectra nextSpectra = allFramesSpectra[i];
                         masterSpectra.RawMeasurements.Add(nextSpectra);
                         if (!float.IsNaN(nextSpectra.ZeroOrderFWHM))
                         {
@@ -308,106 +158,13 @@ namespace Tangra.Controller
                             fwhmCount++;
                         }
 
-						int nextSpectraFirstPixelNo = nextSpectra.Points[0].PixelNo;
-						int deltaIndex = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + masterSpectra.Points[0].PixelNo - nextSpectraFirstPixelNo;
+                        int nextSpectraFirstPixelNo = nextSpectra.Points[0].PixelNo;
+                        int deltaIndex = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + masterSpectra.Points[0].PixelNo - nextSpectraFirstPixelNo;
 
                         int lineAlignOffset = 0;
                         if (alignmentAbsorptionLinePos.HasValue)
                         {
-							int roughLinePos = deltaIndex + alignmentAbsorptionLinePos.Value;
-                            List<SpectraPoint> pointsInRegion = nextSpectra.Points.Where(x => Math.Abs(x.PixelNo - roughLinePos) < 10).ToList();
-                            float[] arrPixelNo = pointsInRegion.Select(x => (float)x.PixelNo).ToArray();
-                            float[] arrPixelValues = pointsInRegion.Select(x => x.RawValue).ToArray();
-                            Array.Sort(arrPixelValues, arrPixelNo);
-                            lineAlignOffset = (int)arrPixelNo[0] - roughLinePos;
-                        }
-
-					    int bestOffset = 0;
-
-                        if (useFineAdjustments)
-                        {
-                            float bestOffsetValue = float.MaxValue;
-
-                            for (int probeOffset = -2; probeOffset <= 2; probeOffset++)
-                            {
-                                float currOffsetValue = 0;
-                                for (int j = 0; j < masterSpectra.Points.Count; j++)
-                                {
-									int indexNextSpectra = deltaIndex + j + probeOffset + lineAlignOffset;
-                                    if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
-                                    {
-                                        currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
-                                    }
-                                }
-
-                                if (currOffsetValue < bestOffsetValue)
-                                {
-                                    bestOffsetValue = currOffsetValue;
-                                    bestOffset = probeOffset;
-                                }
-                            }                            
-                        }
-
-                        for (int j = 0; j < masterSpectra.Points.Count; j++)
-                        {
-							int indexNextSpectra = deltaIndex + j + bestOffset + lineAlignOffset;
-                            if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
-                            {
-                                masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
-                                masterSpectra.Points[j].RawSignal += nextSpectra.Points[indexNextSpectra].RawSignal;
-                                masterSpectra.Points[j].RawSignalPixelCount += nextSpectra.Points[indexNextSpectra].RawSignalPixelCount;
-
-								for (int h = 0; h < pixelArrHeight; h++)
-								{
-									masterSpectra.Pixels[j, h] += nextSpectra.Pixels[indexNextSpectra, h];
-								}
-                            }
-                        }
-					}
-
-                    masterSpectra.ZeroOrderFWHM = fwhmSum / fwhmCount;
-
-					// Normalize per row width
-					for (int i = 0; i < masterSpectra.Points.Count; i++)
-					{
-						if (Math.Abs(masterSpectra.Points[i].RawSignalPixelCount) < 0.0001)
-						{
-							masterSpectra.Points[i].RawValue = 0;
-							for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] = 0;
-						}
-						else
-						{
-							masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
-							for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] /= masterSpectra.Points[i].RawSignalPixelCount;
-						}
-						
-					}
-	            }
-				else if (frameCombineMethod == PixelCombineMethod.Median)
-				{
-                    var valueLists = new List<float>[masterSpectra.Points.Count];
-					for (int j = 0; j < masterSpectra.Points.Count; j++) valueLists[j] = new List<float>();
-
-                    var signalLists = new List<float>[masterSpectra.Points.Count];
-					for (int j = 0; j < masterSpectra.Points.Count; j++) signalLists[j] = new List<float>();
-
-                    var fwhmList = new List<float>();
-                    for (int j = 0; j < masterSpectra.Points.Count; j++) fwhmList.Add(float.NaN);
-
-                    for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
-                    {
-                        if (i < 0 || i > allFramesSpectra.Count - 1) continue;
-
-						Spectra nextSpectra = allFramesSpectra[i];
-                        masterSpectra.RawMeasurements.Add(nextSpectra);
-
-						int nextSpectraFirstPixelNo = nextSpectra.Points[0].PixelNo;
-						int deltaIndex = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + masterSpectra.Points[0].PixelNo - nextSpectraFirstPixelNo;
-
-                        int lineAlignOffset = 0;
-                        if (alignmentAbsorptionLinePos.HasValue)
-                        {
-							int roughLinePos = deltaIndex + alignmentAbsorptionLinePos.Value;
+                            int roughLinePos = deltaIndex + alignmentAbsorptionLinePos.Value;
                             List<SpectraPoint> pointsInRegion = nextSpectra.Points.Where(x => Math.Abs(x.PixelNo - roughLinePos) < 10).ToList();
                             float[] arrPixelNo = pointsInRegion.Select(x => (float)x.PixelNo).ToArray();
                             float[] arrPixelValues = pointsInRegion.Select(x => x.RawValue).ToArray();
@@ -426,7 +183,7 @@ namespace Tangra.Controller
                                 float currOffsetValue = 0;
                                 for (int j = 0; j < masterSpectra.Points.Count; j++)
                                 {
-									int indexNextSpectra = deltaIndex + j + probeOffset + lineAlignOffset;
+                                    int indexNextSpectra = deltaIndex + j + probeOffset + lineAlignOffset;
                                     if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
                                     {
                                         currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
@@ -441,100 +198,193 @@ namespace Tangra.Controller
                             }
                         }
 
-						for (int j = 0; j < masterSpectra.Points.Count; j++)
-						{
+                        for (int j = 0; j < masterSpectra.Points.Count; j++)
+                        {
+                            int indexNextSpectra = deltaIndex + j + bestOffset + lineAlignOffset;
+                            if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+                            {
+                                masterSpectra.Points[j].RawValue += nextSpectra.Points[indexNextSpectra].RawValue;
+                                masterSpectra.Points[j].RawSignal += nextSpectra.Points[indexNextSpectra].RawSignal;
+                                masterSpectra.Points[j].RawSignalPixelCount += nextSpectra.Points[indexNextSpectra].RawSignalPixelCount;
+
+                                for (int h = 0; h < pixelArrHeight; h++)
+                                {
+                                    masterSpectra.Pixels[j, h] += nextSpectra.Pixels[indexNextSpectra, h];
+                                }
+                            }
+                        }
+                    }
+
+                    masterSpectra.ZeroOrderFWHM = fwhmSum / fwhmCount;
+
+                    // Normalize per row width
+                    for (int i = 0; i < masterSpectra.Points.Count; i++)
+                    {
+                        if (Math.Abs(masterSpectra.Points[i].RawSignalPixelCount) < 0.0001)
+                        {
+                            masterSpectra.Points[i].RawValue = 0;
+                            for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] = 0;
+                        }
+                        else
+                        {
+                            masterSpectra.Points[i].RawValue = masterSpectra.Points[i].RawValue * masterSpectra.SignalAreaWidth / masterSpectra.Points[i].RawSignalPixelCount;
+                            for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] /= masterSpectra.Points[i].RawSignalPixelCount;
+                        }
+
+                    }
+                }
+                else if (frameCombineMethod == PixelCombineMethod.Median)
+                {
+                    var valueLists = new List<float>[masterSpectra.Points.Count];
+                    for (int j = 0; j < masterSpectra.Points.Count; j++) valueLists[j] = new List<float>();
+
+                    var signalLists = new List<float>[masterSpectra.Points.Count];
+                    for (int j = 0; j < masterSpectra.Points.Count; j++) signalLists[j] = new List<float>();
+
+                    var fwhmList = new List<float>();
+                    for (int j = 0; j < masterSpectra.Points.Count; j++) fwhmList.Add(float.NaN);
+
+                    for (int i = startingFrameIndex; i < startingFrameIndex + frameCountToProcess - 1; i++)
+                    {
+                        if (i < 0 || i > allFramesSpectra.Count - 1) continue;
+
+                        Spectra nextSpectra = allFramesSpectra[i];
+                        masterSpectra.RawMeasurements.Add(nextSpectra);
+
+                        int nextSpectraFirstPixelNo = nextSpectra.Points[0].PixelNo;
+                        int deltaIndex = nextSpectra.ZeroOrderPixelNo - masterSpectra.ZeroOrderPixelNo + masterSpectra.Points[0].PixelNo - nextSpectraFirstPixelNo;
+
+                        int lineAlignOffset = 0;
+                        if (alignmentAbsorptionLinePos.HasValue)
+                        {
+                            int roughLinePos = deltaIndex + alignmentAbsorptionLinePos.Value;
+                            List<SpectraPoint> pointsInRegion = nextSpectra.Points.Where(x => Math.Abs(x.PixelNo - roughLinePos) < 10).ToList();
+                            float[] arrPixelNo = pointsInRegion.Select(x => (float)x.PixelNo).ToArray();
+                            float[] arrPixelValues = pointsInRegion.Select(x => x.RawValue).ToArray();
+                            Array.Sort(arrPixelValues, arrPixelNo);
+                            lineAlignOffset = (int)arrPixelNo[0] - roughLinePos;
+                        }
+
+                        int bestOffset = 0;
+
+                        if (useFineAdjustments)
+                        {
+                            float bestOffsetValue = float.MaxValue;
+
+                            for (int probeOffset = -2; probeOffset <= 2; probeOffset++)
+                            {
+                                float currOffsetValue = 0;
+                                for (int j = 0; j < masterSpectra.Points.Count; j++)
+                                {
+                                    int indexNextSpectra = deltaIndex + j + probeOffset + lineAlignOffset;
+                                    if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+                                    {
+                                        currOffsetValue += Math.Abs(originalMasterPoints[j].RawValue - nextSpectra.Points[indexNextSpectra].RawValue);
+                                    }
+                                }
+
+                                if (currOffsetValue < bestOffsetValue)
+                                {
+                                    bestOffsetValue = currOffsetValue;
+                                    bestOffset = probeOffset;
+                                }
+                            }
+                        }
+
+                        for (int j = 0; j < masterSpectra.Points.Count; j++)
+                        {
                             fwhmList[j] = nextSpectra.ZeroOrderFWHM;
 
-							int indexNextSpectra = deltaIndex + j + bestOffset + lineAlignOffset;
-							if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
-							{
-								valueLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
-								signalLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
+                            int indexNextSpectra = deltaIndex + j + bestOffset + lineAlignOffset;
+                            if (indexNextSpectra >= 0 && indexNextSpectra < nextSpectra.Points.Count)
+                            {
+                                valueLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
+                                signalLists[j].Add(nextSpectra.Points[indexNextSpectra].RawValue);
 
-								for (int h = 0; h < pixelArrHeight; h++)
-								{
-									masterSpectra.Pixels[j, h] += nextSpectra.Pixels[indexNextSpectra, h];
-								}
-							}
-						}
-					}
+                                for (int h = 0; h < pixelArrHeight; h++)
+                                {
+                                    masterSpectra.Pixels[j, h] += nextSpectra.Pixels[indexNextSpectra, h];
+                                }
+                            }
+                        }
+                    }
 
-				    fwhmList.Sort();
+                    fwhmList.Sort();
                     masterSpectra.ZeroOrderFWHM = fwhmList.Count == 0 ? float.NaN : fwhmList[fwhmList.Count / 2];
-                    
-					for (int i = 0; i < masterSpectra.Points.Count; i++)
-					{
-						valueLists[i].Sort();
-						signalLists[i].Sort();
 
-						masterSpectra.Points[i].RawValue = valueLists[i].Count == 0 ? 0 : valueLists[i][valueLists[i].Count / 2];
-						masterSpectra.Points[i].RawSignal = signalLists[i].Count == 0 ? 0 : signalLists[i][signalLists[i].Count / 2];
-						masterSpectra.Points[i].RawSignalPixelCount = signalLists[i].Count;
+                    for (int i = 0; i < masterSpectra.Points.Count; i++)
+                    {
+                        valueLists[i].Sort();
+                        signalLists[i].Sort();
 
-						if (Math.Abs(masterSpectra.Points[i].RawSignalPixelCount) < 0.0001)
-							for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] = 0;
-						else
-							for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] /= masterSpectra.Points[i].RawSignalPixelCount;
-					}
-				}
+                        masterSpectra.Points[i].RawValue = valueLists[i].Count == 0 ? 0 : valueLists[i][valueLists[i].Count / 2];
+                        masterSpectra.Points[i].RawSignal = signalLists[i].Count == 0 ? 0 : signalLists[i][signalLists[i].Count / 2];
+                        masterSpectra.Points[i].RawSignalPixelCount = signalLists[i].Count;
+
+                        if (Math.Abs(masterSpectra.Points[i].RawSignalPixelCount) < 0.0001)
+                            for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] = 0;
+                        else
+                            for (int h = 0; h < pixelArrHeight; h++) masterSpectra.Pixels[i, h] /= masterSpectra.Points[i].RawSignalPixelCount;
+                    }
+                }
             }
 
-			return masterSpectra;
+            return masterSpectra;
         }
 
-		internal void DisplaySpectra(MasterSpectra masterSpectra, TangraConfig.PersistedConfiguration configuration, TangraConfig.SpectraViewDisplaySettings displaySettings, string fileName = null)
-	    {
-			EnsureViewSpectraForm(displaySettings);
+        internal void DisplaySpectra(MasterSpectra masterSpectra, TangraConfig.PersistedConfiguration configuration, TangraConfig.SpectraViewDisplaySettings displaySettings, string fileName = null)
+        {
+            EnsureViewSpectraForm(displaySettings);
 
-	        m_CurrentSpectra = masterSpectra;
+            m_CurrentSpectra = masterSpectra;
             m_Configuration = configuration;
             m_SpectraCalibrator = new SpectraCalibrator(masterSpectra);
 
             m_ViewSpectraForm.SetMasterSpectra(masterSpectra, fileName);
-	        m_ViewSpectraForm.StartPosition = FormStartPosition.CenterParent;
-			m_ViewSpectraForm.Show(m_MainFormView);
-	    }
+            m_ViewSpectraForm.StartPosition = FormStartPosition.CenterParent;
+            m_ViewSpectraForm.Show(m_MainFormView);
+        }
 
-	    public void EnsureViewSpectraFormClosed()
-	    {
-			if (m_ViewSpectraForm != null)
-			{
-				try
-				{
-					if (m_ViewSpectraForm.Visible) m_ViewSpectraForm.Close();
-					m_ViewSpectraForm.Dispose();
-				}
-				catch
-				{ }
+        public void EnsureViewSpectraFormClosed()
+        {
+            if (m_ViewSpectraForm != null)
+            {
+                try
+                {
+                    if (m_ViewSpectraForm.Visible) m_ViewSpectraForm.Close();
+                    m_ViewSpectraForm.Dispose();
+                }
+                catch
+                { }
 
-				try
-				{
-					m_ViewSpectraForm.Dispose();
-				}
-				catch
-				{ }
+                try
+                {
+                    m_ViewSpectraForm.Dispose();
+                }
+                catch
+                { }
 
-				m_ViewSpectraForm = null;
-			}
-	    }
+                m_ViewSpectraForm = null;
+            }
+        }
 
-	    public void EnsureViewSpectraForm(TangraConfig.SpectraViewDisplaySettings displaySettings)
-	    {
-		    EnsureViewSpectraFormClosed();
+        public void EnsureViewSpectraForm(TangraConfig.SpectraViewDisplaySettings displaySettings)
+        {
+            EnsureViewSpectraFormClosed();
 
-			m_ViewSpectraForm = new frmViewSpectra(this, m_VideoController, displaySettings);
-	    }
+            m_ViewSpectraForm = new frmViewSpectra(this, m_VideoController, displaySettings);
+        }
 
-		public void ConfigureSaveSpectraFileDialog(SaveFileDialog saveFileDialog)
-	    {
-			try
-			{
-				saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
-			    saveFileDialog.Filter = "Tangra Spectra Reduction (*.spectra)|*.spectra";
-				saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".spectra");
-			}
-			catch { /* In some rare cases m_VideoController.CurrentVideoFileName may throw an error. We want to ignore it. */ }
-	    }
+        public void ConfigureSaveSpectraFileDialog(SaveFileDialog saveFileDialog)
+        {
+            try
+            {
+                saveFileDialog.InitialDirectory = Path.GetDirectoryName(m_VideoController.CurrentVideoFileName);
+                saveFileDialog.Filter = "Tangra Spectra Reduction (*.spectra)|*.spectra";
+                saveFileDialog.FileName = Path.ChangeExtension(Path.GetFileName(m_VideoController.CurrentVideoFileName), ".spectra");
+            }
+            catch { /* In some rare cases m_VideoController.CurrentVideoFileName may throw an error. We want to ignore it. */ }
+        }
 
         public void ConfigureExportSpectraFileDialog(SaveFileDialog saveFileDialog, string videoFileName)
         {
@@ -547,18 +397,18 @@ namespace Tangra.Controller
             catch { /* In some rare cases m_VideoController.CurrentVideoFileName may throw an error. We want to ignore it. */ }
         }
 
-		public SpectraFileHeader GetSpectraFileHeader()
-	    {
-		    var rv = new SpectraFileHeader()
-		    {
-			    PathToVideoFile = m_VideoController.CurrentVideoFileName,
+        public SpectraFileHeader GetSpectraFileHeader()
+        {
+            var rv = new SpectraFileHeader()
+            {
+                PathToVideoFile = m_VideoController.CurrentVideoFileName,
                 Width = TangraContext.Current.FrameWidth,
                 Height = TangraContext.Current.FrameHeight,
                 BitPix = m_VideoController.VideoBitPix,
-				DataAav16NormVal = m_VideoController.VideoAav16NormVal,
+                DataAav16NormVal = m_VideoController.VideoAav16NormVal,
                 SourceInfo = string.Format("Video ({0})", m_VideoController.CurrentVideoFileType),
                 ObjectName = "",
-                Telescope =  "",
+                Telescope = "",
                 Instrument = "",
                 Recorder = "",
                 Observer = "",
@@ -566,9 +416,9 @@ namespace Tangra.Controller
                 DEC = float.NaN,
                 Longitude = float.NaN,
                 Latitude = float.NaN
-		    };
+            };
 
-		    VideoFileFormat fileFormat = m_VideoController.GetVideoFileFormat();
+            VideoFileFormat fileFormat = m_VideoController.GetVideoFileFormat();
             if (fileFormat.IsAAV())
             {
                 Dictionary<string, string> tags = m_VideoController.GetVideoFileTags();
@@ -587,33 +437,33 @@ namespace Tangra.Controller
                 if (!string.IsNullOrEmpty(ra)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.RA);
                 if (!string.IsNullOrEmpty(dec)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.DEC);
                 if (!string.IsNullOrEmpty(lng)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.Longitude);
-                if (!string.IsNullOrEmpty(lat)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.Latitude);                
+                if (!string.IsNullOrEmpty(lat)) float.TryParse(ra, NumberStyles.Float, CultureInfo.InvariantCulture, out rv.Latitude);
             }
 
-		    return rv;
-	    }
+            return rv;
+        }
 
-	    public void LoadSpectraFile()
-	    {
-			var openFileDialog = new OpenFileDialog()
-			{
-				Filter = "Tangra Spectra Reduction (*.spectra)|*.spectra",
-				CheckFileExists = true
-			};
+        public void LoadSpectraFile()
+        {
+            var openFileDialog = new OpenFileDialog()
+            {
+                Filter = "Tangra Spectra Reduction (*.spectra)|*.spectra",
+                CheckFileExists = true
+            };
 
-			if (openFileDialog.ShowDialog(m_MainFormView) == DialogResult.OK)
-			{
-				OpenSpectraFile(openFileDialog.FileName);
-			}
-	    }
+            if (openFileDialog.ShowDialog(m_MainFormView) == DialogResult.OK)
+            {
+                OpenSpectraFile(openFileDialog.FileName);
+            }
+        }
 
-	    internal void OpenSpectraFile(string fileName)
-	    {
-		    if (File.Exists(fileName))
-		    {
-				SpectraFile spectraFile = SpectraFile.Load(fileName);
-				if (spectraFile != null)
-				{
+        internal void OpenSpectraFile(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                SpectraFile spectraFile = SpectraFile.Load(fileName);
+                if (spectraFile != null)
+                {
                     DisplaySpectra(spectraFile.Data, null, m_DisplaySettings, fileName);
 
                     string videoFile = m_VideoController.GetVideoFileMatchingLcFile(spectraFile.Header.PathToVideoFile, fileName);
@@ -630,17 +480,17 @@ namespace Tangra.Controller
                         // NOTE: No video file found, just show the saved averaged frame
                         TangraContext.Current.Reset();
 
-						if (spectraFile.Data.MeasurementInfo.FrameBitmapPixels != null &&
-							spectraFile.Data.MeasurementInfo.FrameBitmapPixels.Length > 0)
-						{
-							if (m_VideoController.SingleBitmapFile(spectraFile.Data.MeasurementInfo.FrameBitmapPixels, spectraFile.Header.Width, spectraFile.Header.Height))
-							{
-								TangraContext.Current.CanPlayVideo = false;
-								m_VideoController.UpdateViews();
+                        if (spectraFile.Data.MeasurementInfo.FrameBitmapPixels != null &&
+                            spectraFile.Data.MeasurementInfo.FrameBitmapPixels.Length > 0)
+                        {
+                            if (m_VideoController.SingleBitmapFile(spectraFile.Data.MeasurementInfo.FrameBitmapPixels, spectraFile.Header.Width, spectraFile.Header.Height))
+                            {
+                                TangraContext.Current.CanPlayVideo = false;
+                                m_VideoController.UpdateViews();
 
-								PSFFit.SetDataRange(spectraFile.Header.BitPix, spectraFile.Header.DataAav16NormVal);
-							}
-						}
+                                PSFFit.SetDataRange(spectraFile.Header.BitPix, spectraFile.Header.DataAav16NormVal);
+                            }
+                        }
 
                         TangraContext.Current.CanPlayVideo = false;
                         TangraContext.Current.CanScrollFrames = false;
@@ -649,11 +499,11 @@ namespace Tangra.Controller
                     TangraContext.Current.FileName = Path.GetFileName(fileName);
                     TangraContext.Current.FileFormat = spectraFile.Header.SourceInfo;
                     m_VideoController.UpdateViews();
-				}
+                }
 
-		        RegisterRecentSpectraFile(fileName);
-		    }
-	    }
+                RegisterRecentSpectraFile(fileName);
+            }
+        }
 
         internal void RegisterRecentSpectraFile(string fileName)
         {
@@ -662,7 +512,7 @@ namespace Tangra.Controller
 
         internal void SetMarker(float pixelPos, float wavelength, bool attemptCalibration, int polynomialOrder)
         {
-			m_SpectraCalibrator.SetMarker(pixelPos, wavelength, attemptCalibration, polynomialOrder);
+            m_SpectraCalibrator.SetMarker(pixelPos, wavelength, attemptCalibration, polynomialOrder);
         }
 
         internal void SetFirstOrderDispersion(float dispersion)
@@ -684,41 +534,41 @@ namespace Tangra.Controller
         internal void SelectPixel(int pixelNo)
         {
             float waveLength = m_SpectraCalibrator.ResolveWavelength(pixelNo);
-			m_ViewSpectraForm.DisplaySelectedDataPoint(pixelNo, waveLength);
+            m_ViewSpectraForm.DisplaySelectedDataPoint(pixelNo, waveLength);
         }
 
-	    internal void DeselectPixel()
-	    {
-		    m_ViewSpectraForm.ClearSelectedDataPoint();
-	    }
+        internal void DeselectPixel()
+        {
+            m_ViewSpectraForm.ClearSelectedDataPoint();
+        }
 
-	    internal SpectraCalibration GetSpectraCalibration()
-	    {
-		    if (IsCalibrated())
-			    return m_SpectraCalibrator.ToSpectraCalibration();
+        internal SpectraCalibration GetSpectraCalibration()
+        {
+            if (IsCalibrated())
+                return m_SpectraCalibrator.ToSpectraCalibration();
 
-		    return null;
-	    }
+            return null;
+        }
 
         internal MeasurementInfo GetMeasurementInfo()
         {
             return new MeasurementInfo()
             {
-               FramesToMeasure = SpectraReductionContext.FramesToMeasure,
-               MeasurementAreaWing = SpectraReductionContext.MeasurementAreaWing,
-               BackgroundAreaWing = SpectraReductionContext.BackgroundAreaWing,
-			   BackgroundAreaGap = SpectraReductionContext.BackgroundAreaGap,
-               BackgroundMethod = SpectraReductionContext.BackgroundMethod,
-               FrameCombineMethod = SpectraReductionContext.FrameCombineMethod,
-               UseFineAdjustments = SpectraReductionContext.UseFineAdjustments,
-               AlignmentAbsorptionLinePos = SpectraReductionContext.AlignmentAbsorptionLinePos
+                FramesToMeasure = SpectraReductionContext.FramesToMeasure,
+                MeasurementAreaWing = SpectraReductionContext.MeasurementAreaWing,
+                BackgroundAreaWing = SpectraReductionContext.BackgroundAreaWing,
+                BackgroundAreaGap = SpectraReductionContext.BackgroundAreaGap,
+                BackgroundMethod = SpectraReductionContext.BackgroundMethod,
+                FrameCombineMethod = SpectraReductionContext.FrameCombineMethod,
+                UseFineAdjustments = SpectraReductionContext.UseFineAdjustments,
+                AlignmentAbsorptionLinePos = SpectraReductionContext.AlignmentAbsorptionLinePos
             };
         }
 
-		public void OnSpectraViewerClosed()
-		{
-			m_VideoController.CloseOpenedVideoFile();
-		}
+        public void OnSpectraViewerClosed()
+        {
+            m_VideoController.CloseOpenedVideoFile();
+        }
 
         internal void SaveCalibratedConfiguration()
         {
@@ -742,116 +592,116 @@ namespace Tangra.Controller
             }
         }
 
-		internal string ExportToDat(MasterSpectra spectra)
-	    {
-			SpectraCalibrator calibrator = GetSpectraCalibrator();
-			var bld = new StringBuilder();
+        internal string ExportToDat(MasterSpectra spectra)
+        {
+            SpectraCalibrator calibrator = GetSpectraCalibrator();
+            var bld = new StringBuilder();
 
-			AddDatExportHeader(bld, spectra);
+            AddDatExportHeader(bld, spectra);
 
-			foreach (SpectraPoint point in spectra.Points)
-			{
-				float wavelength = calibrator.ResolveWavelength(point.PixelNo);
-				if (wavelength < 0) continue;
-				bld.AppendFormat("{0}\t{1}\r\n", wavelength, point.RawValue);
-			}
+            foreach (SpectraPoint point in spectra.Points)
+            {
+                float wavelength = calibrator.ResolveWavelength(point.PixelNo);
+                if (wavelength < 0) continue;
+                bld.AppendFormat("{0}\t{1}\r\n", wavelength, point.RawValue);
+            }
 
-			return bld.ToString();
-	    }
+            return bld.ToString();
+        }
 
-		internal void PopulateMasterSpectraObservationDetails(MasterSpectra spectra)
-	    {
-			var dict = m_VideoController.GetVideoFileTags();
+        internal void PopulateMasterSpectraObservationDetails(MasterSpectra spectra)
+        {
+            var dict = m_VideoController.GetVideoFileTags();
 
-			float lng = float.NaN;
-			float lat = float.NaN;
-			float ra = float.NaN;
-			float dec = float.NaN;
-			DateTime? centralTime = null;
+            float lng = float.NaN;
+            float lat = float.NaN;
+            float ra = float.NaN;
+            float dec = float.NaN;
+            DateTime? centralTime = null;
 
-			if (spectra.ObservationInfo == null) spectra.ObservationInfo = new ObservationInfo();
-			spectra.ObservationInfo.Reset();
+            if (spectra.ObservationInfo == null) spectra.ObservationInfo = new ObservationInfo();
+            spectra.ObservationInfo.Reset();
 
-			if (dict.ContainsKey("Longitude"))
-			{
-				if (float.TryParse(dict["Longitude"], NumberStyles.Float, CultureInfo.InvariantCulture, out lng))
-					spectra.ObservationInfo.AddProperty("Longitude", lng.ToString("0.0000", CultureInfo.InvariantCulture));
-			}
-			if (dict.ContainsKey("Latitude"))
-			{
-				if (float.TryParse(dict["Latitude"], NumberStyles.Float, CultureInfo.InvariantCulture, out lat))
-					spectra.ObservationInfo.AddProperty("Latitude", lat.ToString("0.0000", CultureInfo.InvariantCulture));
-			}
-			if (dict.ContainsKey("RA"))
-			{
-				if (float.TryParse(dict["RA"], NumberStyles.Float, CultureInfo.InvariantCulture, out ra))
-					spectra.ObservationInfo.AddProperty("RA", ra.ToString("0.0000", CultureInfo.InvariantCulture), "hours");
-			}
-			if (dict.ContainsKey("DEC"))
-			{
-				if (float.TryParse(dict["DEC"], NumberStyles.Float, CultureInfo.InvariantCulture, out dec))
-					spectra.ObservationInfo.AddProperty("DEC", dec.ToString("0.0000", CultureInfo.InvariantCulture), "degrees");
-			}
-			if (spectra.MeasurementInfo.FirstFrameTimeStamp.HasValue && spectra.MeasurementInfo.LastFrameTimeStamp.HasValue)
-			{
-				centralTime = new DateTime((spectra.MeasurementInfo.FirstFrameTimeStamp.Value.Ticks + spectra.MeasurementInfo.LastFrameTimeStamp.Value.Ticks) / 2);
-				double jd = JulianDayHelper.JDUtcAtDate(centralTime.Value);
-				spectra.ObservationInfo.AddProperty("JD", jd.ToString("0.00000", CultureInfo.InvariantCulture), "UT");
-			}
+            if (dict.ContainsKey("Longitude"))
+            {
+                if (float.TryParse(dict["Longitude"], NumberStyles.Float, CultureInfo.InvariantCulture, out lng))
+                    spectra.ObservationInfo.AddProperty("Longitude", lng.ToString("0.0000", CultureInfo.InvariantCulture));
+            }
+            if (dict.ContainsKey("Latitude"))
+            {
+                if (float.TryParse(dict["Latitude"], NumberStyles.Float, CultureInfo.InvariantCulture, out lat))
+                    spectra.ObservationInfo.AddProperty("Latitude", lat.ToString("0.0000", CultureInfo.InvariantCulture));
+            }
+            if (dict.ContainsKey("RA"))
+            {
+                if (float.TryParse(dict["RA"], NumberStyles.Float, CultureInfo.InvariantCulture, out ra))
+                    spectra.ObservationInfo.AddProperty("RA", ra.ToString("0.0000", CultureInfo.InvariantCulture), "hours");
+            }
+            if (dict.ContainsKey("DEC"))
+            {
+                if (float.TryParse(dict["DEC"], NumberStyles.Float, CultureInfo.InvariantCulture, out dec))
+                    spectra.ObservationInfo.AddProperty("DEC", dec.ToString("0.0000", CultureInfo.InvariantCulture), "degrees");
+            }
+            if (spectra.MeasurementInfo.FirstFrameTimeStamp.HasValue && spectra.MeasurementInfo.LastFrameTimeStamp.HasValue)
+            {
+                centralTime = new DateTime((spectra.MeasurementInfo.FirstFrameTimeStamp.Value.Ticks + spectra.MeasurementInfo.LastFrameTimeStamp.Value.Ticks) / 2);
+                double jd = JulianDayHelper.JDUtcAtDate(centralTime.Value);
+                spectra.ObservationInfo.AddProperty("JD", jd.ToString("0.00000", CultureInfo.InvariantCulture), "UT");
+            }
 
-			if (!float.IsNaN(lng) && !float.IsNaN(lat) && !float.IsNaN(ra) && !float.IsNaN(dec) && centralTime.HasValue)
-			{
-				var extCalc = new AtmosphericExtinctionCalculator(ra, dec, lng, lat, 0);
-				double airMass;
-				double altitudeDeg;
-				extCalc.CalculateExtinction(centralTime.Value, out altitudeDeg, out airMass);
+            if (!float.IsNaN(lng) && !float.IsNaN(lat) && !float.IsNaN(ra) && !float.IsNaN(dec) && centralTime.HasValue)
+            {
+                var extCalc = new AtmosphericExtinctionCalculator(ra, dec, lng, lat, 0);
+                double airMass;
+                double altitudeDeg;
+                extCalc.CalculateExtinction(centralTime.Value, out altitudeDeg, out airMass);
 
-				spectra.ObservationInfo.AddProperty("X", airMass.ToString("0.000", CultureInfo.InvariantCulture), "air mass");
-			}
+                spectra.ObservationInfo.AddProperty("X", airMass.ToString("0.000", CultureInfo.InvariantCulture), "air mass");
+            }
 
             if (!float.IsNaN(spectra.ZeroOrderFWHM)) spectra.ObservationInfo.AddProperty("FWHM", spectra.ZeroOrderFWHM.ToString("0.00"), "zero order image FWHM");
 
-			if (!float.IsNaN(spectra.MeasurementInfo.Gain)) spectra.ObservationInfo.AddProperty("Gain", spectra.MeasurementInfo.Gain.ToString("0.0", CultureInfo.InvariantCulture), "dB");
-			if (!float.IsNaN(spectra.MeasurementInfo.ExposureSeconds)) spectra.ObservationInfo.AddProperty("Exposure", spectra.MeasurementInfo.ExposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "sec");
+            if (!float.IsNaN(spectra.MeasurementInfo.Gain)) spectra.ObservationInfo.AddProperty("Gain", spectra.MeasurementInfo.Gain.ToString("0.0", CultureInfo.InvariantCulture), "dB");
+            if (!float.IsNaN(spectra.MeasurementInfo.ExposureSeconds)) spectra.ObservationInfo.AddProperty("Exposure", spectra.MeasurementInfo.ExposureSeconds.ToString("0.000", CultureInfo.InvariantCulture), "sec");
 
-			if (dict.ContainsKey("ObjectName")) spectra.ObservationInfo.AddProperty("Target", dict["ObjectName"]);
-			if (dict.ContainsKey("Instrument")) spectra.ObservationInfo.AddProperty("Camera", dict["Instrument"]);
-			if (dict.ContainsKey("Telescope")) spectra.ObservationInfo.AddProperty("Telescope", dict["Telescope"]);
-			if (dict.ContainsKey("Recorder")) spectra.ObservationInfo.AddProperty("Recorder", dict["Recorder"]);
-			if (dict.ContainsKey("Observer")) spectra.ObservationInfo.AddProperty("Observer", dict["Observer"]);
+            if (dict.ContainsKey("ObjectName")) spectra.ObservationInfo.AddProperty("Target", dict["ObjectName"]);
+            if (dict.ContainsKey("Instrument")) spectra.ObservationInfo.AddProperty("Camera", dict["Instrument"]);
+            if (dict.ContainsKey("Telescope")) spectra.ObservationInfo.AddProperty("Telescope", dict["Telescope"]);
+            if (dict.ContainsKey("Recorder")) spectra.ObservationInfo.AddProperty("Recorder", dict["Recorder"]);
+            if (dict.ContainsKey("Observer")) spectra.ObservationInfo.AddProperty("Observer", dict["Observer"]);
 
-			if (spectra.IsCalibrated())
-			{
-				if (spectra.Calibration.PolynomialOrder == 1)
-					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("1-st order[{0},{1}]", spectra.Calibration.A, spectra.Calibration.B));
-				else if (spectra.Calibration.PolynomialOrder == 2)
-					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("2-nd order[{0},{1},{2}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C));
-				else if (spectra.Calibration.PolynomialOrder == 3)
-					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("3-rd order[{0},{1},{2},{3}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C, spectra.Calibration.D));
-				else if (spectra.Calibration.PolynomialOrder == 4)
-					spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("4-th order[{0},{1},{2},{3},{4}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C, spectra.Calibration.D, spectra.Calibration.E));
+            if (spectra.IsCalibrated())
+            {
+                if (spectra.Calibration.PolynomialOrder == 1)
+                    spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("1-st order[{0},{1}]", spectra.Calibration.A, spectra.Calibration.B));
+                else if (spectra.Calibration.PolynomialOrder == 2)
+                    spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("2-nd order[{0},{1},{2}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C));
+                else if (spectra.Calibration.PolynomialOrder == 3)
+                    spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("3-rd order[{0},{1},{2},{3}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C, spectra.Calibration.D));
+                else if (spectra.Calibration.PolynomialOrder == 4)
+                    spectra.ObservationInfo.AddProperty("WavelengthCalibration", string.Format("4-th order[{0},{1},{2},{3},{4}]", spectra.Calibration.A, spectra.Calibration.B, spectra.Calibration.C, spectra.Calibration.D, spectra.Calibration.E));
 
-				spectra.ObservationInfo.AddProperty("Dispersion", spectra.Calibration.Dispersion.ToString("0.00", CultureInfo.InvariantCulture), "A/pix");
-			}
-	    }
+                spectra.ObservationInfo.AddProperty("Dispersion", spectra.Calibration.Dispersion.ToString("0.00", CultureInfo.InvariantCulture), "A/pix");
+            }
+        }
 
         internal void AddDatExportHeader(StringBuilder output, MasterSpectra spectra)
         {
-			if (spectra.ObservationInfo.IsEmpty)
-				PopulateMasterSpectraObservationDetails(spectra);
+            if (spectra.ObservationInfo.IsEmpty)
+                PopulateMasterSpectraObservationDetails(spectra);
 
-	        string[] propNames = spectra.ObservationInfo.GetPropertyNames();
+            string[] propNames = spectra.ObservationInfo.GetPropertyNames();
 
-	        foreach (string name in propNames)
-	        {
-		        string value = spectra.ObservationInfo.GetProperty(name);
-				string comment = spectra.ObservationInfo.GetPropertyComment(name);
+            foreach (string name in propNames)
+            {
+                string value = spectra.ObservationInfo.GetProperty(name);
+                string comment = spectra.ObservationInfo.GetPropertyComment(name);
 
-				if (!string.IsNullOrEmpty(comment))
-					output.AppendFormat("# {0}={1} #{2}\r\n", name, value, comment);
-				else
-					output.AppendFormat("# {0}={1}\r\n", name, value);
-	        }
+                if (!string.IsNullOrEmpty(comment))
+                    output.AppendFormat("# {0}={1} #{2}\r\n", name, value, comment);
+                else
+                    output.AppendFormat("# {0}={1}\r\n", name, value);
+            }
             output.AppendLine();
         }
     }
