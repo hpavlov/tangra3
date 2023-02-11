@@ -356,6 +356,12 @@ namespace Tangra.VideoOperations.ConvertVideoToAav
 
         private void btnDetectIntegrationRate_Click(object sender, EventArgs e)
         {
+            if (m_VideoController.IsPlainAviVideo)
+            {
+                var frmDef = new frmCorrectInterlacedDefects(m_VideoController);
+                frmDef.ShowDialog();
+            }
+
             var intDetController = new IntegrationDetectionController(m_VideoController, (int)nudFirstFrame.Value);
             using (var frm = new frmIntegrationDetection(intDetController, m_VideoController))
             {
