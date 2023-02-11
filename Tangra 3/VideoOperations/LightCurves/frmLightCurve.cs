@@ -975,11 +975,6 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void NormalizationMenuItemChecked(object sender, EventArgs e)
         {
-            // Remove the checkbox from the sub menu items
-            DrawColoredRectangle(miNormalisation1, 0, true);
-            DrawColoredRectangle(miNormalisation2, 1, true);
-            DrawColoredRectangle(miNormalisation3, 2, true);
-            DrawColoredRectangle(miNormalisation4, 3, true);
 
             if (sender == miNoNormalization)
             {
@@ -992,62 +987,143 @@ namespace Tangra.VideoOperations.LightCurves
                 m_LightCurveController.Context.Normalisation = -1;
                 tslblNormalisation.Text = "No Normalisation";
                 tslblNormalisation.Image = null;
+
+                for (int i=0; i < m_Header.ObjectCount; i++)
+                {
+                    m_LightCurveController.Context.Normalisations[i] = false;
+                }
+
+                DrawColoredRectangle(miNormalisation1, 0, true);
+                DrawColoredRectangle(miNormalisation2, 1, true);
+                DrawColoredRectangle(miNormalisation3, 2, true);
+                DrawColoredRectangle(miNormalisation4, 3, true);
+
             }
             else if (sender == miNormalisation1)
             {
-                miNoNormalization.Checked = false;
-                miNormalisation1.Checked = true;
-                miNormalisation2.Checked = false;
-                miNormalisation3.Checked = false;
-                miNormalisation4.Checked = false;
+                // toggle the state of the normalisation star
+                m_LightCurveController.Context.Normalisations[0] ^= true;
 
-                m_LightCurveController.Context.Normalisation = 0;
-                tslblNormalisation.Text = "Normalised";
-                DrawColoredRectangle(tslblNormalisation, 0, true);
-                DrawColoredRectangleWithCheckBox(miNormalisation1, 0);
+                if (m_LightCurveController.Context.Normalisations[0])
+                {
+                    miNoNormalization.Checked = false;
+                    miNormalisation1.Checked = true;
+
+                    m_LightCurveController.Context.Normalisation = 0;
+                    tslblNormalisation.Text = "Normalised";
+
+                    DrawColoredRectangleWithCheckBox(miNormalisation1, 0);
+                }
+                else
+                {
+                    miNormalisation1.Checked = false;
+                    m_LightCurveController.Context.Normalisation = -1;
+                    DrawColoredRectangle(miNormalisation1, 0, true);
+                }
             }
             else if (sender == miNormalisation2)
             {
-                miNoNormalization.Checked = false;
-                miNormalisation1.Checked = false;
-                miNormalisation2.Checked = true;
-                miNormalisation3.Checked = false;
-                miNormalisation4.Checked = false;
+                m_LightCurveController.Context.Normalisations[1] ^= true;
 
-                m_LightCurveController.Context.Normalisation = 1;
-                tslblNormalisation.Text = "Normalised";
-                DrawColoredRectangle(tslblNormalisation, 1, true);
-                DrawColoredRectangleWithCheckBox(miNormalisation2, 1);
+
+                if (m_LightCurveController.Context.Normalisations[1])
+                {
+                    miNoNormalization.Checked = false;
+                    miNormalisation2.Checked = true;
+
+                    m_LightCurveController.Context.Normalisation = 1;
+                    tslblNormalisation.Text = "Normalised";
+
+                    DrawColoredRectangleWithCheckBox(miNormalisation2, 1);
+                }
+                else
+                {
+                    miNormalisation2.Checked = false;
+                    m_LightCurveController.Context.Normalisation = -1;
+                    DrawColoredRectangle(miNormalisation2, 1, true);
+                }
             }
             else if (sender == miNormalisation3)
             {
-                miNoNormalization.Checked = false;
-                miNormalisation1.Checked = false;
-                miNormalisation2.Checked = false;
-                miNormalisation3.Checked = true;
-                miNormalisation4.Checked = false;
+                m_LightCurveController.Context.Normalisations[2] ^= true;
 
-                m_LightCurveController.Context.Normalisation = 2;
-                tslblNormalisation.Text = "Normalised";
-                DrawColoredRectangle(tslblNormalisation, 2, true);
-                DrawColoredRectangleWithCheckBox(miNormalisation3, 2);
+                if (m_LightCurveController.Context.Normalisations[2])
+                {
+                    miNoNormalization.Checked = false;
+                    miNormalisation3.Checked = true;
+
+                    m_LightCurveController.Context.Normalisation = 2;
+                    tslblNormalisation.Text = "Normalised";
+
+                    DrawColoredRectangleWithCheckBox(miNormalisation3, 2);
+                }
+                else
+                {
+                    miNormalisation3.Checked = false;
+                    m_LightCurveController.Context.Normalisation = -1;
+                    DrawColoredRectangle(miNormalisation3, 2, true);
+                }
             }
             else if (sender == miNormalisation4)
             {
-                miNoNormalization.Checked = false;
-                miNormalisation1.Checked = false;
-                miNormalisation2.Checked = false;
-                miNormalisation3.Checked = false;
-                miNormalisation4.Checked = true;
+                m_LightCurveController.Context.Normalisations[3] ^= true;
 
-                m_LightCurveController.Context.Normalisation = 3;                
-                tslblNormalisation.Text = "Normalised";
-                DrawColoredRectangle(tslblNormalisation, 3, true);
-                DrawColoredRectangleWithCheckBox(miNormalisation4, 3);
+                if (m_LightCurveController.Context.Normalisations[3])
+                {
+                    miNoNormalization.Checked = false;
+                    miNormalisation4.Checked = true;
+
+                    m_LightCurveController.Context.Normalisation = 3;
+                    tslblNormalisation.Text = "Normalised";
+
+                    DrawColoredRectangleWithCheckBox(miNormalisation4, 3);
+                }
+                else
+                {
+                    miNormalisation4.Checked = false;
+                    m_LightCurveController.Context.Normalisation = -1;
+                    DrawColoredRectangle(miNormalisation4, 3, true);
+                }
             }
+
+            tsblDrawNormalisationImage();
 
             statusStrip1.Refresh();
             pnlChart.Invalidate();
+        }
+
+        private void tsblDrawNormalisationImage()
+        {
+            int numChecked = 0;
+            for (int i=0; i < m_Header.ObjectCount; i++)
+            {
+                if (m_LightCurveController.Context.Normalisations[i]) numChecked++;
+            }
+
+            if (numChecked > 0)
+            {
+                m_LightCurveController.Context.Normalisation = numChecked; // set to force the lightcurve to be redrawn
+                if (tslblNormalisation.Image == null) tslblNormalisation.Image = new Bitmap(16, 16);
+                DrawIncludedObjectImage(tslblNormalisation.Image, numChecked, m_LightCurveController.Context.Normalisations);
+            }
+            else
+            {
+                miNoNormalization.Checked = true;
+                miNormalisation1.Checked = false;
+                miNormalisation2.Checked = false;
+                miNormalisation3.Checked = false;
+                miNormalisation4.Checked = false;
+
+                m_LightCurveController.Context.Normalisation = -1;
+                tslblNormalisation.Text = "No Normalisation";
+                tslblNormalisation.Image = null;
+
+                DrawColoredRectangle(miNormalisation1, 0, true);
+                DrawColoredRectangle(miNormalisation2, 1, true);
+                DrawColoredRectangle(miNormalisation3, 2, true);
+                DrawColoredRectangle(miNormalisation4, 3, true);
+            }
+
         }
 
         private bool m_Reprocessing = false;
@@ -1138,34 +1214,7 @@ namespace Tangra.VideoOperations.LightCurves
             miNormalisation3.Checked = false;
             miNormalisation4.Checked = false;
 
-            switch (m_LightCurveController.Context.Normalisation)
-            {
-                case -1:
-                    miNoNormalization.Checked = true;
-                    tslblNormalisation.Text = "No Normalisation";
-                    tslblNormalisation.Image = null;
-                    break;
-                case 0:
-                    miNormalisation1.Checked = true;
-                    tslblNormalisation.Text = "Normalised";
-                    DrawColoredRectangle(tslblNormalisation, 0, true);
-                    break;
-                case 1:
-                    miNormalisation2.Checked = true;
-                    tslblNormalisation.Text = "Normalised";
-                    DrawColoredRectangle(tslblNormalisation, 1, true);
-                    break;
-                case 2:
-                    miNormalisation3.Checked = true;
-                    tslblNormalisation.Text = "Normalised";
-                    DrawColoredRectangle(tslblNormalisation, 2, true);
-                    break;
-                case 3:
-                    miNormalisation4.Checked = true;
-                    tslblNormalisation.Text = "Normalised";
-                    DrawColoredRectangle(tslblNormalisation, 3, true);
-                    break;
-            }
+            tsblDrawNormalisationImage();
 
             miNormalisation16DataPoints.Enabled = m_LightCurveController.Context.Normalisation >= 0;
             miNormalisation8DataPoints.Enabled = m_LightCurveController.Context.Normalisation >= 0;
@@ -1226,12 +1275,12 @@ namespace Tangra.VideoOperations.LightCurves
                 DrawColoredRectangleWithCheckBox(menuItems[i], i);
             }
 
-            DrawIncludedObjectImage(miIncludeObject.Image, numChecked);
+            DrawIncludedObjectImage(miIncludeObject.Image, numChecked, m_IncludeObjects);
             statusStrip1.Refresh();
             #endregion
         }
 
-        private void DrawIncludedObjectImage(Image img, int numObjects)
+        private void DrawIncludedObjectImage(Image img, int numObjects, bool[] includeObjects)
         {
             using(Graphics g = Graphics.FromImage(img))
             {
@@ -1241,7 +1290,7 @@ namespace Tangra.VideoOperations.LightCurves
                     {
                         for (int i = 0; i < 4; i++)
                         {
-                            if (m_IncludeObjects[i])
+                            if (includeObjects[i])
                             {
                                 g.Clear(m_DisplaySettings.TargetColors[i]);
                                 g.Save();
@@ -1254,7 +1303,7 @@ namespace Tangra.VideoOperations.LightCurves
                         int objDrawn = 0;
                         for (int i = 0; i < 4; i++)
                         {
-                            if (m_IncludeObjects[i])
+                            if (includeObjects[i])
                             {
                                 if (objDrawn == 0)
                                 {
@@ -1276,7 +1325,7 @@ namespace Tangra.VideoOperations.LightCurves
                         int objDrawn = 0;
                         for (int i = 0; i < 4; i++)
                         {
-                            if (m_IncludeObjects[i])
+                            if (includeObjects[i])
                             {
                                 if (objDrawn == 0)
                                 {
@@ -1305,7 +1354,7 @@ namespace Tangra.VideoOperations.LightCurves
                         int objDrawn = 0;
                         for (int i = 0; i < 4; i++)
                         {
-                            if (m_IncludeObjects[i])
+                            if (includeObjects[i])
                             {
                                 if (objDrawn == 0)
                                 {
