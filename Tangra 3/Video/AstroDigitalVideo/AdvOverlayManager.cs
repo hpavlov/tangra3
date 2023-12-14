@@ -69,7 +69,7 @@ namespace Tangra.Video.AstroDigitalVideo
                 if (m_CurrentImageWidth != currentImage.Width)
                     ComputeFontSizeAndTimeStampPosition(g, currentImage.Width, currentImage.Height);
 
-				if (isAstroDigitalVideo)
+				if (isAstroDigitalVideo && !isAstroAnalogueVideo)
                     OverlayADVState(g, currentImage, state, context);	
 				else if (isAstroAnalogueVideo)
                     OverlayAAVState(g, currentImage, state, context);
