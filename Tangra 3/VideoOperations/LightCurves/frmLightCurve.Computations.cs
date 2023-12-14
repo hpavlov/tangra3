@@ -269,44 +269,84 @@ namespace Tangra.VideoOperations.LightCurves
 
         private void PerformNormalization()
         {
+            // Calculate the normalisation factor for each star chosen as a normalisation star
+            // and then calculate the normalisation factor averaged over all normalisation stars.
+
             List<double> normalIndexes = new List<double>();
+            List<double> averagedNormalIndexes = new List<double>();
 
-            switch(m_LightCurveController.Context.NormMethod)
+            int numberOfNormalisationStars = 0;
+
+            for (int starIndx = 0; starIndx < m_Header.ObjectCount; starIndx++)
             {
-                case LightCurveContext.NormalisationMethod.LinearFit:
-                    if (m_LightCurveController.Context.Binning > 0)
-                        PerformLinearFitBinnedNormalisation(ref normalIndexes);
-                    else
-                        PerformLinearFitReadingsNormalisation(ref normalIndexes);
-                    break;
+                
+                if (!m_LightCurveController.Context.Normalisations[starIndx]) continue;
 
-                case LightCurveContext.NormalisationMethod.FrameByFrame:
-                    if (m_LightCurveController.Context.Binning > 0)
-                        PerformAverageBinnedNormalisation(ref normalIndexes, 1);
-                    else
-                        PerformAverageReadingsNormalisation(ref normalIndexes, 1);
-                    break;
+                normalIndexes.Clear();
 
-                case LightCurveContext.NormalisationMethod.Average4Frame:
-                    if (m_LightCurveController.Context.Binning > 0)
-                        PerformAverageBinnedNormalisation(ref normalIndexes, 4);
-                    else
-                        PerformAverageReadingsNormalisation(ref normalIndexes, 4);
-                    break;
+                numberOfNormalisationStars++;
 
-				case LightCurveContext.NormalisationMethod.Average8Frame:
-					if (m_LightCurveController.Context.Binning > 0)
-						PerformAverageBinnedNormalisation(ref normalIndexes, 8);
-					else
-						PerformAverageReadingsNormalisation(ref normalIndexes, 8);
-					break;
+                m_LightCurveController.Context.Normalisation = starIndx;
 
-                case LightCurveContext.NormalisationMethod.Average16Frame:
-                    if (m_LightCurveController.Context.Binning > 0)
-                        PerformAverageBinnedNormalisation(ref normalIndexes, 16);
-                    else
-                        PerformAverageReadingsNormalisation(ref normalIndexes, 16);
-                    break;
+                switch (m_LightCurveController.Context.NormMethod)
+                {
+                    case LightCurveContext.NormalisationMethod.LinearFit:
+                        if (m_LightCurveController.Context.Binning > 0)
+                            PerformLinearFitBinnedNormalisation(ref normalIndexes);
+                        else
+                            PerformLinearFitReadingsNormalisation(ref normalIndexes);
+                        break;
+
+                    case LightCurveContext.NormalisationMethod.FrameByFrame:
+                        if (m_LightCurveController.Context.Binning > 0)
+                            PerformAverageBinnedNormalisation(ref normalIndexes, 1);
+                        else
+                            PerformAverageReadingsNormalisation(ref normalIndexes, 1);
+                        break;
+
+                    case LightCurveContext.NormalisationMethod.Average4Frame:
+                        if (m_LightCurveController.Context.Binning > 0)
+                            PerformAverageBinnedNormalisation(ref normalIndexes, 4);
+                        else
+                            PerformAverageReadingsNormalisation(ref normalIndexes, 4);
+                        break;
+
+                    case LightCurveContext.NormalisationMethod.Average8Frame:
+                        if (m_LightCurveController.Context.Binning > 0)
+                            PerformAverageBinnedNormalisation(ref normalIndexes, 8);
+                        else
+                            PerformAverageReadingsNormalisation(ref normalIndexes, 8);
+                        break;
+
+                    case LightCurveContext.NormalisationMethod.Average16Frame:
+                        if (m_LightCurveController.Context.Binning > 0)
+                            PerformAverageBinnedNormalisation(ref normalIndexes, 16);
+                        else
+                            PerformAverageReadingsNormalisation(ref normalIndexes, 16);
+                        break;
+                }
+
+                if (numberOfNormalisationStars == 1)
+                {
+                    for (int indx = 0; indx < normalIndexes.Count; indx++)
+                    {
+                        averagedNormalIndexes.Add(normalIndexes[indx]);
+                    }
+                }
+                else
+                {
+                    for (int indx = 0; indx < normalIndexes.Count; indx++)
+                    {
+                        averagedNormalIndexes[indx] = averagedNormalIndexes[indx] + normalIndexes[indx];
+                    }
+                }
+
+            }
+
+            // calculate the normalisation factor averaged over all the normalisation stars
+            for (int indx = 0; indx < normalIndexes.Count; indx++)
+            {
+                normalIndexes[indx] = averagedNormalIndexes[indx] / numberOfNormalisationStars;
             }
 
             int minValue = int.MaxValue;

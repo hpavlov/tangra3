@@ -86,7 +86,8 @@ namespace Tangra.Controller
 		private int m_Binning = 0;
 	    private int m_BinningFirstFrame = 0;
 		private int m_Normalisation = -1;
-		private FilterType m_Filter = FilterType.NoFilter;
+        private bool[] m_Normalisations = new bool[4];
+        private FilterType m_Filter = FilterType.NoFilter;
 		private NormalisationMethod m_NormMethod = NormalisationMethod.Average4Frame;
 		private float[] m_ReProcessApertures = new float[4];
 		private int[] m_ReProcessFitAreas = new int[4];
@@ -102,7 +103,7 @@ namespace Tangra.Controller
 		public uint MinFrame;
 		public uint MaxFrame;
 		public int ObjectCount;
-
+        
 		public uint m_SelectedFrameNo = 0;
 
 		private XAxisMode m_XAxisMode;
@@ -140,6 +141,7 @@ namespace Tangra.Controller
 		private ProcessingType m_bu_ProcessingType = ProcessingType.SignalMinusBackground;
 		private int m_bu_Binning = 0;
 		private int m_bu_Normalisation = -1;
+        private bool[] m_bu_Normalisations = new bool[4];
 		private FilterType m_bu_Filter = FilterType.NoFilter;
 		private NormalisationMethod mbu__NormMethod = NormalisationMethod.Average4Frame;
 		private float[] m_bu_ReProcessApertures = new float[4];
@@ -155,7 +157,10 @@ namespace Tangra.Controller
 			m_bu_ProcessingType = m_ProcessingType;
 			m_bu_Binning = m_Binning;
 			m_bu_Normalisation = m_Normalisation;
-			m_bu_Filter = m_Filter;
+            for (int i = 0; i < 4; i++)
+                m_bu_Normalisations[i] = m_Normalisations[i];
+
+            m_bu_Filter = m_Filter;
 			mbu__NormMethod = m_NormMethod;
 			bu_SelectedFrameNo = SelectedFrameNo;
 
@@ -178,7 +183,10 @@ namespace Tangra.Controller
 			m_ProcessingType = m_bu_ProcessingType;
 			m_Binning = m_bu_Binning;
 			m_Normalisation = m_bu_Normalisation;
-			m_Filter = m_bu_Filter;
+            for (int i = 0; i < 4; i++)
+                m_Normalisations[i] = m_bu_Normalisations[i];
+
+            m_Filter = m_bu_Filter;
 			m_NormMethod = mbu__NormMethod;
 			SelectedFrameNo = bu_SelectedFrameNo;
 
@@ -313,6 +321,11 @@ namespace Tangra.Controller
 			}
 		}
 
+        public bool[] Normalisations
+        {
+            get { return m_Normalisations; }
+        }
+
 		public FilterType Filter
 		{
 			get { return m_Filter; }
@@ -327,7 +340,7 @@ namespace Tangra.Controller
 			}
 		}
 
-		public NormalisationMethod NormMethod
+        public NormalisationMethod NormMethod
 		{
 			get { return m_NormMethod; }
 			set
@@ -335,7 +348,7 @@ namespace Tangra.Controller
 				if (m_NormMethod != value)
 				{
 					m_NormMethod = value;
-					// If the normalization is specified, changing the method will make the data durty
+					// If the normalization is specified, changing the method will make the data dirty
 					m_Dirty = m_Normalisation > -1;
 				}
 			}

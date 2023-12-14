@@ -2234,7 +2234,7 @@ namespace Tangra.Controller
 
 		private void ToggleAstroVideoStatusForm(bool forceShow)
 		{
-			if (IsAstroDigitalVideo)
+			if (IsAstroDigitalVideo && !IsAstroAnalogueVideo)
 			{
 				HideAavStatusForm();
 
